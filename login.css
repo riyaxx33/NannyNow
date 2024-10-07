@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Cooper+Hewitt:wght@400;700&display=swap');
+body{
+    margin:0px;
+    padding:0px;
+    background-color: rgb(241, 216, 241);
+}
+.jumbotron{
+    background-color: #cc94f0;
+    display:flex;
+    justify-content: center;
+    align-items:center;
+}
+img{
+    width: auto;
+    height:70px;
+}
+.title{
+    font-size: 50px;
+    padding-left: 20px;
+    color:white;
+    font-family: 'Cooper Hewitt', sans-serif;
+}
+.tagline{
+    font-family: 'Cooper Hewitt', sans-serif;
+    font-size: 40px;
+    
+}
