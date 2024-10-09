@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps Example</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Approximate Location</h1>
+    <div id="map"></div>
+    <script>
+        function initMap() {
+            // Approximate location coordinates
+            const approximateLocation = { lat: 37.7749, lng: -122.4194 }; // Example: San Francisco
+
+            // Create a map centered on the approximate location
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 12,
+                center: approximateLocation,
+            });
+
+            // Create a marker at the approximate location
+            const marker = new google.maps.Marker({
+                position: approximateLocation,
+                map: map,
+                title: "Click for more info",
+            });
+
+            // Add a click listener to the marker
+            marker.addListener("click", () => {
+                // Show a message instead of coordinates
+                alert("This is an approximate location in the area.");
+            });
+        }
+
+        // Initialize the map
+        initMap();
+    </script>
+</body>
+</html>
