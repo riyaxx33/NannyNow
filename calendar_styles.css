@@ -1,0 +1,47 @@
+body {
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+}
+
+.calendar {
+  background-color: #f9f9f9;
+}
+
+#month-year {
+  margin-bottom: 20px;
+}
+
+#calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.day {
+  padding: 15px;
+  border: 1px solid #ddd;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.day:hover {
+  background-color: #e9ecef;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .day {
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
+@media (min-width: 768px) {
+  .day {
+    font-size: 16px;
+    padding: 15px;
+  }
+}
