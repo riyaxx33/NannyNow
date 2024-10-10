@@ -43,3 +43,6 @@ const db = getFirestore(app);
 
 // Initialize Cloud Storage
 const storage = getStorage(app);
+
+// Export Firebase services
+export { auth, db };
