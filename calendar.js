@@ -1,10 +1,25 @@
 document.addEventListener("DOMContentLoaded", function () {
   const calendarGrid = document.getElementById("calendar-grid");
   const monthYear = document.getElementById("month-year");
-  const modal = new bootstrap.Modal(document.getElementById("event-modal"));
+  var modal = new bootstrap.Modal(document.getElementById("event-modal"));
   const eventForm = document.getElementById("event-form");
   const eventTitle = document.getElementById("event-title");
   const eventDate = document.getElementById("event-date");
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   const daysInMonth = (month, year) => new Date(year, month, 0).getDate();
   let currentDate = new Date();
@@ -13,7 +28,10 @@ document.addEventListener("DOMContentLoaded", function () {
     let year = currentDate.getFullYear();
     let month = currentDate.getMonth() + 1; // Months are 0-indexed
 
-    monthYear.textContent = daysInMonth(month, year);
+    monthYear.textContent = `${monthNames[month - 1]} ${year}`;
+
+    // Get the number of days in the month
+    let numDays = daysInMonth(month, year);
 
     // Clear previous days
     while (calendarGrid.firstChild) {
