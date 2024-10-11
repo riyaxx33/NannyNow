@@ -37,13 +37,14 @@ document.addEventListener("DOMContentLoaded", function () {
     monthYear.textContent = `${monthNames[month]} ${year}`;
 
     // Get the number of days in the month
-    let numDays = daysInMonth(month, year);
+    let numDays = daysInMonth(month + 1, year);
 
     // Clear previous days
     while (calendarGrid.firstChild) {
       calendarGrid.removeChild(calendarGrid.firstChild);
     }
 
+    /*
     // Add day labels
     daysOfWeek.forEach((day) => {
       let dayLabel = document.createElement("div");
@@ -51,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
       dayLabel.textContent = day;
       calendarGrid.appendChild(dayLabel);
     });
+    */
 
     // Fill empty slots before the 1st day of the month
     for (let i = 0; i < firstDayOfMonth; i++) {
@@ -58,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
       emptySlot.className = "col empty";
       calendarGrid.appendChild(emptySlot);
     }
+    ``;
 
     // Get today's date
     let today = new Date();
