@@ -16,6 +16,21 @@ body {
   gap: 5px;
 }
 
+.today {
+  background-color: #f0ad4e;
+  color: white;
+  border-radius: 50%;
+}
+
+.event {
+  background-color: #5bc0de;
+  color: white;
+  font-size: 0.75em;
+  padding: 2px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
 .day {
   padding: 15px;
   border: 1px solid #ddd;
