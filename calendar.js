@@ -24,13 +24,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
   let currentDate = new Date();
+  const events = {};
 
   // Calculate the number of days in a month
-  const daysInMonth = (month, year) => new Date(year, month, 0).getDate();
+  const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
 
   function renderCalendar() {
     let year = currentDate.getFullYear();
-    let month = currentDate.getMonth() + 1;
+    let month = currentDate.getMonth();
     let firstDayOfMonth = new Date(year, month, 1).getDay();
 
     monthYear.textContent = `${monthNames[month]} ${year}`;
@@ -58,11 +59,31 @@ document.addEventListener("DOMContentLoaded", function () {
       calendarGrid.appendChild(emptySlot);
     }
 
+    // Get today's date
+    let today = new Date();
+    let isToday = year === today.getFullYear() && month === today.getMonth();
+
     // Generate days
     for (let day = 1; day <= numDays; day++) {
       let dayElement = document.createElement("div");
       dayElement.className = "col day text-center border py-2";
+
+      // Check if this say is today and apply a special class
+      if (isToday && day === today.getDate()) {
+        dayElement.classList.add("today");
+      }
+
       dayElement.textContent = day;
+
+      // Display event if exists
+      const eventKey = `${year}-${month + 1}-${day}`;
+      if (events[eventKey]) {
+        let eventDiv = document.createElement("div");
+        eventDiv.className = "event";
+        eventDiv.textContent = events[eventKey];
+        dayElement.appendChild(eventDiv);
+      }
+
       dayElement.addEventListener("click", () =>
         openModal(year, month + 1, day)
       );
@@ -81,8 +102,12 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
     const title = eventTitle.value;
     const date = eventDate.value;
-    alert(`Event: ${title}\nDate: ${date}`);
+
+    // Store event
+    events[date] = title;
+    alert(`Event: ${title} added on ${date}`);
     modal.hide();
+    renderCalendar();
   });
 
   // Add event listeners for the navigation buttons
