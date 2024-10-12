@@ -1,295 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Indeed-like Job Listing Page</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nanny Job Listing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-      body {
-        padding-top: 60px;
-      }
+        body {
+            padding-top: 60px;
+        }
+    
+        /* Make the right details container fixed */
+        #detailsContainer {
+            position: sticky;
+            top: 60px; /* Matches the navbar height to keep it aligned */
+            border-left: 1px solid #ccc;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            height: calc(100vh - 60px); /* Ensures it takes full height minus the navbar */
+            overflow-y: auto; /* Allow vertical scroll within the container if content exceeds */
+        }
 
-      /* Make the right details container fixed */
-      #detailsContainer {
-        position: sticky;
-        top: 60px; /* Matches the navbar height to keep it aligned */
-        border-left: 1px solid #ccc;
-        border: 2px solid #ddd;
-        border-radius: 5px;
-        padding: 20px;
-        height: calc(
-          100vh - 60px
-        ); /* Ensures it takes full height minus the navbar */
-        overflow-y: hidden; /* Disable scrolling for the entire container */
-      }
+        /* Styling the container that holds the job description */
+        #jobDescriptionContainer {
+            height: 300px; /* Set a fixed height for the description section */
+            overflow-y: auto; /* Enables vertical scrolling */
+            padding: 10px;
+            border: 1px solid #ddd; /* Optional: Add a border around the scrollable area */
+            margin-top: 15px;
+        }
 
-      /* Styling the container that holds the job description */
-      #jobDescriptionContainer {
-        height: calc(
-          100% - 70px
-        ); /* Adjust to fill the rest of the container */
-        overflow-y: auto; /* Enables vertical scrolling */
-        padding: 10px;
-        border: 1px solid #ddd; /* Optional: Add a border around the scrollable area */
-        margin-top: 15px;
-      }
+        /* Job card styling */
+        .job-card {
+            cursor: pointer;
+            margin-bottom: 10px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+    
+        .job-card:hover {
+            background-color: #f8f9fa;
+        }
+    
+        .job-card img {
+            width: 100px;
+            height: 100px;
+            margin-right: 15px;
+        }
+    
+        .job-card-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+    
+        .job-description {
+            flex-grow: 1;
+        }
 
-      /* Job card styling similar to Indeed */
-      .job-card {
-        cursor: pointer;
-        margin-bottom: 10px;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: background-color 0.3s ease;
-        height: 200px; /* Compact height */
-      }
-
-      .job-card:hover {
-        background-color: #f8f9fa;
-      }
-
-      .job-card img {
-        width: 100px;
-        height: 100px;
-        margin-right: 15px;
-      }
-
-      .job-card-content {
-        display: flex;
-        align-items: center;
-        width: 100%;
-      }
-
-      .job-description {
-        flex-grow: 1;
-      }
-
-      #jobSearch {
-        width: 100%; /* Makes the search bar take full width of its container */
-        border-radius: 4px; /* Optional: Rounded corners */
-        border: 1px solid #ccc; /* Optional: Border color */
-        padding: 10px; /* Optional: Padding inside the input */
-        box-shadow: none; /* Removes the default input shadow */
-      }
+        /* Optional: Styling for filters */
+        #dayFilter, #timeFilter, #salaryFilter {
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
     </style>
-  </head>
-  <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-      <div class="container">
-        <a class="navbar-brand" href="#">NANYNow</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">Company Name</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="parent_post.html">Posts</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Chats</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">My Profile</a>
-            </li>
-          </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Post a Job</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+            </ul>
         </div>
-      </div>
-    </nav>
-
-    <div class="container mt-3">
-      <input
-        type="text"
-        id="jobSearch"
-        class="form-control"
-        placeholder="Search for NANNY..."
-        onkeyup="searchJobs()"
-      />
     </div>
+</nav>
 
-    <!-- Main Content Section -->
-    <div class="container mt-5">
-      <div class="row">
+<!-- Filters Section -->
+<div class="mt-3 container">
+    <div class="row">
+        <!-- Day Filter -->
+        <div class="col-md-3">
+            <select id="dayFilter" class="form-control" onchange="filterJobs()">
+                <option value="">Select Day</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+            </select>
+        </div>
+
+        <!-- Time Filter -->
+        <div class="col-md-3">
+            <select id="timeFilter" class="form-control" onchange="filterJobs()">
+                <option value="">Select Time</option>
+                <option value="Morning">Morning</option>
+                <option value="Afternoon">Afternoon</option>
+                <option value="Evening">Evening</option>
+                <option value="Night">Night</option>
+            </select>
+        </div>
+
+        <!-- Salary Filter -->
+        <div class="col-md-3">
+            <input type="number" id="salaryFilter" class="form-control" placeholder="Enter max salary" onkeyup="filterJobs()">
+        </div>
+
+        <!-- Reset Filters Button -->
+        <div class="col-md-3">
+            <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Section -->
+<div class="container mt-5">
+    <div class="row">
         <!-- Job Cards Section -->
         <div class="col-md-6">
-          <div class="list-group">
-            <div
-              class="list-group-item job-card"
-              onclick="showDetails('Nanny 1', 'Description for Nanny 1')"
-            >
-              <div class="job-card-content">
-                <img src="https://via.placeholder.com/60" alt="Job 1 Image" />
-                <div class="job-description">
-                  <h5>Nanny 1</h5>
-                  <p>San Francisco, CA</p>
+            <div class="list-group">
+                <div class="list-group-item job-card" data-day="Monday" data-time="Morning" data-salary="50" onclick="showDetails('Nanny 1', 'Description for Nanny 1')">
+                    <div class="job-card-content">
+                        <img src="https://via.placeholder.com/60" alt="Job 1 Image">
+                        <div class="job-description">
+                            <h5>Nanny 1</h5>
+                            <p>San Francisco, CA</p>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div
-              class="list-group-item job-card"
-              onclick="showDetails('Nanny 2', 'Description for Nanny 2')"
-            >
-              <div class="job-card-content">
-                <img src="https://via.placeholder.com/60" alt="Job 2 Image" />
-                <div class="job-description">
-                  <h5>Nanny 2</h5>
-                  <p>New York, NY</p>
+                <div class="list-group-item job-card" data-day="Tuesday" data-time="Afternoon" data-salary="40" onclick="showDetails('Nanny 2', 'Description for Nanny 2')">
+                    <div class="job-card-content">
+                        <img src="https://via.placeholder.com/60" alt="Job 2 Image">
+                        <div class="job-description">
+                            <h5>Nanny 2</h5>
+                            <p>New York, NY</p>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div
-              class="list-group-item job-card"
-              onclick="showDetails('Nanny 3', 'Description for Nanny 3')"
-            >
-              <div class="job-card-content">
-                <img src="https://via.placeholder.com/60" alt="Job 3 Image" />
-                <div class="job-description">
-                  <h5>Nanny 3</h5>
-                  <p>Chicago, IL</p>
+                <div class="list-group-item job-card" data-day="Wednesday" data-time="Evening" data-salary="60" onclick="showDetails('Nanny 3', 'Description for Nanny 3')">
+                    <div class="job-card-content">
+                        <img src="https://via.placeholder.com/60" alt="Job 3 Image">
+                        <div class="job-description">
+                            <h5>Nanny 3</h5>
+                            <p>Chicago, IL</p>
+                        </div>
+                    </div>
                 </div>
+                <!-- More job cards here... -->
+                <div class="list-group-item job-card" data-day="Wednesday" data-time="Evening" data-salary="60" onclick="showDetails('Nanny 3', 'Description for Nanny 3')">
+                  <div class="job-card-content">
+                      <img src="https://via.placeholder.com/60" alt="Job 3 Image">
+                      <div class="job-description">
+                          <h5>Nanny 3</h5>
+                          <p>Chicago, IL</p>
+                      </div>
+                  </div>
               </div>
-            </div>
-            <div
-              class="list-group-item job-card"
-              onclick="showDetails('Nanny 4', 'Description for Nanny 4')"
-            >
-              <div class="job-card-content">
-                <img src="https://via.placeholder.com/60" alt="Job 4 Image" />
-                <div class="job-description">
-                  <h5>Nanny 4</h5>
-                  <p>Austin, TX</p>
+              <div class="list-group-item job-card" data-day="Wednesday" data-time="Evening" data-salary="60" onclick="showDetails('Nanny 3', 'Description for Nanny 3')">
+                <div class="job-card-content">
+                    <img src="https://via.placeholder.com/60" alt="Job 3 Image">
+                    <div class="job-description">
+                        <h5>Nanny 3</h5>
+                        <p>Chicago, IL</p>
+                    </div>
                 </div>
-              </div>
             </div>
-            <div
-              class="list-group-item job-card"
-              onclick="showDetails('Nanny 5', 'Description for Nanny 5')"
-            >
+            <div class="list-group-item job-card" data-day="Wednesday" data-time="Evening" data-salary="60" onclick="showDetails('Nanny 3', 'Description for Nanny 3')">
               <div class="job-card-content">
-                <img src="https://via.placeholder.com/60" alt="Job 5 Image" />
-                <div class="job-description">
-                  <h5>Nanny 5</h5>
-                  <p>Seattle, WA</p>
-                </div>
+                  <img src="https://via.placeholder.com/60" alt="Job 3 Image">
+                  <div class="job-description">
+                      <h5>Nanny 3</h5>
+                      <p>Chicago, IL</p>
+                  </div>
               </div>
-            </div>
           </div>
+          <div class="list-group-item job-card" data-day="Wednesday" data-time="Evening" data-salary="60" onclick="showDetails('Nanny 3', 'Description for Nanny 3')">
+            <div class="job-card-content">
+                <img src="https://via.placeholder.com/60" alt="Job 3 Image">
+                <div class="job-description">
+                    <h5>Nanny 3</h5>
+                    <p>Chicago, IL</p>
+                </div>
+            </div>
+        </div>
+            </div>
         </div>
 
         <!-- Job Details Section -->
         <div class="col-md-6" id="detailsContainer">
-          <h4 id="nannyName">click to see nanny name</h4>
-          <div id="jobDetails">SEE WHAT</div>
+            <h4 id="nannyName">Job Details</h4>
+            <div id="jobDetails">Select a job to see details</div>
+            
+            <!-- Scrollable job description section -->
+            <div id="jobDescriptionContainer">
+                <div id="jobDescription">Lorem ipsum odor amet, consectetuer adipiscing elit. 
+                  Convallis mattis nulla viverra taciti cursus lorem interdum. Quis sem tempus urna nibh a viverra duis. 
+                  Class pellentesque aliquet pulvinar natoque est mauris. Lacus blandit molestie efficitur platea pretium. 
+                  Conubia pellentesque iaculis, congue nisl luctus finibus tristique a imperdiet? Dictum sem fusce urna suscipit suspendisse.
 
-          <!-- Scrollable job description section -->
-          <div id="jobDescriptionContainer">
-            <div id="jobDescription">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-              lacinia odio vitae vestibulum. Cras et ligula eget odio aliquam
-              vulputate. Curabitur sit amet orci nec odio fermentum accumsan.
-              Integer ac felis id turpis faucibus varius. Sed quis sapien a
-              metus pretium pellentesque. Etiam sollicitudin arcu a lacus
-              tincidunt, et malesuada justo pharetra. Fusce volutpat diam vitae
-              orci scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus
-              ipsum at lacus venenatis, a facilisis sapien elementum. Lorem
-              ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia
-              odio vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
-              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
-              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
-              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
-              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
-              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
-              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
-              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
-              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
-              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
-              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum.
+                  Aliquet donec gravida; dolor tristique class platea. Ipsum mus vehicula lacinia ultricies condimentum dui vehicula. 
+                  Eu aptent nascetur volutpat class sociosqu. Fringilla vestibulum dolor cras non porta; semper tempus venenatis. 
+                  Imperdiet suspendisse donec massa eros sit. Leo nascetur vitae, porta libero tincidunt cras ullamcorper. 
+                  Tortor rutrum dolor nascetur nisl tellus morbi. Torquent pretium hendrerit non mollis magna penatibus tempus. 
+                  Sodales sem iaculis morbi sociosqu varius nisl. Dolor scelerisque ornare nec praesent ultricies aliquam.
+                  
+                  Sit dui maecenas dignissim convallis interdum lobortis maximus diam ac. Nostra ac venenatis pharetra eget mollis aliquet etiam. 
+                  Purus commodo semper varius enim magna hendrerit. Aliquet leo parturient lorem himenaeos in lacus ligula. 
+                  Imperdiet natoque felis malesuada a condimentum erat pharetra. Morbi posuere lobortis odio ac erat himenaeos varius per nunc. 
+                  Est ex aliquet tempor praesent, odio commodo lacus. Sodales turpis mollis mi adipiscing non libero.
+                  
+                  Risus volutpat vulputate est libero quisque ridiculus urna curae nec. Molestie turpis molestie magnis magnis lorem lacus a dignissim primis. 
+                  Dignissim fames tempor diam in semper augue gravida. In habitant ligula mattis semper vulputate ex nisl. Auctor rhoncus elit integer lectus nisi, lacus eros. 
+                  Suspendisse laoreet feugiat risus magna potenti condimentum ornare. Class metus maecenas metus maecenas facilisis curabitur. 
+                  Aliquam adipiscing aliquet porta volutpat malesuada.
+                  
+                  Magna blandit convallis semper, varius curabitur nostra. Ipsum ante finibus nascetur euismod nam nibh dui. 
+                  Fermentum nam sapien mus turpis penatibus aliquet massa. Litora dapibus libero gravida at taciti ante. 
+                  Purus est turpis nisl ultrices justo aliquet. Venenatis scelerisque efficitur morbi vel faucibus orci tristique parturient bibendum. 
+                  Dui praesent porta mollis semper non donec rutrum ad. Viverra rutrum egestas maximus etiam volutpat duis dui. Elementum congue lacus vivamus; 
+                  nec ut metus maximus vehicula.</div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
+</div>
 
-    <script>
-      function showDetails(title, description) {
-        document.getElementById("nannyName").innerHTML = title;
-        document.getElementById("jobDetails").innerHTML = description;
-        // document.getElementById("jobDescription").innerHTML = "Detailed description for " + title;
-      }
+<script>
+    function showDetails(title, description) {
+        document.getElementById('nannyName').innerHTML = title;
+        document.getElementById('jobDetails').innerHTML = description;
+    }
 
-      function searchJobs() {
-        const input = document.getElementById("jobSearch");
-        const filter = input.value.toLowerCase();
-        const jobCards = document.querySelectorAll(".job-card");
+    // Filter jobs based on day, time, and salary
+    function filterJobs() {
+        var dayFilter = document.getElementById('dayFilter').value;
+        var timeFilter = document.getElementById('timeFilter').value;
+        var salaryFilter = document.getElementById('salaryFilter').value;
 
-        jobCards.forEach((card) => {
-          const title = card.querySelector("h5").textContent.toLowerCase();
-          const location = card.querySelector("p").textContent.toLowerCase();
-          if (title.includes(filter) || location.includes(filter)) {
-            card.style.display = "";
-          } else {
-            card.style.display = "none";
-          }
+        var jobCards = document.querySelectorAll('.job-card');
+        
+        jobCards.forEach(function(card) {
+            var day = card.getAttribute('data-day');
+            var time = card.getAttribute('data-time');
+            var salary = card.getAttribute('data-salary');
+
+            // Check if the card matches the selected filters
+            var matchesDay = dayFilter === "" || day === dayFilter;
+            var matchesTime = timeFilter === "" || time === timeFilter;
+            var matchesSalary = salaryFilter === "" || parseInt(salary) <= parseInt(salaryFilter);
+
+            if (matchesDay && matchesTime && matchesSalary) {
+                card.style.display = "block"; // Show card if it matches the filters
+            } else {
+                card.style.display = "none"; // Hide card if it doesn't match
+            }
         });
-      }
-    </script>
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="backend/firebase-config.js"></script>
-  </body>
+    // Reset all filters and show all jobs
+    function resetFilters() {
+        document.getElementById('dayFilter').value = "";
+        document.getElementById('timeFilter').value = "";
+        document.getElementById('salaryFilter').value = "";
+
+        var jobCards = document.querySelectorAll('.job-card');
+        jobCards.forEach(function(card) {
+            card.style.display = "block"; // Show all cards
+        });
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
+
