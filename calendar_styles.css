@@ -1,46 +1,61 @@
 body {
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
 }
 
 .calendar {
-  background-color: #f9f9f9;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
 }
 
 #month-year {
+  font-size: 1.5em;
+  text-align: center;
   margin-bottom: 20px;
+  color: #333;
 }
 
 #calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 10px;
 }
 
 .today {
-  background-color: #f0ad4e;
+  background-color: #007aff;
   color: white;
   border-radius: 50%;
 }
 
 .event {
-  background-color: #5bc0de;
+  background-color: #ffcc00;
   color: white;
-  font-size: 0.75em;
-  padding: 2px;
+  font-size: 0.85em;
+  padding: 5px;
   border-radius: 4px;
   margin-top: 4px;
+  text-align: center;
 }
 
 .day {
   padding: 15px;
-  border: 1px solid #ddd;
+  border: 1px solid #e0e0e0;
   text-align: center;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, transform 0.2s;
+  border-radius: 8px;
+  background-color: #ffffff;
 }
 
 .day:hover {
-  background-color: #e9ecef;
+  background-color: #f0f0f0;
+  transform: scale(1.02);
 }
 
 .modal-body {
@@ -49,14 +64,14 @@ body {
 
 @media (max-width: 768px) {
   .day {
-    font-size: 12px;
-    padding: 10px;
+    font-size: 14px;
+    padding: 12px;
   }
 }
 
 @media (min-width: 768px) {
   .day {
-    font-size: 16px;
+    font-size: 18px;
     padding: 15px;
   }
 }
