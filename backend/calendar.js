@@ -1,35 +1,71 @@
+// Import Firebase services from firebase-config.js
+import { auth, db } from "./firebase-config.js";
+import {
+  doc,
+  setDoc,
+  onSnapshot,
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
 document.addEventListener("DOMContentLoaded", function () {
-  const calendarGrid = document.getElementById("calendar-grid");
-  const monthYear = document.getElementById("month-year");
-  var modal = new bootstrap.Modal(document.getElementById("event-modal"));
-  const eventForm = document.getElementById("event-form");
-  const eventTitle = document.getElementById("event-title");
-  const eventDate = document.getElementById("event-date");
+  // Define userId globally
+  let userId = null;
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  // Initialise events object globally
+  let events = {};
 
-  const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+  // Monitor authentication state
+  onAuthStateChanged(auth, (user) => {
+    // User is logged in
+    if (user) {
+      userId = user.uid;
+      // Load events only if user is authenticated
+      loadUserEvents(userId);
+    } else {
+      // User is not logged in; redirect to login page
+      window.location.href = "../login_page.html";
+    }
+  });
 
-  let currentDate = new Date();
-  const events = {};
+  // Fetch and display user's events from Firebase
+  async function loadUserEvents() {
+    const userDoc = doc(db, "users", userId);
+    onSnapshot(userDoc, (docSnap) => {
+      if (docSnap.exists()) {
+        // load events
+        events = docSnap.data().events || {};
 
-  // Calculate the number of days in a month
-  const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
+        // render calendar with loaded events
+        renderCalendar(events);
+      }
+    });
+  }
 
-  function renderCalendar() {
+  function renderCalendar(events) {
+    const calendarGrid = document.getElementById("calendar-grid");
+    const monthYear = document.getElementById("month-year");
+    let currentDate = new Date();
+
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    // const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+    // Calculate the number of days in a month
+    const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
+
     let year = currentDate.getFullYear();
     let month = currentDate.getMonth();
     let firstDayOfMonth = new Date(year, month, 1).getDay();
@@ -60,7 +96,6 @@ document.addEventListener("DOMContentLoaded", function () {
       emptySlot.className = "col empty";
       calendarGrid.appendChild(emptySlot);
     }
-    ``;
 
     // Get today's date
     let today = new Date();
@@ -95,22 +130,38 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function openModal(year, month, day) {
-    eventDate.value = `${year}-${month < 10 ? "0" : ""}${month}-${
-      day < 10 ? "0" : ""
-    }${day}`;
+    var modal = new bootstrap.Modal(document.getElementById("event-modal"));
+    const eventDate = document.getElementById("event-date");
+    eventDate.value = `${year}-${month.toString().padStart(2, "0")}-${day
+      .toString()
+      .padStart(2, "0")}`;
     modal.show();
   }
 
-  eventForm.addEventListener("submit", (e) => {
+  const eventForm = document.getElementById("event-form");
+  eventForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const eventTitle = document.getElementById("event-title");
+    const eventDate = document.getElementById("event-date");
     const title = eventTitle.value;
     const date = eventDate.value;
 
     // Store event
     events[date] = title;
-    alert(`Event: ${title} added on ${date}`);
-    modal.hide();
-    renderCalendar();
+
+    // Save event to Firebase
+    try {
+      const userDoc = doc(db, "users", userId);
+      const eventData = { [`events.${date}`]: title };
+      await setDoc(userDoc, { events }, { merge: true });
+      alert(`Event: ${title} added on ${date}`);
+      bootstrap.Modal.getInstance(
+        document.getElementById("event-modal")
+      ).hide();
+      renderCalendar(events);
+    } catch (error) {
+      console.error("Error saving event: ", error);
+    }
   });
 
   // Add event listeners for the navigation buttons
@@ -124,5 +175,5 @@ document.addEventListener("DOMContentLoaded", function () {
     renderCalendar();
   });
 
-  renderCalendar();
+  // renderCalendar();
 });
