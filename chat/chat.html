@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Chat</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        }
+        .chat-box {
+        width: 400px;
+        max-width: 100%;
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        }
+        .messages {
+        height: 300px;
+        overflow-y: scroll;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        }
+        .message {
+        margin-bottom: 10px;
+        }
+        .message p {
+        margin: 0;
+        }
+        .send-box {
+        display: flex;
+        }
+        .send-box input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        }
+        .send-box button {
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 10px;
+        }
+        .send-box button:hover {
+        background-color: #0056b3;
+        }
+    </style>
+    </head>
+    <body>
+
+    <div class="chat-box">
+    <h2>Chat Room</h2>
+
+    <!-- Display chat messages -->
+    <div class="messages" id="message-display"></div>
+
+    <!-- Input field and Send button -->
+    <div class="send-box">
+        <input type="text" id="message-input" placeholder="Type a message..." />
+        <button id="send-btn">Send</button>
+    </div>
+    </div>
+
+    <script>
+    // Firebase configuration (replace with your project's settings)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDhfIueghJR04KUXmMqkmOIr6ZWKDtNDRI",
+        authDomain: "nannynow-5e87d.firebaseapp.com",
+        projectId: "nannynow-5e87d",
+        storageBucket: "nannynow-5e87d.appspot.com",
+        messagingSenderId: "220123277584",
+        appId: "1:220123277584:web:496e0632568cee90a89d95",
+};
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Initialize Firestore
+    const db = firebase.firestore();
+
+    // Function to send a chat message to Firestore
+    function sendMessage(chatID, senderID, messageText) {
+        db.collection('chats').doc(chatID).collection('messages').add({
+        senderID: senderID,
+        text: messageText,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+        console.log('Message sent');
+        })
+        .catch((error) => {
+        console.error('Error sending message: ', error);
+        });
+    }
+
+    // Function to listen for new messages in a chat
+    function loadMessages(chatID) {
+        db.collection('chats').doc(chatID).collection('messages')
+        .orderBy('timestamp')
+        .onSnapshot((snapshot) => {
+            const messageDisplay = document.getElementById('message-display');
+            messageDisplay.innerHTML = '';
+
+            snapshot.forEach((doc) => {
+            const message = doc.data();
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+
+            const messageContent = document.createElement('p');
+            messageContent.innerText = `${message.senderID}: ${message.text}`;
+            messageElement.appendChild(messageContent);
+
+            messageDisplay.appendChild(messageElement);
+            });
+
+            // Scroll to the bottom of the chat
+            messageDisplay.scrollTop = messageDisplay.scrollHeight;
+        });
+    }
+
+    // Example chat and sender ID
+    const chatID = "chat123";  // Replace with actual chat ID
+    const senderID = "user456";  // Replace with actual sender/user ID
+
+    // Load messages for a specific chat
+    loadMessages(chatID);
+
+    // Sending a message
+    document.getElementById('send-btn').addEventListener('click', function() {
+        const messageInput = document.getElementById('message-input');
+        const messageText = messageInput.value;
+
+        if (messageText.trim()) {
+        sendMessage(chatID, senderID, messageText);
+        messageInput.value = '';  // Clear the input after sending
+        }
+    });
+    </script>
+
+</body>
+</html>
+
