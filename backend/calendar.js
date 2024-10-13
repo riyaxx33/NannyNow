@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialise events object globally
   let events = {};
 
+  let currentDate = new Date();
+
   // Monitor authentication state
   onAuthStateChanged(auth, (user) => {
     // User is logged in
@@ -37,14 +39,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // render calendar with loaded events
         renderCalendar(events);
+      } else {
+        console.log("No user document found.");
+        events = {};
+        renderCalendar(events);
       }
     });
   }
 
+  // renderCalendar(events);
+
   function renderCalendar(events) {
+    console.log("Rendering Calendar for:", currentDate);
+
     const calendarGrid = document.getElementById("calendar-grid");
     const monthYear = document.getElementById("month-year");
-    let currentDate = new Date();
 
     const monthNames = [
       "January",
@@ -61,10 +70,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "December",
     ];
 
-    // const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-
     // Calculate the number of days in a month
-    const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
+    const daysInMonth = (month, year) => new Date(year, month, 0).getDate();
 
     let year = currentDate.getFullYear();
     let month = currentDate.getMonth();
@@ -79,16 +86,6 @@ document.addEventListener("DOMContentLoaded", function () {
     while (calendarGrid.firstChild) {
       calendarGrid.removeChild(calendarGrid.firstChild);
     }
-
-    /*
-    // Add day labels
-    daysOfWeek.forEach((day) => {
-      let dayLabel = document.createElement("div");
-      dayLabel.className = "col fw-bold text-center";
-      dayLabel.textContent = day;
-      calendarGrid.appendChild(dayLabel);
-    });
-    */
 
     // Fill empty slots before the 1st day of the month
     for (let i = 0; i < firstDayOfMonth; i++) {
@@ -112,6 +109,10 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       dayElement.textContent = day;
+
+      if (!events) {
+        events = {};
+      }
 
       // Display event if exists
       const eventKey = `${year}-${month + 1}-${day}`;
@@ -141,6 +142,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const eventForm = document.getElementById("event-form");
   eventForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    if (!userId) {
+      console.error("User is not authenticated. Cannot save event.");
+      alert("You must be logged in to add an event.");
+      return; // Exit if not authenticated
+    }
+
     const eventTitle = document.getElementById("event-title");
     const eventDate = document.getElementById("event-date");
     const title = eventTitle.value;
@@ -166,11 +174,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Add event listeners for the navigation buttons
   document.getElementById("prev-month").addEventListener("click", () => {
+    console.log("Previous month:", currentDate);
     currentDate.setMonth(currentDate.getMonth() - 1);
     renderCalendar();
   });
 
   document.getElementById("next-month").addEventListener("click", () => {
+    console.log("Next month:", currentDate);
     currentDate.setMonth(currentDate.getMonth() + 1);
     renderCalendar();
   });
