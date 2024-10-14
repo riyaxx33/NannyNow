@@ -1,0 +1,102 @@
+/* Header Section */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background-color: #faf9f6;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.logoo {
+  height: 60px;
+  width: auto;
+}
+
+header .auth-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.auth-buttons .btn {
+  padding: 10px 20px;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.auth-buttons .signup {
+  background-color: #d3d3d3;
+}
+
+.auth-buttons .btn:hover {
+  background-color: #ccc;
+}
+
+/* Main Heading */
+h1.title {
+  font-size: 50px;
+  font-weight: bold;
+  color: #333; /* Match existing text color */
+}
+
+/* Signup Form */
+form {
+  display: flex;
+  flex-direction: column;
+  background-color: #faf9f6; /* Background for the form */
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+select {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  width: 100%; /* Full width */
+  max-width: 400px; /* Maximum width */
+  font-size: 16px;
+}
+
+/* Add Child Button */
+#addChildBtn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #d3d3d3; /* Match existing button color */
+  border: none;
+  border-radius: 5px;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#addChildBtn:hover {
+  background-color: #ccc; /* Hover effect */
+}
+
+/* Child Details Section */
+.child-details {
+  width: 100%;
+  max-width: 400px; /* Consistent width with inputs */
+  background-color: #f9f3e5; /* Light background for child sections */
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Error Message */
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
