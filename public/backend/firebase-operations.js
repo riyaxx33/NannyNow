@@ -12,6 +12,10 @@ import { db } from "./firebase-config.js";
 
 const storage = getStorage();
 
+export function redirectToParentHome() {
+  window.location.href = "/parent_home.html";
+}
+
 export async function storeParentData(user, formData) {
   try {
     let profilePictureUrl = null;
@@ -70,8 +74,4 @@ export function handleFileUpload(event) {
     return file;
   }
   return null;
-}
-
-export function redirectToParentHome() {
-  window.location.href = "/parent_home.html";
 }
