@@ -37,7 +37,7 @@
         <h1>Parent Signup Form</h1>
         <!-- Email row -->
         <div class="row">
-          <div class="col-12">
+          <div class="col-md-6 mb-4">
             <label for="email" class="form-label"></label>
             <input
               type="email"
@@ -47,6 +47,23 @@
               v-model="email"
               required
             />
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="profilePicture" class="form-label d-block fw-bold"
+                >Upload Your Profile Picture</label
+              >
+              <input
+                type="file"
+                id="profilePicture"
+                @change="handleFileUpload"
+                accept="image/*"
+                class="form-control-file"
+              />
+              <small class="text-muted d-block mt-2"
+                >Only image files of sizes smaller than 5MB are accepted.</small
+              >
+            </div>
           </div>
         </div>
         <div class="row">
