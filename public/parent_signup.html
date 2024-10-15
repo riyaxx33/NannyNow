@@ -210,12 +210,22 @@
         >
           Add Another Child
         </button>
+
+        <div class="row">
+          <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+          </div>
+        </div>
       </form>
     </div>
 
     <script type="module">
       import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
-      import { storeParentData } from "../backend/firebase-operations.js";
+      import {
+        storeParentData,
+        handleFileUpload,
+        redirectToParentHome,
+      } from "../backend/firebase-operations.js";
       import { auth } from "../backend/firebase-config.js";
       import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
@@ -233,6 +243,7 @@
             confirmPassword: "",
             passwordError: "",
             confirmPasswordError: "",
+            profilePicture: null,
           };
         },
         computed: {
@@ -273,6 +284,15 @@
             }
           },
 
+          handleProfilePictureUpload(event) {
+            const file = handleFileUpload(event);
+            if (file) {
+              this.profilePicture = file;
+            } else {
+              this.profilePicture = null;
+            }
+          },
+
           async handleSubmit() {
             if (!this.isFormValid) {
               console.log("Form is not valid");
@@ -295,9 +315,11 @@
                 gender: this.gender,
                 homeAddress: this.homeAddress,
                 children: this.children,
+                profilePicture: this.profilePicture,
               });
 
               console.log("User registered successfully");
+              redirectToParentHome();
             } catch (error) {
               console.log("Error in signup process:", error);
             }
