@@ -12,6 +12,7 @@ import { db } from "./firebase-config.js";
 
 const storage = getStorage();
 
+// redirect to parent homepage
 export function redirectToParentHome() {
   window.location.href = "/parent_home.html";
 }
