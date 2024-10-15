@@ -1,0 +1,79 @@
+/* Reset margins and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center children horizontally */
+    font-family: 'Roboto', sans-serif; /* Set font for body */
+    background-color: #f9f3e5; /* Optional background color */
+}
+
+header {
+    background-color: #faf9f6; /* Light background color for the header */
+    padding: 20px; /* Adds space inside the header */
+    width: 100%; /* Ensure the header takes full width */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+}
+
+.logoo {
+    width: 150px; /* Adjust logo size as needed */
+    margin-left:20px;
+}
+
+.login-container {
+    margin-top: 20px; /* Adds space above the login container */
+    display: flex;
+    justify-content: center; /* Center login box */
+    align-items: center; /* Center vertically */
+    flex-direction: column; /* Stacks children vertically */
+    width:500px;
+}
+
+.login-box {
+    background-color: white; /* Background color for the login box */
+    padding: 20px; /* Space inside the login box */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    width:100%;
+}
+
+.login-box h2 {
+    margin-bottom:15px;
+    display:flex;
+    justify-content:center;
+}
+
+.input-group {
+    margin-bottom: 15px; /* Space between input fields */
+}
+
+.input-group label {
+    display: block; /* Label on a new line */
+    margin-bottom: 10px; /* Space below label */
+}
+
+.input-group input {
+    width: 100%; /* Full width */
+    padding: 10px; /* Space inside input */
+    border: 1px solid #ccc; /* Border style */
+    border-radius: 4px; /* Rounded corners */
+}
+
+.btn {
+    width: 100%; /* Full width */
+    padding: 10px; /* Space inside button */
+    background-color: #d3d3d3; /* Green background */
+    color:black; /* White text */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.btn:hover {
+    background-color: #ccc; /* Darker green on hover */
+}

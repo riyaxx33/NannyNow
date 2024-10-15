@@ -44,6 +44,10 @@ h1.title {
   color: #333; /* Match existing text color */
 }
 
+.container{
+  padding-top: 20px;
+}
+
 /* Signup Form */
 form {
   display: flex;
@@ -100,3 +104,4 @@ select {
   color: red;
   margin-top: 10px;
 }
+ 
