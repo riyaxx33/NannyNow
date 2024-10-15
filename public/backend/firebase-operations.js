@@ -72,6 +72,6 @@ export function handleFileUpload(event) {
   return null;
 }
 
-function redirectToParentHome() {
-  window.location.href = "../public/parent_home.html";
+export function redirectToParentHome() {
+  window.location.href = "/parent_home.html";
 }
