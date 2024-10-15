@@ -22,8 +22,9 @@
   </head>
 
   <header>
-    <img class="logoo" src="img/logo.png" alt="Nany logo" />
-    <!-- Add your logo here -->
+    <a href="first_page.html">
+      <img class="logoo" src="img/logo.png" alt="Nany logo" />
+    </a>
     <div class="auth-buttons">
       <a href="login_page.html" class="btn login">Login</a>
       <a href="#" class="btn signup">Sign Up</a>
@@ -46,6 +47,40 @@
               v-model="email"
               required
             />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <label for="password" class="form-label"></label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              placeholder="Password"
+              v-model="password"
+              required
+              @input="validatePassword"
+            />
+            <div v-if="passwordError" class="text-danger">
+              {{ passwordError }}
+            </div>
+          </div>
+
+          <!-- confirm password -->
+          <div class="col-6">
+            <label for="confirmPassword" class="form-label"></label>
+            <input
+              type="password"
+              class="form-control"
+              id="confirmPassword"
+              placeholder="Confirm Password"
+              v-model="password"
+              required
+              @input="validatePassword"
+            />
+            <div v-if="confirmPasswordError" class="text-danger">
+              {{ confirmPasswordError }}
+            </div>
           </div>
         </div>
 
@@ -177,18 +212,61 @@
             gender: "",
             homeAddress: "",
             children: [{ name: "", age: null }],
+            password: "",
+            confirmPassword: "",
+            passwordError: "",
+            confirmPasswordError: "",
           };
         },
+        computed: {
+          isFormValid() {
+            return (
+              this.email &&
+              this.firstName &&
+              this.lastName &&
+              this.dob &&
+              this.homeAddress & this.password &&
+              this.confirmPassword &&
+              !this.passwordError &&
+              !this.confirmPasswordError
+            );
+          },
+        },
+
         methods: {
           addChild() {
             this.children.push({ name: "", age: null });
           },
+
+          validatePassword() {
+            // Password must be at least 8 characters long and contain a number
+            const passwordRegex = /^(?=.*\d).{8,}$/;
+
+            if (!passwordRegex.test(this.password)) {
+              this.passwordError =
+                "Password must be at least 8 characters long and contain a number";
+            } else {
+              this.passwordError = "";
+            }
+
+            if (this.password !== this.confirmPassword) {
+              this.confirmPasswordError = "Passwords do not match";
+            } else {
+              this.confirmPasswordError = "";
+            }
+          },
+
           async handleSubmit() {
+            if (!this.isFormValid) {
+              console.log("Form is not valid");
+              return;
+            }
+
             try {
               const userCredential = await createUserWithEmailAndPassword(
                 auth,
                 this.email,
-                "tempPassword"
+                this.password
               );
               const user = userCredential.user;
 
