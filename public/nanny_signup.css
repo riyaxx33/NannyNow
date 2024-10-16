@@ -38,10 +38,10 @@ header {
   }
   
   /* Main Heading */
-  h1.title {
-    font-size: 50px;
-    font-weight: bold;
+  h1{
+    font-size: 40px;
     color: #333; /* Match existing text color */
+    margin-bottom: 20px;
   }
 
   .container{
@@ -63,6 +63,7 @@ header {
   input[type="email"],
   input[type="password"],
   input[type="date"],
+  input[type="number"],
   select {
     padding: 10px;
     margin-bottom: 15px;

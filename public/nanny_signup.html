@@ -34,10 +34,35 @@
     <div id="app" class="container">
       <form @submit.prevent="handleSubmit" class="pt-2">
         <h1>Nanny Signup Form</h1>
+        <!--Full name and name-->
+        <div class="row">
+          <div class="col-6">
+            <label for="firstName" class="form-label">First Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="firstName"
+              placeholder="First Name"
+              v-model="firstName"
+              required
+            />
+          </div>
+          <div class="col-6">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="lastName"
+              placeholder="Last Name"
+              v-model="lastName"
+              required
+            />
+          </div>
+        </div>
         <!-- Email row -->
         <div class="row">
-          <div class="col-md-6 mb-4">
-            <label for="email" class="form-label"></label>
+          <div class="col-6">
+            <label for="email" class="form-label">Email</label>
             <input
               type="email"
               class="form-control"
@@ -47,28 +72,21 @@
               required
             />
           </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label for="profilePicture" class="form-label d-block fw-bold"
-                >Upload Your Profile Picture</label
-              >
-              <input
-                type="file"
-                id="profilePicture"
-                v-model="profilePicture"
-                @change="handleFileUpload"
-                accept="image/*"
-                class="form-control-file"
-              />
-              <small class="text-muted d-block mt-2"
-                >Only image files of sizes smaller than 5MB are accepted.</small
-              >
-            </div>
+          <div class="col-6">
+            <label for="phoneNumber" class="form-label">Phone Number</label>
+            <input
+              type="text"
+              class="form-control"
+              id="phoneNumber"
+              placeholder="Phone Number"
+              v-model="phoneNumber"
+              required
+            />
           </div>
         </div>
         <div class="row">
           <div class="col-6">
-            <label for="password" class="form-label"></label>
+            <label for="password" class="form-label">Password</label>
             <input
               type="password"
               class="form-control"
@@ -82,10 +100,9 @@
               {{ passwordError }}
             </div>
           </div>
-
           <!-- confirm password -->
           <div class="col-6">
-            <label for="confirmPassword" class="form-label"></label>
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
             <input
               type="password"
               class="form-control"
@@ -100,32 +117,6 @@
             </div>
           </div>
         </div>
-
-        <div class="row">
-          <div class="col-6">
-            <label for="firstName" class="form-label"></label>
-            <input
-              type="text"
-              class="form-control"
-              id="firstName"
-              placeholder="First Name"
-              v-model="firstName"
-              required
-            />
-          </div>
-          <div class="col-6">
-            <label for="lastName" class="form-label"></label>
-            <input
-              type="text"
-              class="form-control"
-              id="lastName"
-              placeholder="Last Name"
-              v-model="lastName"
-              required
-            />
-          </div>
-        </div>
-
         <div class="row">
           <div class="mt-3 col-6">
             <label for="dob" class="form-label">Date of Birth</label>
@@ -146,71 +137,50 @@
             </select>
           </div>
         </div>
-
         <div class="row">
-          <!-- Home address -->
-          <div class="mt-3">
-            <label for="homeaddress" class="form-label"></label>
+          <div class="col-6">
+            <label for="yrsExp" class="form-label">Years of Experience</label>
             <input
               type="text"
               class="form-control"
-              id="homeaddress"
-              placeholder="Home Address"
-              v-model="homeAddress"
+              id="yrsExp"
+              placeholder="Years of Experience"
+              v-model="yrsExp"
               required
             />
           </div>
-        </div>
-
-        <!-- Child Details Section -->
-        <div class="mt-4">
-          <div
-            v-for="(child, index) in children"
-            :key="index"
-            class="child-details mb-3"
-          >
-            <h6>Child {{ index + 1 }}</h6>
-            <div class="form-group">
-              <label
-                :for="'child' + (index + 1) + 'Name'"
-                class="form-label"
-              ></label>
-              <input
-                type="text"
-                class="form-control"
-                :id="'child' + (index + 1)
-              + 'Name'"
-                placeholder="Child's Name"
-                v-model="child.name"
-              />
-            </div>
-
-            <div class="form-group">
-              <label
-                :for="'child' + (index + 1) + 'Age'"
-                class="form-label"
-              ></label>
-              <input
-                type="number"
-                class="form-control"
-                :id="'child' + (index + 1) + 'Age'"
-                placeholder="Child's Age"
-                v-model="child.age"
-              />
-            </div>
+          <div class="form-group col-6">
+            <label for="profilePicture" class="form-label d-block">Upload Your Profile Picture</label>
+            <input
+              type="file"
+              id="profilePicture"
+              v-model="profilePicture"
+              @change="handleFileUpload"
+              accept="image/*"
+              class="form-control-file"
+            />
+            <small class="text-muted d-block mt-2"
+              >Only image files of sizes smaller than 5MB are accepted.</small
+            >
           </div>
         </div>
-
-        <!-- Add Child Button -->
-        <button
-          type="button"
-          class="btn btn-primary"
-          id="addChildBtn"
-          @click="addChild"
-        >
-          Add Another Child
-        </button>
-
+        <div class="col-12">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            class="form-control"
+            id="description"
+            placeholder="Introduce yourself and note down any prior experience you would like to share..."
+            v-model="description"
+            required
+            rows="5"
+          ></textarea>
+        </div>
+        <div class="col-12 mt-3">
+        <label for="consent">
+          <input type="checkbox" id="consent" name="consent" required>
+          I consent to providing my personal details to nany
+        </label>
+      </div>
         <div class="row">
           <div class="col-12 mt-4">
             <button type="submit" class="btn btn-primary">Sign Up</button>
@@ -224,9 +194,9 @@
     <script type="module">
       import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
       import {
-        storeParentData,
+        storeNannyData,
         handleFileUpload,
-        redirectToParentHome,
+        redirectToNannyHome,
       } from "./backend/firebase-op.js";
       import { auth } from "./backend/firebase-config.js";
       import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
@@ -240,7 +210,6 @@
             dob: "",
             gender: "",
             homeAddress: "",
-            children: [{ name: "", age: null }],
             password: "",
             confirmPassword: "",
             passwordError: "",
@@ -264,9 +233,6 @@
         },
 
         methods: {
-          addChild() {
-            this.children.push({ name: "", age: null });
-          },
 
           validatePassword() {
             // Password must be at least 8 characters long and contain a number
@@ -310,19 +276,18 @@
               );
               const user = userCredential.user;
 
-              await storeParentData(user, {
+              await storeNannyData(user, {
                 email: this.email,
                 firstName: this.firstName,
                 lastName: this.lastName,
                 dob: this.dob,
                 gender: this.gender,
                 homeAddress: this.homeAddress,
-                children: this.children,
                 profilePicture: this.profilePicture,
               });
 
               console.log("User registered successfully");
-              redirectToParentHome();
+              redirectToNannyHome();
             } catch (error) {
               console.log("Error in signup process:", error);
               this.errorMessage = error.message;
