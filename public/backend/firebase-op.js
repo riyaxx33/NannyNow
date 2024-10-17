@@ -43,6 +43,7 @@ export async function storeParentData(user, formData) {
     await setDoc(doc(db, "PARENT", user.uid), {
       homeAddress: formData.homeAddress,
       children: formData.children,
+      aboutMe: formData.aboutMe,
     });
 
     console.log("Parent data stored successfully");

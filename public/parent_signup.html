@@ -162,6 +162,20 @@
           </div>
         </div>
 
+        <div class="row mt-4">
+          <div class="col-12">
+            <label for="aboutMe" class="form-label">About Me</label>
+            <textarea
+              class="form-control"
+              id="aboutMe"
+              v-model="aboutMe"
+              rows="4"
+              placeholder="Write a paragraph describing yourself and your family..."
+              required
+            ></textarea>
+          </div>
+        </div>
+
         <!-- Child Details Section -->
         <div class="mt-4">
           <div
@@ -246,6 +260,7 @@
             passwordError: "",
             confirmPasswordError: "",
             profilePicture: null,
+            aboutMe: "",
           };
         },
         computed: {
@@ -256,6 +271,7 @@
               this.lastName &&
               this.dob &&
               this.homeAddress &&
+              this.aboutMe &&
               this.password &&
               this.confirmPassword &&
               !this.passwordError &&
@@ -320,6 +336,7 @@
                 homeAddress: this.homeAddress,
                 children: this.children,
                 profilePicture: this.profilePicture,
+                aboutMe: this.aboutMe,
               });
 
               console.log("User registered successfully");
