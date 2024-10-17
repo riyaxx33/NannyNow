@@ -56,7 +56,7 @@
                 type="file"
                 id="profilePicture"
                 v-model="profilePicture"
-                @change="handleFileUpload"
+                @change="handleProfilePictureUpload"
                 accept="image/*"
                 class="form-control-file"
               />
@@ -306,8 +306,10 @@
           handleProfilePictureUpload(event) {
             const file = handleFileUpload(event);
             if (file) {
+              console.log("Profile picture selected:", file.name);
               this.profilePicture = file;
             } else {
+              console.log("No valid file selected");
               this.profilePicture = null;
             }
           },

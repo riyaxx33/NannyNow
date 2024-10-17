@@ -23,9 +23,17 @@ export async function storeParentData(user, formData) {
 
     // Upload profile picture if provided
     if (formData.profilePicture) {
-      const storageRef = ref(storage, `profile_pictures/${user.uid}`);
+      const fileName = `${user.uid}_${Date.now()}_${
+        formData.profilePicture.name
+      }`;
+      const storageRef = ref(storage, `profile_pictures/${fileName}`);
+
+      console.log("Uploading profile picture...");
       const snapshot = await uploadBytes(storageRef, formData.profilePicture);
+      console.log("Profile picture uploaded successfully");
+
       profilePictureUrl = await getDownloadURL(snapshot.ref);
+      console.log("Profile picture URL:", profilePictureUrl);
     }
 
     // Store USER data
@@ -51,7 +59,7 @@ export async function storeParentData(user, formData) {
     // Redirect to parent_home.html after successful signup
     redirectToParentHome();
   } catch (error) {
-    console.log("Error storing parent data:", error);
+    console.error("Error storing parent data:", error);
     throw error;
   }
 }
@@ -72,7 +80,7 @@ export function handleFileUpload(event) {
       alert("File is too large. Please upload an image smaller than 5MB.");
       return null;
     }
-
+    console.log("File selected:", file.name);
     return file;
   }
   return null;
