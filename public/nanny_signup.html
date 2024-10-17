@@ -84,6 +84,7 @@
             />
           </div>
         </div>
+        <!-- Password -->
         <div class="row">
           <div class="col-6">
             <label for="password" class="form-label">Password</label>
@@ -97,7 +98,7 @@
               @input="validatePassword"
             />
             <div v-if="passwordError" class="text-danger">
-              {{ passwordError }}
+              {{passwordError}}
             </div>
           </div>
           <!-- confirm password -->
@@ -108,7 +109,7 @@
               class="form-control"
               id="confirmPassword"
               placeholder="Confirm Password"
-              v-model="password"
+              v-model="confirmPassword"
               required
               @input="validatePassword"
             />
@@ -117,6 +118,7 @@
             </div>
           </div>
         </div>
+        <!-- DOB and Gender  -->
         <div class="row">
           <div class="mt-3 col-6">
             <label for="dob" class="form-label">Date of Birth</label>
@@ -137,6 +139,7 @@
             </select>
           </div>
         </div>
+        <!-- yrs of exp and pfp -->
         <div class="row">
           <div class="col-6">
             <label for="yrsExp" class="form-label">Years of Experience</label>
@@ -164,6 +167,7 @@
             >
           </div>
         </div>
+        <!-- description -->
         <div class="col-12">
           <label for="description" class="form-label">Description</label>
           <textarea
@@ -175,12 +179,14 @@
             rows="5"
           ></textarea>
         </div>
+        <!-- consent -->
         <div class="col-12 mt-3">
         <label for="consent">
           <input type="checkbox" id="consent" name="consent" required>
           I consent to providing my personal details to nany
         </label>
-      </div>
+        </div>
+      <!-- submit -->
         <div class="row">
           <div class="col-12 mt-4">
             <button type="submit" class="btn btn-primary">Sign Up</button>
@@ -239,8 +245,7 @@
             const passwordRegex = /^(?=.*\d).{8,}$/;
 
             if (!passwordRegex.test(this.password)) {
-              this.passwordError =
-                "Password must be at least 8 characters long and contain a number";
+              this.passwordError = "Password must be at least 8 characters long and contain a number";
             } else {
               this.passwordError = "";
             }
