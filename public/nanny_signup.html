@@ -98,7 +98,7 @@
               @input="validatePassword"
             />
             <div v-if="passwordError" class="text-danger">
-              {{passwordError}}
+              {{ passwordError }}
             </div>
           </div>
           <!-- confirm password -->
@@ -215,11 +215,12 @@
             lastName: "",
             dob: "",
             gender: "",
-            homeAddress: "",
+            yrsExperience: "",
             password: "",
             confirmPassword: "",
             passwordError: "",
             confirmPasswordError: "",
+            description:"",
             profilePicture: null,
           };
         },
@@ -230,10 +231,12 @@
               this.firstName &&
               this.lastName &&
               this.dob &&
-              this.homeAddress & this.password &&
+              this.yrsExperience &&
+              this.password &&
               this.confirmPassword &&
               !this.passwordError &&
-              !this.confirmPasswordError
+              !this.confirmPasswordError&&
+              this.description
             );
           },
         },
@@ -285,10 +288,12 @@
                 email: this.email,
                 firstName: this.firstName,
                 lastName: this.lastName,
+                password: this.password,
                 dob: this.dob,
                 gender: this.gender,
-                homeAddress: this.homeAddress,
                 profilePicture: this.profilePicture,
+                description:this.description,
+                yrsExperience: this.yrsExperience
               });
 
               console.log("User registered successfully");

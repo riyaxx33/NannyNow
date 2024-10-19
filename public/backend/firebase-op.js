@@ -100,19 +100,18 @@ export async function storeNannyData(user, formData) {
       profilePictureUrl: profilePictureUrl,
     });
 
-    // Store PARENT data
+    // Store Nanny data
     await setDoc(doc(db, "NANNY", user.uid), {
-      homeAddress: formData.homeAddress,
-      children: formData.children,
-      aboutMe: formData.aboutMe,
+      yrsExperience:formData.yrsExperience,
+      description:formData.description
     });
 
-    console.log("Parent data stored successfully");
+    console.log("Nanny data stored successfully");
 
-    // Redirect to parent_home.html after successful signup
-    redirectToParentHome();
+    // Redirect to nanny_home.html after successful signup
+    redirectToNannyHome();
   } catch (error) {
-    console.error("Error storing parent data:", error);
+    console.error("Error storing Nanny data:", error);
     throw error;
   }
 }
