@@ -44,14 +44,19 @@ h1.title {
   color: #333; /* Match existing text color */
 }
 
-.container{
+.container {
   padding-top: 20px;
+}
+
+.col-md-12 {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /* Signup Form */
 form {
-  display: flex;
-  flex-direction: column;
+  /* display: flex; */
+  /* flex-direction: column; */
   background-color: #faf9f6; /* Background for the form */
   padding: 40px;
   border-radius: 10px;
@@ -59,6 +64,7 @@ form {
 }
 
 /* Input Fields */
+/*
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -68,10 +74,11 @@ select {
   margin-bottom: 15px;
   border: 1px solid #d3d3d3;
   border-radius: 5px;
-  width: 100%; /* Full width */
-  max-width: 400px; /* Maximum width */
+  width: 100%; 
+  max-width: 400px; 
   font-size: 16px;
 }
+*/
 
 /* Add Child Button */
 #addChildBtn {
@@ -104,4 +111,3 @@ select {
   color: red;
   margin-top: 10px;
 }
- 

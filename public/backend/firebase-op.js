@@ -1,6 +1,6 @@
 import {
   doc,
-  setDoc, 
+  setDoc,
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import {
   getStorage,
@@ -20,7 +20,6 @@ export function redirectToParentHome() {
 export function redirectToNannyHome() {
   window.location.href = "/nanny_home.html";
 }
-
 
 // STORE PARENT DATA
 export async function storeParentData(user, formData) {
@@ -51,6 +50,7 @@ export async function storeParentData(user, formData) {
       gender: formData.gender,
       role: "parent",
       profilePictureUrl: profilePictureUrl,
+      phoneNumber: formData.phoneNumber,
     });
 
     // Store PARENT data
@@ -101,8 +101,8 @@ export async function storeNannyData(user, formData) {
     });
     // Store Nanny data
     await setDoc(doc(db, "NANNY", user.uid), {
-      yrsExperience:formData.yrsExperience,
-      description:formData.description
+      yrsExperience: formData.yrsExperience,
+      description: formData.description,
     });
 
     console.log("Nanny data stored successfully");
@@ -114,7 +114,6 @@ export async function storeNannyData(user, formData) {
     throw error;
   }
 }
-
 
 export function handleFileUpload(event) {
   const file = event.target.files[0];
@@ -138,8 +137,6 @@ export function handleFileUpload(event) {
   return null;
 }
 
-
-
 export async function storePostData(user, postData) {
   try {
     // Create a unique ID for the post using the user's UID and the current timestamp
@@ -158,10 +155,8 @@ export async function storePostData(user, postData) {
 
     // Optionally redirect or perform other actions after storing
     // redirectToPostPage(); // Uncomment and define this function as needed
-
   } catch (error) {
     console.error("Error storing post data:", error);
     throw error; // Rethrow the error to handle it in the calling function
   }
 }
-
