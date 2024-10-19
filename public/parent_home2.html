@@ -174,7 +174,7 @@
 
           const fetchNannies = async () => {
             try {
-              const userCollectionRef = collection(db, "user");
+              const userCollectionRef = collection(db, "USER");
               const q = query(userCollectionRef, where("role", "==", "nanny"));
               const userSnapshot = await getDocs(q);
 
