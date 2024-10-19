@@ -14,7 +14,7 @@ const storage = getStorage();
 
 // redirect to parent homepage
 export function redirectToParentHome() {
-  window.location.href = "/parent_home.html";
+  window.location.href = "/parent_home2.html";
 }
 
 export function redirectToNannyHome() {
@@ -99,7 +99,6 @@ export async function storeNannyData(user, formData) {
       role: "nanny",
       profilePictureUrl: profilePictureUrl,
     });
-
     // Store Nanny data
     await setDoc(doc(db, "NANNY", user.uid), {
       yrsExperience:formData.yrsExperience,
