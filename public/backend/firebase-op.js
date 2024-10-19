@@ -1,6 +1,6 @@
 import {
   doc,
-  setDoc,
+  setDoc, 
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import {
   getStorage,
@@ -137,3 +137,31 @@ export function handleFileUpload(event) {
   }
   return null;
 }
+
+
+
+export async function storePostData(user, postData) {
+  try {
+    // Create a unique ID for the post using the user's UID and the current timestamp
+    const postId = `${user.uid}_${Date.now()}`;
+
+    // Store POST data in the Firestore "POSTS" collection
+    await setDoc(doc(db, "POSTS", postId), {
+      userId: user.uid, // Store the user's UID
+      date: postData.date, // Store the date
+      pay: postData.pay, // Store the pay per hour
+      description: postData.description, // Store the job description
+      createdAt: new Date().toISOString(), // Optional: Store the timestamp of when the post was created
+    });
+
+    console.log("Post data stored successfully");
+
+    // Optionally redirect or perform other actions after storing
+    // redirectToPostPage(); // Uncomment and define this function as needed
+
+  } catch (error) {
+    console.error("Error storing post data:", error);
+    throw error; // Rethrow the error to handle it in the calling function
+  }
+}
+

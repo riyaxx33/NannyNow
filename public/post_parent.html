@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en"> 
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+      crossorigin="anonymous"
+    />
+
+    <title>Nanny Post Job</title>
+    <link rel="stylesheet" href="post_parent.css" />
+  </head>
+
+  <body class="background">
+    <header>
+      <a href="display.html">
+        <img class="logoo" src="img/logo.png" alt="Nany logo" />
+      </a>
+    </header>
+
+    <div id="app" class="container">
+      <form @submit.prevent="handleSubmit" class="pt-2">
+        <h1>Post a Job</h1>
+
+        <!-- Date and Pay -->
+        <div class="row">
+          <div class="col-6">
+            <label for="date" class="form-label">When do you need a nanny?</label>
+            <input type="date" class="form-control" id="date" v-model="date" required />
+          </div>
+          <div class="col-6">
+            <label for="pay" class="form-label">Pay per hour</label>
+            <input
+              type="text"
+              class="form-control"
+              id="pay"
+              placeholder="Pay per hour"
+              v-model="pay"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="col-12 mt-3">
+          <label for="request" class="form-label">Notes for Nanny</label>
+          <textarea
+            class="form-control"
+            id="request"
+            placeholder="Write down any requests or notes that your nanny should know before coming down..."
+            v-model="request"
+            required
+            rows="5"
+          ></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="col-12 mt-4">
+          <button type="submit" class="btn btn-primary">Post Job</button>
+        </div>
+
+        <!-- Error Message -->
+        <p v-if="errorMessage" class="text-danger">{{ errorMessage }}</p>
+      </form>
+    </div>
+
+    <script type="module">
+      import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+      import { storePostData } from "./backend/firebase-op.js";
+      import { getAuth } from "https://www.gstatic.com/firebasejs/9.8.0/firebase-auth.js"; // Update to the correct version of Firebase
+      import { auth } from "./backend/firebase-config.js";
+    
+      const app = createApp({
+        data() {
+          return {
+            date: "",
+            pay: "",
+            request: "",
+            errorMessage: "" // Define errorMessage here
+          };
+        },
+        computed: {
+          isPostValid() {
+            return this.date && this.pay && this.request;
+          }
+        },
+        methods: {
+          async handleSubmit() {
+            if (!this.isPostValid) {
+              console.log("Post is not valid");
+              this.errorMessage = "Please fill in all required fields.";
+              return;
+            }
+    
+            const currentUser = auth.currentUser; // Get the currently logged-in user
+    
+            if (!currentUser) {
+              console.error("User is not logged in");
+              this.errorMessage = "You must be logged in to post a job.";
+              return;
+            }
+    
+            try {
+              await storePostData(currentUser, {
+                date: this.date,
+                pay: this.pay,
+                description: this.request // Make sure to match the parameter name in storePostData
+              });
+    
+              console.log("Job posted successfully");
+              // Optionally redirect or show success
+            } catch (error) {
+              console.log("Error posting job:", error);
+              this.errorMessage = error.message;
+            }
+          }
+        }
+      });
+    
+      app.mount("#app"); // Make sure to mount your Vue app to the correct DOM element
+    </script>
+    
+
+    <!-- Bootstrap JS -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
