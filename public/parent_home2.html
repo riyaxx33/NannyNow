@@ -1,201 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>NANYNow - Nanny Listing Page</title>
-        <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        />
-        <style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NANYNow - Nanny Listing Page</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        padding-top: 60px;
+      }
 
-        body {
-            padding-top: 60px;
-        }
-    
-        /* Make the right details container fixed */
-        #detailsContainer {
-            position: sticky;
-            top: 60px; /* Matches the navbar height to keep it aligned */
-            border-left: 1px solid #ccc;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            padding: 20px;
-            height: calc(100vh - 60px); /* Ensures it takes full height minus the navbar */
-            overflow-y: auto; /* Allow vertical scroll within the container if content exceeds */
-        }
+      /* Make the right details container fixed */
+      #detailsContainer {
+        position: sticky;
+        top: 60px; /* Matches the navbar height to keep it aligned */
+        border-left: 1px solid #ccc;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        height: calc(
+          100vh - 60px
+        ); /* Ensures it takes full height minus the navbar */
+        overflow-y: auto; /* Allow vertical scroll within the container if content exceeds */
+      }
 
-        /* Styling the container that holds the job description */
-        #jobDescriptionContainer {
-            height: 300px; /* Set a fixed height for the description section */
-            overflow-y: auto; /* Enables vertical scrolling */
-            padding: 10px;
-            border: 1px solid #ddd; /* Optional: Add a border around the scrollable area */
-            margin-top: 15px;
-        }
+      /* Styling the container that holds the job description */
+      #jobDescriptionContainer {
+        height: 300px; /* Set a fixed height for the description section */
+        overflow-y: auto; /* Enables vertical scrolling */
+        padding: 10px;
+        border: 1px solid #ddd; /* Optional: Add a border around the scrollable area */
+        margin-top: 15px;
+      }
 
-        /* Job card styling */
-        .job-card {
-            cursor: pointer;
-            margin-bottom: 10px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.3s ease;
-        }
-    
-        .job-card:hover {
-            background-color: #f8f9fa;
-        }
-    
-        .job-card img {
-            width: 100px;
-            height: 100px;
-            margin-right: 15px;
-        }
-    
-        .job-card-content {
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-    
-        .job-description {
-            flex-grow: 1;
-        }
+      /* Job card styling */
+      .job-card {
+        cursor: pointer;
+        margin-bottom: 10px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.3s ease;
+      }
 
-        /* Optional: Styling for filters */
-        #dayFilter, #timeFilter, #salaryFilter {
-            border-radius: 4px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
+      .job-card:hover {
+        background-color: #f8f9fa;
+      }
+
+      .job-card img {
+        width: 100px;
+        height: 100px;
+        margin-right: 15px;
+      }
+
+      .job-card-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      .job-description {
+        flex-grow: 1;
+      }
+
+      /* Optional: Styling for filters */
+      #dayFilter,
+      #timeFilter,
+      #salaryFilter {
+        border-radius: 4px;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
     </style>
-    </head>
-    <body>
-        <div id="app">
-            <!-- Navigation Bar -->
-            <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-                <!-- ... (keep the existing navbar HTML) ... -->
-            </nav>
-    
-            <div class="container mt-3">
-                <input
-                    type="text"
-                    v-model="searchQuery"
-                    class="form-control"
-                    placeholder="Search for NANNY..."
-                    @input="searchJobs"
-                />
-            </div>
-    
-            <!-- Main Content Section -->
-            <div class="container mt-5">
-                <div class="row">
-                    <!-- Nanny Cards Section -->
-                    <div class="col-md-6">
-                        <div class="list-group">
-                            <div 
-                                v-for="nanny in filteredNannies" 
-                                :key="nanny.id" 
-                                class="list-group-item job-card"
-                                @click="showDetails(nanny)"
-                            >
-                                <div class="job-card-content">
-                                    <img :src="nanny.profilePictureURL || 'https://via.placeholder.com/60'" :alt="nanny.firstName + ' ' + nanny.lastName" />
-                                    <div class="job-description">
-                                        <h5>{{ nanny.firstName }} {{ nanny.lastName }}</h5>
-                                        <p>Experience: {{ nanny.yearsOfExperience || 'N/A' }} years</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <!-- Nanny Details Section -->
-                    <div class="col-md-6" id="detailsContainer">
-                        <h4>{{ selectedNanny ? selectedNanny.firstName + ' ' + selectedNanny.lastName : 'Select a nanny to view details' }}</h4>
-                        <div v-if="selectedNanny">
-                            <p>Email: {{ selectedNanny.email }}</p>
-                            <p>Gender: {{ selectedNanny.gender }}</p>
-                            <p>Date of Birth: {{ selectedNanny.dob }}</p>
-                            <p>Years of Experience: {{ selectedNanny.yearsOfExperience || 'N/A' }}</p>
-                        </div>
-                        <div id="jobDescriptionContainer">
-                            <div id="jobDescription">{{ selectedNanny ? selectedNanny.description : '' }}</div>
-                        </div>
-                    </div>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Navigation Bar -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <!-- ... (keep the existing navbar HTML) ... -->
+      </nav>
+
+      <div class="container mt-3">
+        <input
+          type="text"
+          v-model="searchQuery"
+          class="form-control"
+          placeholder="Search for NANNY..."
+          @input="searchJobs"
+        />
+      </div>
+
+      <!-- Main Content Section -->
+      <div class="container mt-5">
+        <div class="row">
+          <!-- Nanny Cards Section -->
+          <div class="col-md-6">
+            <div class="list-group">
+              <div
+                v-for="nanny in filteredNannies"
+                :key="nanny.id"
+                class="list-group-item job-card"
+                @click="showDetails(nanny)"
+              >
+                <div class="job-card-content">
+                  <img
+                    :src="nanny.profilePictureURL || 'https://via.placeholder.com/60'"
+                    :alt="nanny.firstName + ' ' + nanny.lastName"
+                  />
+                  <div class="job-description">
+                    <h5>{{ nanny.firstName }} {{ nanny.lastName }}</h5>
+                    <p>
+                      Experience: {{ nanny.yearsOfExperience || 'N/A' }} years
+                    </p>
+                  </div>
                 </div>
+              </div>
             </div>
+          </div>
+
+          <!-- Nanny Details Section -->
+          <div class="col-md-6" id="detailsContainer">
+            <h4>
+              {{ selectedNanny ? selectedNanny.firstName + ' ' +
+              selectedNanny.lastName : 'Select a nanny to view details' }}
+            </h4>
+            <div v-if="selectedNanny">
+              <p>Email: {{ selectedNanny.email }}</p>
+              <p>Gender: {{ selectedNanny.gender }}</p>
+              <p>Date of Birth: {{ selectedNanny.dob }}</p>
+              <p>
+                Years of Experience: {{ selectedNanny.yearsOfExperience || 'N/A'
+                }}
+              </p>
+            </div>
+            <div id="jobDescriptionContainer">
+              <div id="jobDescription">
+                {{ selectedNanny ? selectedNanny.description : '' }}
+              </div>
+            </div>
+          </div>
         </div>
-    
-        <script type="module">
-            import { db } from './backend/firebase-config.js';
-            import { collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-    
-            const { createApp, ref, computed, onMounted } = Vue;
-    
-            createApp({
-                setup() {
-                    const nannies = ref([]);
-                    const selectedNanny = ref(null);
-                    const searchQuery = ref('');
-    
-                    const fetchNannies = async () => {
-                        try {
-                            const userCollectionRef = collection(db, 'user');
-                            const q = query(userCollectionRef, where('role', '==', 'nanny'));
-                            const userSnapshot = await getDocs(q);
-                            
-                            const nannyData = await Promise.all(userSnapshot.docs.map(async (userDoc) => {
-                                const userData = userDoc.data();
-                                const nannyDocRef = doc(db, 'NANNY', userDoc.id);
-                                const nannySnapshot = await getDoc(nannyDocRef);
-                                const nannyDetails = nannySnapshot.data();
-                                return { ...userData, ...nannyDetails, id: userDoc.id };
-                            }));
-    
-                            nannies.value = nannyData;
-                        } catch (error) {
-                            console.error("Error fetching nanny data:", error);
-                        }
-                    };
-    
-                    const filteredNannies = computed(() => {
-                        const query = searchQuery.value.toLowerCase();
-                        return nannies.value.filter(nanny => 
-                            nanny.firstName.toLowerCase().includes(query) ||
-                            nanny.lastName.toLowerCase().includes(query) ||
-                            (nanny.yearsOfExperience && nanny.yearsOfExperience.toString().includes(query))
-                        );
-                    });
-    
-                    const showDetails = (nanny) => {
-                        selectedNanny.value = nanny;
-                    };
-    
-                    const searchJobs = () => {
-                        // The filtering is handled by the computed property
-                    };
-    
-                    onMounted(fetchNannies);
-    
-                    return {
-                        nannies,
-                        selectedNanny,
-                        searchQuery,
-                        filteredNannies,
-                        showDetails,
-                        searchJobs
-                    };
-                }
-            }).mount('#app');
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
-    </body>
+      </div>
+    </div>
+
+    <script type="module">
+      import {
+        createApp,
+        ref,
+        computed,
+        onMounted,
+      } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+      import { db } from "./backend/firebase-config.js";
+      import {
+        collection,
+        query,
+        where,
+        getDocs,
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+      createApp({
+        setup() {
+          const nannies = ref([]);
+          const selectedNanny = ref(null);
+          const searchQuery = ref("");
+
+          const fetchNannies = async () => {
+            try {
+              const userCollectionRef = collection(db, "user");
+              const q = query(userCollectionRef, where("role", "==", "nanny"));
+              const userSnapshot = await getDocs(q);
+
+              const nannyData = await Promise.all(
+                userSnapshot.docs.map(async (userDoc) => {
+                  const userData = userDoc.data();
+                  const nannyDocRef = doc(db, "NANNY", userDoc.id);
+                  const nannySnapshot = await getDoc(nannyDocRef);
+                  const nannyDetails = nannySnapshot.data();
+                  return { ...userData, ...nannyDetails, id: userDoc.id };
+                })
+              );
+
+              nannies.value = nannyData;
+            } catch (error) {
+              console.error("Error fetching nanny data:", error);
+            }
+          };
+
+          const filteredNannies = computed(() => {
+            const query = searchQuery.value.toLowerCase();
+            return nannies.value.filter(
+              (nanny) =>
+                nanny.firstName.toLowerCase().includes(query) ||
+                nanny.lastName.toLowerCase().includes(query) ||
+                (nanny.yearsOfExperience &&
+                  nanny.yearsOfExperience.toString().includes(query))
+            );
+          });
+
+          const showDetails = (nanny) => {
+            selectedNanny.value = nanny;
+          };
+
+          const searchJobs = () => {
+            // The filtering is handled by the computed property
+          };
+
+          onMounted(fetchNannies);
+
+          return {
+            nannies,
+            selectedNanny,
+            searchQuery,
+            filteredNannies,
+            showDetails,
+            searchJobs,
+          };
+        },
+      }).mount("#app");
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
