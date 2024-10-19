@@ -142,13 +142,13 @@
         <!-- yrs of exp and pfp -->
         <div class="row">
           <div class="col-6">
-            <label for="yrsExp" class="form-label">Years of Experience</label>
+            <label for="yrsExperience" class="form-label">Years of Experience</label>
             <input
               type="text"
               class="form-control"
               id="yrsExp"
               placeholder="Years of Experience"
-              v-model="yrsExp"
+              v-model="yrsExperience"
               required
             />
           </div>
@@ -221,6 +221,7 @@
             passwordError: "",
             confirmPasswordError: "",
             description:"",
+            errorMessage: "",
             profilePicture: null,
           };
         },
