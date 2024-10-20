@@ -85,7 +85,7 @@
             try {
               // Fetch data from USER collection
               const userDocRef = doc(db, "USER", userId);
-              const userDocSnap = await getDoc(docRef);
+              const userDocSnap = await getDoc(userDocRef);
 
               if (userDocSnap.exists()) {
                 this.profileData = userDocSnap.data();
