@@ -1,4 +1,4 @@
-import { login, redirectBasedOnRole } from "./auth";
+import { login, redirectBasedOnRole } from "./auth.js";
 
 // Reference to form and error message
 const loginForm = document.getElementById("loginForm");
