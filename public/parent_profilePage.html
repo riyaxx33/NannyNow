@@ -81,15 +81,35 @@
               this.loading = false;
             });
           },
-          async fetchUserProfile() {
+          async fetchUserProfile(userId) {
             try {
-              const docRef = doc(db, "USER", user.uid);
-              const docSnap = await getDoc(docRef);
+              // Fetch data from USER collection
+              const userDocRef = doc(db, "USER", userId);
+              const userDocSnap = await getDoc(docRef);
 
-              if (docSnap.exists()) {
-                this.profileData = docSnap.data();
+              if (userDocSnap.exists()) {
+                this.profileData = userDocSnap.data();
               } else {
-                this.error = "No profile data found";
+                this.error = "No user data found";
+                return;
+              }
+
+              // Fetch PARENT-specific data
+              const role = await getUserRole(userId);
+
+              if (role === "parent") {
+                const parentDocRef = doc(db, "PARENT", userId);
+                const parentDocSnap = await getDoc(parentDocRef);
+
+                if (parentDocSnap.exists()) {
+                  // Merge parent-specific data
+                  this.profileData = {
+                    ...this.profileData,
+                    ...parentDocSnap.data(),
+                  };
+                } else {
+                  this.error = "No parent data found.";
+                }
               }
             } catch (error) {
               this.error = "Error fetching profile data";
@@ -105,7 +125,7 @@
             }
           },
         },
-      });
+      }).mount("#app");
     </script>
   </body>
 </html>
