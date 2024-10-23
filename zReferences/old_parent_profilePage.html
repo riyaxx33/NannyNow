@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parent Profile</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.esm-browser.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div v-if="loading">Loading...</div>
+      <div v-else-if="error">{{ error }}</div>
+      <div v-else-if="profileData" class="profile">
+        <h1>
+          {{ profileData.firstName }} {{ profileData.lastName }}'s Profile
+        </h1>
+        <img
+          :src="profileData.profilePicture"
+          alt="Profile Picture"
+          v-if="profileData.profilePicture"
+        />
+        <p><strong>Email:</strong> {{ profileData.email }}</p>
+        <p><strong>Date of Birth:</strong> {{ profileData.dob }}</p>
+        <p><strong>Gender:</strong> {{ profileData.gender }}</p>
+        <p><strong>Home Address:</strong> {{ profileData.homeAddress }}</p>
+        <p><strong>Phone Number:</strong> {{ profileData.phoneNumber }}</p>
+        <p><strong>About Me:</strong> {{ profileData.aboutMe }}</p>
+        <h2>Children</h2>
+        <ul>
+          <li v-for="child in profileData.children" :key="child.name">
+            {{ child.name }} ({{ child.age }} years old)
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script type="module">
+      import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+      import { db } from "./backend/firebase-config.js";
+      import {
+        initAuth,
+        logout,
+        getCurrentUser,
+        getUserRole,
+      } from "./backend/auth.js";
+      import {
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+      createApp({
+        data() {
+          return {
+            profileData: null,
+            loading: true,
+            error: null,
+          };
+        },
+        created() {
+          this.initializeAuthListener();
+        },
+        methods: {
+          initializeAuthListener() {
+            initAuth(async (user) => {
+              if (user) {
+                try {
+                  const role = await getUserRole(user.uid);
+                  if (role !== "parent") {
+                    this.error =
+                      "Access denied. This page is for parents only.";
+                    return;
+                  }
+                  await this.fetchUserProfile(user.uid);
+                } catch (error) {
+                  this.error = "Error: " + error.message;
+                }
+              } else {
+                // User is not logged in, redirect to login page
+                window.location.href = "login.html";
+              }
+              this.loading = false;
+            });
+          },
+          async fetchUserProfile(userId) {
+            try {
+              // Fetch data from USER collection
+              const userDocRef = doc(db, "USER", userId);
+              const userDocSnap = await getDoc(userDocRef);
+
+              if (userDocSnap.exists()) {
+                this.profileData = userDocSnap.data();
+              } else {
+                this.error = "No user data found";
+                return;
+              }
+
+              // Fetch PARENT-specific data
+              const role = await getUserRole(userId);
+
+              if (role === "parent") {
+                const parentDocRef = doc(db, "PARENT", userId);
+                const parentDocSnap = await getDoc(parentDocRef);
+
+                if (parentDocSnap.exists()) {
+                  // Merge parent-specific data
+                  this.profileData = {
+                    ...this.profileData,
+                    ...parentDocSnap.data(),
+                  };
+                } else {
+                  this.error = "No parent data found.";
+                }
+              }
+            } catch (error) {
+              this.error = "Error fetching profile data";
+              console.error("Error fetching profile data:", error);
+            }
+          },
+          async logout() {
+            try {
+              await logout();
+              window.location.href = "login.html";
+            } catch (error) {
+              this.error = "Logout failed: " + error.message;
+            }
+          },
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>
