@@ -5,8 +5,9 @@ rules_version = '2';
 //    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if false;
+    match /profile_pictures/{allPaths=**} {
+      allow read: if true;  // Or more restrictive if needed
+      allow write: if request.auth != null;  // Only authenticated users can upload
     }
   }
 }
