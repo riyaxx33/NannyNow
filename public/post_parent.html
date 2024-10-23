@@ -1,34 +1,99 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
-      crossorigin="anonymous"
-    />
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <title>Nanny Post Job</title>
-    <link rel="stylesheet" href="post_parent.css" />
+    <style>
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 40px;
+        background-color: #faf9f6;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .logoo {
+        height: 60px;
+        width: auto;
+      }
+
+      h2 {
+        font-size: 30px;
+        color: #333;
+        margin-bottom: 2px;
+        margin-left: 80px;
+        margin-top: 20px;
+      }
+      h3{
+        font-size:30px;
+        margin-left:5px;
+      }
+
+      .container {
+        padding-top: 10px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        background-color: #faf9f6;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      .button-container {
+  display: flex;
+  justify-content: flex-end; /* Aligns items to the right */
+  margin-top: 10px; /* Adds space above the buttons */
+}
+.posts-container {
+  margin-top: 20px; /* Adds space above the posts container */
+  padding: 15px; /* Adds padding inside the container */
+  border: 1px solid #ddd; /* Optional: border around the container */
+  border-radius: 5px; /* Optional: rounded corners */
+  background-color:  #faf9f6; /* Optional: background color for the container */
+}
+
+.no-posts-message {
+  text-align: center; /* Centers the message */
+  color: #666; /* Gray color for the message */
+  padding: 20px; /* Adds padding around the message */
+  font-weight: bold; /* Makes the message bold */
+}
+
+      .post-item {
+        background-color: #f9f3e5;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+      }
+
+      .post-item h5 {
+        margin: 0;
+        padding-bottom: 10px;
+      }
+
+      .error-message {
+        color: red;
+        margin-top: 10px;
+      }
+    </style>
   </head>
 
   <body class="background">
     <header>
       <a href="display.html">
-        <img class="logoo" src="img/logo.png" alt="Nany logo" />
+        <img class="logoo" src="img/logo.png" alt="Nanny logo" />
       </a>
     </header>
-
+    <h2>Post a Job</h2>
     <div id="app" class="container">
+      <!-- Form to Post a Job -->
       <form @submit.prevent="handleSubmit" class="pt-2">
-        <h1>Post a Job</h1>
-
-        <!-- Date and Pay -->
         <div class="row">
           <div class="col-6">
             <label for="date" class="form-label">When do you need a nanny?</label>
@@ -36,18 +101,18 @@
           </div>
           <div class="col-6">
             <label for="pay" class="form-label">Pay per hour</label>
-            <input
-              type="text"
-              class="form-control"
-              id="pay"
-              placeholder="Pay per hour"
-              v-model="pay"
-              required
-            />
+            <input type="text" class="form-control" id="pay" placeholder="Pay per hour" v-model="pay" required />
+          </div>
+          <div class="col-6 mt-3">
+            <label for="startTime" class="form-label">Start Time</label>
+            <input type="time" class="form-control" id="startTime" v-model="startTime" required />
+          </div>
+          <div class="col-6 mt-3">
+            <label for="endTime" class="form-label">End Time</label>
+            <input type="time" class="form-control" id="endTime" v-model="endTime" required />
           </div>
         </div>
 
-        <!-- Notes -->
         <div class="col-12 mt-3">
           <label for="request" class="form-label">Notes for Nanny</label>
           <textarea
@@ -60,78 +125,178 @@
           ></textarea>
         </div>
 
-        <!-- Submit Button -->
-        <div class="col-12 mt-4">
+        <div class="col-12 mt-4 text-end">
           <button type="submit" class="btn btn-primary">Post Job</button>
         </div>
 
-        <!-- Error Message -->
-        <p v-if="errorMessage" class="text-danger">{{ errorMessage }}</p>
+        <p v-if="errorMessage" class="text-danger text-end">{{ errorMessage }}</p>
       </form>
-    </div>
+
+      <!-- List of posted jobs -->
+      <h3 class="mt-5">Posted Jobs</h3>
+      <div class="posts-container"> <!-- Container for all posts -->
+        <div v-if="posts.length === 0" class="no-posts-message">
+          No posts at the moment.
+        </div>
+        
+        <div v-for="post in posts" :key="post.id" class="post-item">
+          <h5>Date: {{ post.formattedDate }}</h5>
+          <p>Pay: {{ post.pay }}</p>
+          <p>Time: {{ post.startTime }} - {{ post.endTime }}</p>
+          <p>Notes: {{ post.description }}</p>
+          <div class="button-container">
+            <button @click="editPost(post)" class="btn btn-warning btn-sm ">Edit</button>
+            <button @click="deletePost(post.id)" class="btn btn-danger btn-sm ">Delete</button>
+          </div>
+        </div>
+      </div>
 
     <script type="module">
       import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
-      import { storePostData } from "./backend/firebase-op.js";
-      import { getAuth } from "https://www.gstatic.com/firebasejs/9.8.0/firebase-auth.js"; // Update to the correct version of Firebase
+      import { storePostData, fetchPosts, deletePostData, updatePostData } from "./backend/firebase-op.js"; 
       import { auth } from "./backend/firebase-config.js";
-    
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.8.0/firebase-auth.js";
+
       const app = createApp({
         data() {
           return {
             date: "",
             pay: "",
+            startTime: "",  // Added start time
+            endTime: "",    // Added end time
             request: "",
-            errorMessage: "" // Define errorMessage here
+            errorMessage: "",
+            posts: [], // Array to store posts
+            editingPostId: null // ID of the post being edited
           };
         },
         computed: {
           isPostValid() {
-            return this.date && this.pay && this.request;
+            return this.date && this.pay && this.request && this.startTime && this.endTime;
           }
         },
         methods: {
+          formatDate(timestamp) {
+            if (timestamp && timestamp.seconds) {
+              const date = new Date(timestamp.seconds * 1000); // Convert seconds to milliseconds
+              return date.toLocaleDateString('en-GB', { timeZone: 'UTC' }); // Format as dd/mm/yyyy
+            }
+            return ""; // Fallback in case there's no timestamp
+          },
+
           async handleSubmit() {
             if (!this.isPostValid) {
-              console.log("Post is not valid");
               this.errorMessage = "Please fill in all required fields.";
+              console.error("Validation error:", this.errorMessage);
               return;
             }
-    
-            const currentUser = auth.currentUser; // Get the currently logged-in user
-    
+
+            const currentUser = auth.currentUser;
             if (!currentUser) {
-              console.error("User is not logged in");
               this.errorMessage = "You must be logged in to post a job.";
+              console.error("Authentication error:", this.errorMessage);
               return;
             }
-    
+
             try {
-              await storePostData(currentUser, {
-                date: this.date,
-                pay: this.pay,
-                description: this.request // Make sure to match the parameter name in storePostData
-              });
-    
-              console.log("Job posted successfully");
-              // Optionally redirect or show success
+              if (this.editingPostId) {
+                // If editing an existing post, update it
+                await updatePostData(this.editingPostId, {
+                  date: this.date,
+                  pay: this.pay,
+                  startTime: this.startTime,
+                  endTime: this.endTime,
+                  description: this.request
+                });
+                this.editingPostId = null; // Reset editing ID
+              } else {
+                // Otherwise, create a new post
+                await storePostData(currentUser, {
+                  date: this.date,
+                  pay: this.pay,
+                  startTime: this.startTime,
+                  endTime: this.endTime,
+                  description: this.request
+                });
+              }
+
+              // Fetch updated posts after successful submission
+              await this.fetchPosts(currentUser.uid); // Fetch user's posts
+
+              this.date = "";
+              this.pay = "";
+              this.startTime = ""; // Reset start time
+              this.endTime = ""; // Reset end time
+              this.request = "";
+              this.errorMessage = "";
             } catch (error) {
-              console.log("Error posting job:", error);
               this.errorMessage = error.message;
+              console.error("Error during post submission:", error);
             }
+          },
+
+          async fetchPosts(userId) {
+            try {
+              const postsData = await fetchPosts(userId); // Fetch user's posts
+              this.posts = postsData.map((post) => ({
+                ...post,
+                formattedDate: this.formatDate(post.date) // Format the date
+              }));
+
+              // Sort posts by date in descending order (latest first)
+              this.posts.sort((a, b) => {
+                const dateA = new Date(a.date.seconds * 1000); // Convert seconds to milliseconds
+                const dateB = new Date(b.date.seconds * 1000); // Convert seconds to milliseconds
+                return dateB - dateA; // Sort in descending order
+              });
+
+              console.log("User's posts retrieved:", this.posts);
+            } catch (error) {
+              this.errorMessage = "Failed to fetch posts.";
+              console.error("Error fetching posts:", error);
+            }
+          },
+
+          async deletePost(postId) {
+            const confirmation = confirm("Are you sure you want to delete this post?");
+            if (confirmation) {
+              try {
+                await deletePostData(postId);
+                this.fetchPosts(auth.currentUser.uid); // Refresh posts
+                console.log("Post deleted successfully.");
+              } catch (error) {
+                this.errorMessage = "Failed to delete the post.";
+                console.error("Error deleting post:", error);
+              }
+            }
+          },
+
+          editPost(post) {
+            this.date = this.formatDate(post.date);
+            this.pay = post.pay;
+            this.startTime = post.startTime;
+            this.endTime = post.endTime;
+            this.request = post.description;
+            this.editingPostId = post.id; // Set the ID of the post being edited
           }
+        },
+        mounted() {
+          // Using onAuthStateChanged to ensure we detect authentication state changes
+          onAuthStateChanged(auth, (user) => {
+            if (user) {
+              this.fetchPosts(user.uid); // Fetch posts for the logged-in user when the auth state changes
+            } else {
+              console.error("No user is logged in.");
+            }
+          });
         }
       });
-    
-      app.mount("#app"); // Make sure to mount your Vue app to the correct DOM element
-    </script>
-    
 
-    <!-- Bootstrap JS -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
-      crossorigin="anonymous"
-    ></script>
+      app.mount("#app");
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
+
+
+
