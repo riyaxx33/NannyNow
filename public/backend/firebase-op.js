@@ -28,7 +28,7 @@ export function redirectToNannyHome() {
 // Get default profile picture URL based on gender
 async function getDefaultProfilePicURL() {
   try {
-    const defaultImageRef = ref(storage, `profile_pictures/default_avatar.png`);
+    const defaultImageRef = ref(storage, `profile_pictures/default_avatar.jpg`);
     return await getDownloadURL(defaultImageRef);
   } catch (error) {
     console.error("Error getting default profile picture:", error);
