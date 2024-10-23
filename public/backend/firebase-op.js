@@ -29,7 +29,9 @@ export function redirectToNannyHome() {
 async function getDefaultProfilePicURL() {
   try {
     const defaultImageRef = ref(storage, `profile_pictures/default_avatar.jpg`);
-    return await getDownloadURL(defaultImageRef);
+    const url = await getDownloadURL(defaultImageRef);
+    console.log("Default profile URL retrieved:", url);
+    return url;
   } catch (error) {
     console.error("Error getting default profile picture:", error);
     return null;
@@ -42,7 +44,7 @@ export async function storeParentData(user, formData) {
     let profilePictureUrl = null;
 
     // Upload profile picture if provided
-    if (formData.profilePicture) {
+    if (formData.profilePicture instanceof File) {
       try {
         const fileName = `${user.uid}_${Date.now()}_${
           formData.profilePicture.name
