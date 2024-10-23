@@ -18,11 +18,22 @@ const storage = getStorage();
 
 // Redirect to parent homepage
 export function redirectToParentHome() {
-  window.location.href = "/parent_home2.html";
+  window.location.href = "/parent_home.html";
 }
 
 export function redirectToNannyHome() {
   window.location.href = "/nanny_home.html";
+}
+
+// Get default profile picture URL based on gender
+async function getDefaultProfilePicURL() {
+  try {
+    const defaultImageRef = ref(storage, `profile_pictures/default_avatar.png`);
+    return await getDownloadURL(defaultImageRef);
+  } catch (error) {
+    console.error("Error getting default profile picture:", error);
+    return null;
+  }
 }
 
 // Store parent data
@@ -32,15 +43,31 @@ export async function storeParentData(user, formData) {
 
     // Upload profile picture if provided
     if (formData.profilePicture) {
-      const fileName = `${user.uid}_${Date.now()}_${formData.profilePicture.name}`;
-      const storageRef = ref(storage, `profile_pictures/${fileName}`);
+      try {
+        const fileName = `${user.uid}_${Date.now()}_${
+          formData.profilePicture.name
+        }`;
+        const storageRef = ref(storage, `profile_pictures/${fileName}`);
 
-      console.log("Uploading profile picture...");
-      const snapshot = await uploadBytes(storageRef, formData.profilePicture);
-      console.log("Profile picture uploaded successfully");
+        console.log("Uploading profile picture...");
+        const snapshot = await uploadBytes(storageRef, formData.profilePicture);
+        // console.log("Profile picture uploaded successfully");
 
-      profilePictureUrl = await getDownloadURL(snapshot.ref);
-      console.log("Profile picture URL:", profilePictureUrl);
+        profilePictureUrl = await getDownloadURL(snapshot.ref);
+        console.log(
+          "Custom profile picture uploaded successfully:",
+          profilePictureUrl
+        );
+      } catch (uploadError) {
+        console.error("Error uploading custom profile picture:", uploadError);
+        profilePictureUrl = null;
+      }
+    }
+
+    // If no custom picture was provided or upload failed, use default picture
+    if (!profilePictureUrl) {
+      profilePictureUrl = await getDefaultProfilePicURL();
+      console.log("Using default profile picture");
     }
 
     // Store USER data
@@ -79,15 +106,31 @@ export async function storeNannyData(user, formData) {
 
     // Upload profile picture if provided
     if (formData.profilePicture) {
-      const fileName = `${user.uid}_${Date.now()}_${formData.profilePicture.name}`;
-      const storageRef = ref(storage, `profile_pictures/${fileName}`);
+      try {
+        const fileName = `${user.uid}_${Date.now()}_${
+          formData.profilePicture.name
+        }`;
+        const storageRef = ref(storage, `profile_pictures/${fileName}`);
 
-      console.log("Uploading profile picture...");
-      const snapshot = await uploadBytes(storageRef, formData.profilePicture);
-      console.log("Profile picture uploaded successfully");
+        console.log("Uploading profile picture...");
+        const snapshot = await uploadBytes(storageRef, formData.profilePicture);
+        // console.log("Profile picture uploaded successfully");
 
-      profilePictureUrl = await getDownloadURL(snapshot.ref);
-      console.log("Profile picture URL:", profilePictureUrl);
+        profilePictureUrl = await getDownloadURL(snapshot.ref);
+        console.log(
+          "Custom profile picture uploaded successfully:",
+          profilePictureUrl
+        );
+      } catch (uploadError) {
+        console.error("Error uploading custom profile picture:", uploadError);
+        profilePictureUrl = null;
+      }
+    }
+
+    // If no custom picture was provided or upload failed, use default picture
+    if (!profilePictureUrl) {
+      profilePictureUrl = await getDefaultProfilePicURL();
+      console.log("Using default profile picture");
     }
 
     // Store USER data
@@ -172,10 +215,10 @@ export async function fetchPosts(userId) {
   try {
     const postsCollection = collection(db, "POSTS");
     const postSnapshot = await getDocs(postsCollection);
-    
+
     const posts = postSnapshot.docs
       .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter(post => post.userId === userId); // Filter by userId
+      .filter((post) => post.userId === userId); // Filter by userId
 
     console.log("User's posts fetched successfully:", posts);
     return posts;
@@ -208,7 +251,3 @@ export async function deletePostData(postId) {
     throw error;
   }
 }
-
-
-
-
