@@ -76,7 +76,7 @@ export function redirectBasedOnRole(role) {
   if (role === "nanny") {
     window.location.href = "nanny_home.html";
   } else if (role === "parent") {
-    window.location.href = "parent_home2.html";
+    window.location.href = "parent_home.html";
   } else {
     throw new Error("Invalid user role");
   }
