@@ -46,3 +46,5 @@ export const storage = getStorage(app);
 
 // // Export Firebase services
 // export { auth, db };
+
+export { firebaseConfig };

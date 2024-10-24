@@ -45,9 +45,11 @@ export async function login(email, password) {
 }
 
 /* Logout function */
+/* Logout function */
 export async function logout() {
   try {
     await firebaseSignOut(auth);
+    window.location.href = 'index.html'; // Add the redirect here
   } catch (error) {
     console.error("Logout error:", error);
     throw error;

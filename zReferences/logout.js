@@ -1,4 +1,4 @@
-import { logout } from './auth.js';
+import { logout } from '../public/backend/auth.js';
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   console.log("Logout button clicked"); // Add this line for debugging

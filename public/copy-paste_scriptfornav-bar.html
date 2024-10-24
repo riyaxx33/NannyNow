@@ -1,0 +1,63 @@
+<!-- this code is within the body section right before the main body -->
+<header>
+    <div id="navbar"></div>
+</header>
+
+<!-- this code is within the body right before the js version link for bootstrap -->
+<script type="module">
+    import { auth, db } from "./backend/firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+    import { logout } from './backend/auth.js';
+    
+    async function loadNavbar(user) {
+        let fileToLoad = 'unloggedin_navbar_template.html';
+
+        if (user) {
+            try {
+                const userDoc = await getDoc(doc(db, "USER", user.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    if (userData.role === 'parent') {
+                        fileToLoad = 'parent_navbar_template.html';
+                    } else if (userData.role === 'nanny') {
+                        fileToLoad = 'nanny_navbar_template.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching user role:', error);
+            }
+        }
+
+        try {
+            const response = await fetch(fileToLoad);
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const navbarHTML = await response.text();
+            document.getElementById('navbar').innerHTML = navbarHTML;
+
+            // Add event listener to logout link after navbar is loaded
+            const logoutLink = document.querySelector('#logoutBtn');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', async (e) => {
+                    e.preventDefault(); // Prevent the default link behavior
+                    console.log("Logout clicked");
+                    try {
+                        await logout(); // The redirect is now handled in the logout function
+                    } catch (error) {
+                        console.error('Logout failed:', error);
+                    }
+                });
+            } else {
+                console.log('Logout link not found');
+            }
+        } catch (error) {
+            console.error('Failed to load navbar:', error);
+        }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        console.log('Auth state changed');
+        loadNavbar(user);
+    });
+</script>
