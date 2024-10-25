@@ -121,7 +121,7 @@
               <div
                 v-for="child in profileData.children"
                 :key="child.name"
-                class="['child-card', child.gender === 'Male' ? 'bg-info' : 'bg-pink']"
+                :class="['child-card', child.gender === 'Male' ? 'bg-info' : 'bg-pink']"
               >
                 <h6 class="text-white mb-1">{{ child.name }}</h6>
                 <p class="text-light mb-0">{{ child.age }}</p>
