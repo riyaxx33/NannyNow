@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Indeed-like Job Listing Page</title>
+    <title>Nanny Home - Parent Posts</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -13,32 +13,25 @@
         padding-top: 60px;
       }
 
-      /* Make the right details container fixed */
       #detailsContainer {
         position: sticky;
-        top: 60px; /* Matches the navbar height to keep it aligned */
+        top: 60px;
         border-left: 1px solid #ccc;
         border: 2px solid #ddd;
         border-radius: 5px;
         padding: 20px;
-        height: calc(
-          100vh - 60px
-        ); /* Ensures it takes full height minus the navbar */
-        overflow-y: hidden; /* Disable scrolling for the entire container */
+        height: calc(100vh - 60px);
+        overflow-y: hidden;
       }
 
-      /* Styling the container that holds the job description */
       #jobDescriptionContainer {
-        height: calc(
-          100% - 70px
-        ); /* Adjust to fill the rest of the container */
-        overflow-y: auto; /* Enables vertical scrolling */
+        height: calc(100% - 70px);
+        overflow-y: auto;
         padding: 10px;
-        border: 1px solid #ddd; /* Optional: Add a border around the scrollable area */
+        border: 1px solid #ddd;
         margin-top: 15px;
       }
 
-      /* Job card styling similar to Indeed */
       .job-card {
         cursor: pointer;
         margin-bottom: 10px;
@@ -49,7 +42,7 @@
         justify-content: space-between;
         align-items: center;
         transition: background-color 0.3s ease;
-        height: 200px; /* Compact height */
+        height: auto;
       }
 
       .job-card:hover {
@@ -57,9 +50,11 @@
       }
 
       .job-card img {
-        width: 100px;
-        height: 100px;
+        width: 60px;
+        height: 60px;
         margin-right: 15px;
+        border-radius: 50%;
+        object-fit: cover;
       }
 
       .job-card-content {
@@ -73,189 +68,84 @@
       }
 
       #jobSearch {
-        width: 100%; /* Makes the search bar take full width of its container */
-        border-radius: 4px; /* Optional: Rounded corners */
-        border: 1px solid #ccc; /* Optional: Border color */
-        padding: 10px; /* Optional: Padding inside the input */
-        box-shadow: none; /* Removes the default input shadow */
+        width: 100%;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        box-shadow: none;
+        margin-bottom: 20px;
+      }
+
+      .parent-info {
+        margin-bottom: 20px;
+      }
+
+      .children-info {
+        margin: 20px 0;
+      }
+
+      .description-section {
+        margin-top: 20px;
+      }
+
+      .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .profile-header img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-right: 20px;
+        object-fit: cover;
       }
     </style>
   </head>
   <body>
-    <div id="navbar"></div> <!-- Placeholder for navbar -->
+    <div id="navbar"></div>
 
     <div class="container mt-3">
       <input
         type="text"
         id="jobSearch"
         class="form-control"
-        placeholder="Search for NANNY..."
+        placeholder="Search posts..."
         onkeyup="searchJobs()"
       />
     </div>
 
-    <!-- Main Content Section -->
-    <div class="container mt-5">
+    <div class="container mt-4">
       <div class="row">
         <!-- Job Cards Section -->
-        <div class="col-md-6"> 
+        <div class="col-md-6">
           <div class="list-group">
-            <div
-              class="list-group-item job-card"
-              onclick="showDetails('Parent 1', 'Description for Parent 1')"
-            >
-              <div class="job-card-content">
-                <img src="https://via.placeholder.com/60" alt="Job 1 Image" />
-                <div class="job-description">
-                  <h5>Nanny 1</h5>
-                  <p>San Francisco, CA</p>
-                </div>
-              </div>
-            </div>
-            <div
-              class="list-group-item job-card"
-              onclick="showDetails('Parent 2', 'Description for Parent 2')"
-            >
-              <div class="job-card-content">
-                <img src="https://via.placeholder.com/60" alt="Job 2 Image" />
-                <div class="job-description">
-                  <h5>Nanny 2</h5>
-                  <p>New York, NY</p>
-                </div>
-              </div>
-            </div>
-            <div
-              class="list-group-item job-card"
-              onclick="showDetails('Parent 3', 'Description for Parent 3')"
-            >
-              <div class="job-card-content">
-                <img src="https://via.placeholder.com/60" alt="Job 3 Image" />
-                <div class="job-description">
-                  <h5>Nanny 3</h5>
-                  <p>Chicago, IL</p>
-                </div>
-              </div>
-            </div>
-            <div
-              class="list-group-item job-card"
-              onclick="showDetails('Parent 4', 'Description for Parent 4')"
-            >
-              <div class="job-card-content">
-                <img src="https://via.placeholder.com/60" alt="Job 4 Image" />
-                <div class="job-description">
-                  <h5>Nanny 4</h5>
-                  <p>Austin, TX</p>
-                </div>
-              </div>
-            </div>
-            <div
-              class="list-group-item job-card"
-              onclick="showDetails('Parent 5', 'Description for Parent 5')"
-            >
-              <div class="job-card-content">
-                <img src="https://via.placeholder.com/60" alt="Job 5 Image" />
-                <div class="job-description">
-                  <h5>Nanny 5</h5>
-                  <p>Seattle, WA</p>
-                </div>
-              </div>
-            </div>
+            <!-- Job cards will be dynamically inserted here -->
           </div>
         </div>
 
         <!-- Job Details Section -->
         <div class="col-md-6" id="detailsContainer">
-          <h4 id="nannyName">click to see nanny name</h4>
-          <div id="jobDetails">SEE WHAT</div>
+          <div class="profile-header">
+            <img id="profilePicture" src="/api/placeholder/80/80" alt="Profile Picture" />
+            <h4 id="nannyName">Select a post to view details</h4>
+          </div>
+          
+          <div class="parent-info" id="jobDetails">
+            <!-- Parent details will be inserted here -->
+          </div>
 
-          <!-- Scrollable job description section -->
           <div id="jobDescriptionContainer">
             <div id="jobDescription">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-              lacinia odio vitae vestibulum. Cras et ligula eget odio aliquam
-              vulputate. Curabitur sit amet orci nec odio fermentum accumsan.
-              Integer ac felis id turpis faucibus varius. Sed quis sapien a
-              metus pretium pellentesque. Etiam sollicitudin arcu a lacus
-              tincidunt, et malesuada justo pharetra. Fusce volutpat diam vitae
-              orci scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus
-              ipsum at lacus venenatis, a facilisis sapien elementum. Lorem
-              ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia
-              odio vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
-              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
-              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
-              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
-              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
-              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
-              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
-              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
-              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
-              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
-              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
-              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
-              felis id turpis faucibus varius. Sed quis sapien a metus pretium
-              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
-              malesuada justo pharetra. Fusce volutpat diam vitae orci
-              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
-              at lacus venenatis, a facilisis sapien elementum.
+              <!-- Job description and about me will be inserted here -->
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <script>
-      function showDetails(title, description) {
-        document.getElementById("nannyName").innerHTML = title;
-        document.getElementById("jobDetails").innerHTML = description;
-        // document.getElementById("jobDescription").innerHTML = "Detailed description for " + title;
-      }
-
-      function searchJobs() {
-        const input = document.getElementById("jobSearch");
-        const filter = input.value.toLowerCase();
-        const jobCards = document.querySelectorAll(".job-card");
-
-        jobCards.forEach((card) => {
-          const title = card.querySelector("h5").textContent.toLowerCase();
-          const location = card.querySelector("p").textContent.toLowerCase();
-          if (title.includes(filter) || location.includes(filter)) {
-            card.style.display = "";
-          } else {
-            card.style.display = "none";
-          }
-        });
-      }
-    </script>
+    <!-- Scripts -->
     <script type="module">
       import { auth, db } from "./backend/firebase-config.js";
       import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
@@ -263,58 +153,181 @@
       import { logout } from './backend/auth.js';
       
       async function loadNavbar(user) {
-          let fileToLoad = 'unloggedin_navbar_template.html';
-  
-          if (user) {
-              try {
-                  const userDoc = await getDoc(doc(db, "USER", user.uid));
-                  if (userDoc.exists()) {
-                      const userData = userDoc.data();
-                      if (userData.role === 'parent') {
-                          fileToLoad = 'parent_navbar_template.html';
-                      } else if (userData.role === 'nanny') {
-                          fileToLoad = 'nanny_navbar_template.html';
-                      }
-                  }
-              } catch (error) {
-                  console.error('Error fetching user role:', error);
-              }
-          }
-  
+        let fileToLoad = 'unloggedin_navbar_template.html';
+
+        if (user) {
           try {
-              const response = await fetch(fileToLoad);
-              if (!response.ok) throw new Error('Network response was not ok');
-  
-              const navbarHTML = await response.text();
-              document.getElementById('navbar').innerHTML = navbarHTML;
-  
-              // Add event listener to logout link after navbar is loaded
-              const logoutLink = document.querySelector('#logoutBtn');
-              if (logoutLink) {
-                  logoutLink.addEventListener('click', async (e) => {
-                      e.preventDefault(); // Prevent the default link behavior
-                      console.log("Logout clicked");
-                      try {
-                          await logout(); // The redirect is now handled in the logout function
-                      } catch (error) {
-                          console.error('Logout failed:', error);
-                      }
-                  });
-              } else {
-                  console.log('Logout link not found');
+            const userDoc = await getDoc(doc(db, "USER", user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              if (userData.role === 'parent') {
+                fileToLoad = 'parent_navbar_template.html';
+              } else if (userData.role === 'nanny') {
+                fileToLoad = 'nanny_navbar_template.html';
               }
+            }
           } catch (error) {
-              console.error('Failed to load navbar:', error);
+            console.error('Error fetching user role:', error);
           }
+        }
+
+        try {
+          const response = await fetch(fileToLoad);
+          if (!response.ok) throw new Error('Network response was not ok');
+
+          const navbarHTML = await response.text();
+          document.getElementById('navbar').innerHTML = navbarHTML;
+
+          const logoutLink = document.querySelector('#logoutBtn');
+          if (logoutLink) {
+            logoutLink.addEventListener('click', async (e) => {
+              e.preventDefault();
+              try {
+                await logout();
+              } catch (error) {
+                console.error('Logout failed:', error);
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Failed to load navbar:', error);
+        }
       }
-  
+
       onAuthStateChanged(auth, (user) => {
-          console.log('Auth state changed');
-          loadNavbar(user);
+        loadNavbar(user);
       });
-  </script>
-  
+    </script>
+
+    <!-- Firebase Integration Script -->
+    <script type="module">
+      import { db } from "./backend/firebase-config.js";
+      import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+      // Function to calculate age from DOB
+      function calculateAge(dob) {
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        return age;
+      }
+
+      // Function to load all posts
+      async function loadPosts() {
+        try {
+          const postsSnapshot = await getDocs(collection(db, "POSTS"));
+          const jobListContainer = document.querySelector(".list-group");
+          jobListContainer.innerHTML = '';
+
+          for (const postDoc of postsSnapshot.docs) {
+            const postData = postDoc.data();
+            const userId = postData.userId;
+
+            const parentDoc = await getDoc(doc(db, "USER", userId));
+            const parentData = parentDoc.exists() ? parentDoc.data() : null;
+
+            if (parentData && parentData.role === 'parent') {
+              const jobCard = document.createElement('div');
+              jobCard.className = 'list-group-item job-card';
+              jobCard.onclick = () => showDetails(userId, postDoc.id);
+
+              jobCard.innerHTML = `
+                <div class="job-card-content">
+                  <img src="${parentData.profilePictureUrl || '/api/placeholder/60/60'}" alt="Profile" />
+                  <div class="job-description">
+                    <h5>${parentData.firstName} ${parentData.lastName}</h5>
+                    <p>Time: ${postData.startTime} - ${postData.endTime}</p>
+                    <p>Pay: $${postData.pay}/hr</p>
+                    <p>Date: ${new Date(postData.date).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              `;
+
+              jobListContainer.appendChild(jobCard);
+            }
+          }
+        } catch (error) {
+          console.error("Error loading posts:", error);
+        }
+      }
+
+      // Function to show details when a card is clicked
+      async function showDetails(userId, postId) {
+        try {
+          const parentDoc = await getDoc(doc(db, "USER", userId));
+          const parentData = parentDoc.exists() ? parentDoc.data() : null;
+
+          const postDoc = await getDoc(doc(db, "POSTS", postId));
+          const postData = postDoc.exists() ? postDoc.data() : null;
+
+          const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
+          const parentDetails = parentDetailsDoc.exists() ? parentDetailsDoc.data() : null;
+
+          if (parentData && postData && parentDetails) {
+            // Update profile picture and name
+            document.getElementById("profilePicture").src = parentData.profilePictureUrl || '/api/placeholder/80/80';
+            document.getElementById("nannyName").innerHTML = `${parentData.firstName} ${parentData.lastName}`;
+
+            // Update parent details
+            let detailsHTML = `
+              <p><strong>Gender:</strong> ${parentData.gender}</p>
+              <p><strong>Age:</strong> ${calculateAge(parentData.dob)}</p>
+            `;
+
+            // Add children information
+            if (parentDetails.children && parentDetails.children.length > 0) {
+              detailsHTML += '<h5>Children:</h5>';
+              parentDetails.children.forEach((child, index) => {
+                detailsHTML += `
+                  <p>Child ${index + 1}: ${calculateAge(child.dob)} years old</p>
+                `;
+              });
+            }
+
+            document.getElementById("jobDetails").innerHTML = detailsHTML;
+
+            // Update description section
+            let descriptionHTML = `
+              <h5>Job Description:</h5>
+              <p>${postData.description}</p>
+              <h5>About Parent:</h5>
+              <p>${parentDetails.aboutMe || 'No information provided'}</p>
+            `;
+
+            document.getElementById("jobDescription").innerHTML = descriptionHTML;
+          }
+        } catch (error) {
+          console.error("Error showing details:", error);
+        }
+      }
+
+      // Function to handle search
+      window.searchJobs = function() {
+        const input = document.getElementById("jobSearch");
+        const filter = input.value.toLowerCase();
+        const jobCards = document.querySelectorAll(".job-card");
+
+        jobCards.forEach((card) => {
+          const title = card.querySelector("h5").textContent.toLowerCase();
+          const details = card.querySelector(".job-description").textContent.toLowerCase();
+          if (title.includes(filter) || details.includes(filter)) {
+            card.style.display = "";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      }
+
+      // Load posts when the page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        loadPosts();
+      });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="backend/firebase-config.js"></script>
   </body>
 </html>

@@ -1,0 +1,322 @@
+<!-- THIS IS THE OLD NANNY_HOME NEW ONE IS CALLED "nanny_home.html" -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indeed-like Job Listing Page</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        padding-top: 60px;
+      }
+
+      /* Make the right details container fixed */
+      #detailsContainer {
+        position: sticky;
+        top: 60px; /* Matches the navbar height to keep it aligned */
+        border-left: 1px solid #ccc;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        height: calc(
+          100vh - 60px
+        ); /* Ensures it takes full height minus the navbar */
+        overflow-y: hidden; /* Disable scrolling for the entire container */
+      }
+
+      /* Styling the container that holds the job description */
+      #jobDescriptionContainer {
+        height: calc(
+          100% - 70px
+        ); /* Adjust to fill the rest of the container */
+        overflow-y: auto; /* Enables vertical scrolling */
+        padding: 10px;
+        border: 1px solid #ddd; /* Optional: Add a border around the scrollable area */
+        margin-top: 15px;
+      }
+
+      /* Job card styling similar to Indeed */
+      .job-card {
+        cursor: pointer;
+        margin-bottom: 10px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.3s ease;
+        height: 200px; /* Compact height */
+      }
+
+      .job-card:hover {
+        background-color: #f8f9fa;
+      }
+
+      .job-card img {
+        width: 100px;
+        height: 100px;
+        margin-right: 15px;
+      }
+
+      .job-card-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      .job-description {
+        flex-grow: 1;
+      }
+
+      #jobSearch {
+        width: 100%; /* Makes the search bar take full width of its container */
+        border-radius: 4px; /* Optional: Rounded corners */
+        border: 1px solid #ccc; /* Optional: Border color */
+        padding: 10px; /* Optional: Padding inside the input */
+        box-shadow: none; /* Removes the default input shadow */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbar"></div> <!-- Placeholder for navbar -->
+
+    <div class="container mt-3">
+      <input
+        type="text"
+        id="jobSearch"
+        class="form-control"
+        placeholder="Search for NANNY..."
+        onkeyup="searchJobs()"
+      />
+    </div>
+
+    <!-- Main Content Section -->
+    <div class="container mt-5">
+      <div class="row">
+        <!-- Job Cards Section -->
+        <div class="col-md-6"> 
+          <div class="list-group">
+            <div
+              class="list-group-item job-card"
+              onclick="showDetails('Parent 1', 'Description for Parent 1')"
+            >
+              <div class="job-card-content">
+                <img src="https://via.placeholder.com/60" alt="Job 1 Image" />
+                <div class="job-description">
+                  <h5>Nanny 1</h5>
+                  <p>San Francisco, CA</p>
+                </div>
+              </div>
+            </div>
+            <div
+              class="list-group-item job-card"
+              onclick="showDetails('Parent 2', 'Description for Parent 2')"
+            >
+              <div class="job-card-content">
+                <img src="https://via.placeholder.com/60" alt="Job 2 Image" />
+                <div class="job-description">
+                  <h5>Nanny 2</h5>
+                  <p>New York, NY</p>
+                </div>
+              </div>
+            </div>
+            <div
+              class="list-group-item job-card"
+              onclick="showDetails('Parent 3', 'Description for Parent 3')"
+            >
+              <div class="job-card-content">
+                <img src="https://via.placeholder.com/60" alt="Job 3 Image" />
+                <div class="job-description">
+                  <h5>Nanny 3</h5>
+                  <p>Chicago, IL</p>
+                </div>
+              </div>
+            </div>
+            <div
+              class="list-group-item job-card"
+              onclick="showDetails('Parent 4', 'Description for Parent 4')"
+            >
+              <div class="job-card-content">
+                <img src="https://via.placeholder.com/60" alt="Job 4 Image" />
+                <div class="job-description">
+                  <h5>Nanny 4</h5>
+                  <p>Austin, TX</p>
+                </div>
+              </div>
+            </div>
+            <div
+              class="list-group-item job-card"
+              onclick="showDetails('Parent 5', 'Description for Parent 5')"
+            >
+              <div class="job-card-content">
+                <img src="https://via.placeholder.com/60" alt="Job 5 Image" />
+                <div class="job-description">
+                  <h5>Nanny 5</h5>
+                  <p>Seattle, WA</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job Details Section -->
+        <div class="col-md-6" id="detailsContainer">
+          <h4 id="nannyName">click to see nanny name</h4>
+          <div id="jobDetails">SEE WHAT</div>
+
+          <!-- Scrollable job description section -->
+          <div id="jobDescriptionContainer">
+            <div id="jobDescription">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
+              lacinia odio vitae vestibulum. Cras et ligula eget odio aliquam
+              vulputate. Curabitur sit amet orci nec odio fermentum accumsan.
+              Integer ac felis id turpis faucibus varius. Sed quis sapien a
+              metus pretium pellentesque. Etiam sollicitudin arcu a lacus
+              tincidunt, et malesuada justo pharetra. Fusce volutpat diam vitae
+              orci scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus
+              ipsum at lacus venenatis, a facilisis sapien elementum. Lorem
+              ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia
+              odio vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
+              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
+              felis id turpis faucibus varius. Sed quis sapien a metus pretium
+              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
+              malesuada justo pharetra. Fusce volutpat diam vitae orci
+              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
+              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
+              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
+              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
+              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
+              felis id turpis faucibus varius. Sed quis sapien a metus pretium
+              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
+              malesuada justo pharetra. Fusce volutpat diam vitae orci
+              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
+              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
+              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
+              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
+              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
+              felis id turpis faucibus varius. Sed quis sapien a metus pretium
+              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
+              malesuada justo pharetra. Fusce volutpat diam vitae orci
+              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
+              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
+              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
+              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
+              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
+              felis id turpis faucibus varius. Sed quis sapien a metus pretium
+              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
+              malesuada justo pharetra. Fusce volutpat diam vitae orci
+              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
+              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
+              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
+              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
+              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
+              felis id turpis faucibus varius. Sed quis sapien a metus pretium
+              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
+              malesuada justo pharetra. Fusce volutpat diam vitae orci
+              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
+              at lacus venenatis, a facilisis sapien elementum. Lorem ipsum
+              dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio
+              vitae vestibulum. Cras et ligula eget odio aliquam vulputate.
+              Curabitur sit amet orci nec odio fermentum accumsan. Integer ac
+              felis id turpis faucibus varius. Sed quis sapien a metus pretium
+              pellentesque. Etiam sollicitudin arcu a lacus tincidunt, et
+              malesuada justo pharetra. Fusce volutpat diam vitae orci
+              scelerisque, eu pulvinar metus scelerisque. Vivamus dapibus ipsum
+              at lacus venenatis, a facilisis sapien elementum.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function showDetails(title, description) {
+        document.getElementById("nannyName").innerHTML = title;
+        document.getElementById("jobDetails").innerHTML = description;
+        // document.getElementById("jobDescription").innerHTML = "Detailed description for " + title;
+      }
+
+      function searchJobs() {
+        const input = document.getElementById("jobSearch");
+        const filter = input.value.toLowerCase();
+        const jobCards = document.querySelectorAll(".job-card");
+
+        jobCards.forEach((card) => {
+          const title = card.querySelector("h5").textContent.toLowerCase();
+          const location = card.querySelector("p").textContent.toLowerCase();
+          if (title.includes(filter) || location.includes(filter)) {
+            card.style.display = "";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      }
+    </script>
+    <script type="module">
+      import { auth, db } from "./backend/firebase-config.js";
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+      import { logout } from './backend/auth.js';
+      
+      async function loadNavbar(user) {
+          let fileToLoad = 'unloggedin_navbar_template.html';
+  
+          if (user) {
+              try {
+                  const userDoc = await getDoc(doc(db, "USER", user.uid));
+                  if (userDoc.exists()) {
+                      const userData = userDoc.data();
+                      if (userData.role === 'parent') {
+                          fileToLoad = 'parent_navbar_template.html';
+                      } else if (userData.role === 'nanny') {
+                          fileToLoad = 'nanny_navbar_template.html';
+                      }
+                  }
+              } catch (error) {
+                  console.error('Error fetching user role:', error);
+              }
+          }
+  
+          try {
+              const response = await fetch(fileToLoad);
+              if (!response.ok) throw new Error('Network response was not ok');
+  
+              const navbarHTML = await response.text();
+              document.getElementById('navbar').innerHTML = navbarHTML;
+  
+              // Add event listener to logout link after navbar is loaded
+              const logoutLink = document.querySelector('#logoutBtn');
+              if (logoutLink) {
+                  logoutLink.addEventListener('click', async (e) => {
+                      e.preventDefault(); // Prevent the default link behavior
+                      console.log("Logout clicked");
+                      try {
+                          await logout(); // The redirect is now handled in the logout function
+                      } catch (error) {
+                          console.error('Logout failed:', error);
+                      }
+                  });
+              } else {
+                  console.log('Logout link not found');
+              }
+          } catch (error) {
+              console.error('Failed to load navbar:', error);
+          }
+      }
+  
+      onAuthStateChanged(auth, (user) => {
+          console.log('Auth state changed');
+          loadNavbar(user);
+      });
+  </script>
+  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="backend/firebase-config.js"></script>
+  </body>
+</html>
