@@ -44,6 +44,28 @@
       ul li::before {
         content: "👶 ";
       }
+
+      .child-card {
+        width: 150px;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+      }
+      .child-card:hover {
+        transform: scale(1.05);
+      }
+
+      /* Colour for female children */
+      .bg-pink {
+        background-color: #f8bbd0; /* Light pink */
+      }
+
+      /* Colour for male children */
+      .bg-info {
+        background-color: #5bc0de; /* Bootstrap info blue */
+      }
     </style>
   </head>
   <body>
@@ -94,15 +116,16 @@
           <hr />
 
           <div>
-            <h5>Children</h5>
-            <div class="mt-2">
-              <span
+            <h5 class="mb-3">Children</h5>
+            <div class="d-flex flex-wrap gap-2">
+              <div
                 v-for="child in profileData.children"
                 :key="child.name"
-                class="badge bg-primary text-light me-2 mb-2"
+                class="['child-card', child.gender === 'Male' ? 'bg-info' : 'bg-pink']"
               >
-                {{ child.name }} ({{ child.age }} yrs)
-              </span>
+                <h6 class="text-white mb-1">{{ child.name }}</h6>
+                <p class="text-light mb-0">{{ child.age }}</p>
+              </div>
             </div>
           </div>
 
