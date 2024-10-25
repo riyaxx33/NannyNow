@@ -268,14 +268,31 @@
                   </div>
                   <div class="mb-3">
                     <label
-                      :for="'child' + (rowIndex * 2 + childIndex + 1) + 'Age'"
+                      :for="'child' + (index + 1) + 'Gender'"
+                      class="form-label"
+                      >Gender</label
+                    >
+                    <select
+                      class="form-select"
+                      :id="'child' + (index + 1)
+              + 'Gender'"
+                      v-model="child.gender"
+                    >
+                      <option value="" disabled>Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label
+                      :for="'child' + (index + 1) + 'Age'"
                       class="form-label"
                       >Age</label
                     >
                     <input
                       type="number"
                       class="form-control"
-                      :id="'child' + (rowIndex * 2 + childIndex + 1) + 'Age'"
+                      :id="'child' + (index + 1) + 'Age'"
                       placeholder="Child's Age"
                       v-model="child.age"
                     />
@@ -326,7 +343,7 @@
             gender: "",
             homeAddress: "",
             phoneNumber: "",
-            children: [{ name: "", age: null }],
+            children: [{ name: "", gender: "", age: null }],
             password: "",
             confirmPassword: "",
             passwordError: "",
@@ -356,7 +373,7 @@
 
         methods: {
           addChild() {
-            this.children.push({ name: "", age: null });
+            this.children.push({ name: "", gender: "", age: null });
           },
 
           validatePassword() {
