@@ -101,7 +101,25 @@
         margin-right: 20px;
         object-fit: cover;
       }
+
+      .location-badge {
+        background-color: #e9ecef;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.9em;
+        margin-top: 5px;
+        display: inline-block;
+      }
+
+      #map {
+        height: 200px;
+        width: 100%;
+        margin-top: 15px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+      }
     </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
   </head>
   <body>
     <div id="navbar"></div>
@@ -128,10 +146,14 @@
         <!-- Job Details Section -->
         <div class="col-md-6" id="detailsContainer">
           <div class="profile-header">
-            <img id="profilePicture" src="/api/placeholder/80/80" alt="Profile Picture" />
+            <img
+              id="profilePicture"
+              src="/api/placeholder/80/80"
+              alt="Profile Picture"
+            />
             <h4 id="nannyName">Select a post to view details</h4>
           </div>
-          
+
           <div class="parent-info" id="jobDetails">
             <!-- Parent details will be inserted here -->
           </div>
@@ -149,48 +171,51 @@
     <script type="module">
       import { auth, db } from "./backend/firebase-config.js";
       import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-      import { logout } from './backend/auth.js';
-      
+      import {
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+      import { logout } from "./backend/auth.js";
+
       async function loadNavbar(user) {
-        let fileToLoad = 'unloggedin_navbar_template.html';
+        let fileToLoad = "unloggedin_navbar_template.html";
 
         if (user) {
           try {
             const userDoc = await getDoc(doc(db, "USER", user.uid));
             if (userDoc.exists()) {
               const userData = userDoc.data();
-              if (userData.role === 'parent') {
-                fileToLoad = 'parent_navbar_template.html';
-              } else if (userData.role === 'nanny') {
-                fileToLoad = 'nanny_navbar_template.html';
+              if (userData.role === "parent") {
+                fileToLoad = "parent_navbar_template.html";
+              } else if (userData.role === "nanny") {
+                fileToLoad = "nanny_navbar_template.html";
               }
             }
           } catch (error) {
-            console.error('Error fetching user role:', error);
+            console.error("Error fetching user role:", error);
           }
         }
 
         try {
           const response = await fetch(fileToLoad);
-          if (!response.ok) throw new Error('Network response was not ok');
+          if (!response.ok) throw new Error("Network response was not ok");
 
           const navbarHTML = await response.text();
-          document.getElementById('navbar').innerHTML = navbarHTML;
+          document.getElementById("navbar").innerHTML = navbarHTML;
 
-          const logoutLink = document.querySelector('#logoutBtn');
+          const logoutLink = document.querySelector("#logoutBtn");
           if (logoutLink) {
-            logoutLink.addEventListener('click', async (e) => {
+            logoutLink.addEventListener("click", async (e) => {
               e.preventDefault();
               try {
                 await logout();
               } catch (error) {
-                console.error('Logout failed:', error);
+                console.error("Logout failed:", error);
               }
             });
           }
         } catch (error) {
-          console.error('Failed to load navbar:', error);
+          console.error("Failed to load navbar:", error);
         }
       }
 
@@ -202,7 +227,12 @@
     <!-- Firebase Integration Script -->
     <script type="module">
       import { db } from "./backend/firebase-config.js";
-      import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+      import {
+        collection,
+        getDocs,
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
       // Function to calculate age from DOB
       function calculateAge(dob) {
@@ -210,10 +240,73 @@
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
           age--;
         }
         return age;
+      }
+
+      let map = null;
+      let currentMarker = null;
+
+      // Geocoding function
+      async function getApproximateLocation(address) {
+        return new Promise((resolve, reject) => {
+          const geocoder = new google.maps.Geocoder();
+
+          geocoder.geocode({ address }, (results, status) => {
+            if (status === "OK") {
+              const result = results[0];
+              const { address_components, geometry } = result;
+
+              const neighbourhood = address_components.find(
+                (component) =>
+                  component.types.includes("neighborhood") ||
+                  component.types.includes("sublocality")
+              );
+
+              const locality = address_components.find((component) =>
+                component.types.includes("locality")
+              );
+
+              resolve({
+                displayLocation: neighbourhood
+                  ? `${neighbourhood.long_name}, ${locality.long_name}`
+                  : locality.long_name,
+                coordinates: {
+                  lat: geometry.location.lat(),
+                  lng: geometry.location.lng(),
+                },
+              });
+            } else {
+              reject(new Error("Geocoding failed"));
+            }
+          });
+        });
+      }
+
+      // Function to initialise/update map
+      function initializeMap(coordinates) {
+        if (!map) {
+          map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 13,
+            center: coordinates,
+          });
+        }
+
+        if (currentMarker) {
+          currentMarker.setMap(null);
+        }
+
+        currentMarker = new google.maps.Marker({
+          position: coordinates,
+          map: map,
+        });
+
+        map.setCenter(coordinates);
       }
 
       // Function to load all posts
@@ -221,7 +314,7 @@
         try {
           const postsSnapshot = await getDocs(collection(db, "POSTS"));
           const jobListContainer = document.querySelector(".list-group");
-          jobListContainer.innerHTML = '';
+          jobListContainer.innerHTML = "";
 
           for (const postDoc of postsSnapshot.docs) {
             const postData = postDoc.data();
@@ -230,19 +323,43 @@
             const parentDoc = await getDoc(doc(db, "USER", userId));
             const parentData = parentDoc.exists() ? parentDoc.data() : null;
 
-            if (parentData && parentData.role === 'parent') {
-              const jobCard = document.createElement('div');
-              jobCard.className = 'list-group-item job-card';
+            const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
+            const parentDetails = parentDetailsDoc.exists()
+              ? parentDetailsDoc.data()
+              : null;
+
+            if (parentData && parentData.role === "parent" && parentDetails) {
+              // Get approximate location from address
+              let locationInfo = { displayLocation: "Location not available" };
+              try {
+                if (parentDetails.address) {
+                  locationInfo = await getApproximateLocation(
+                    parentDetails.address
+                  );
+                }
+              } catch (error) {
+                console.error("Error getting location:", error);
+              }
+
+              const jobCard = document.createElement("div");
+              jobCard.className = "list-group-item job-card";
               jobCard.onclick = () => showDetails(userId, postDoc.id);
 
               jobCard.innerHTML = `
                 <div class="job-card-content">
-                  <img src="${parentData.profilePictureUrl || '/api/placeholder/60/60'}" alt="Profile" />
+                  <img src="${
+                    parentData.profilePictureUrl || "/api/placeholder/60/60"
+                  }" alt="Profile" />
                   <div class="job-description">
                     <h5>${parentData.firstName} ${parentData.lastName}</h5>
                     <p>Time: ${postData.startTime} - ${postData.endTime}</p>
                     <p>Pay: $${postData.pay}/hr</p>
                     <p>Date: ${new Date(postData.date).toLocaleDateString()}</p>
+                    <div class="location-badge">
+                      <i class="bi bi-geo-alt"></i> ${
+                        locationInfo.displayLocation
+                      }
+                    </div>
                   </div>
                 </div>
               `;
@@ -265,40 +382,55 @@
           const postData = postDoc.exists() ? postDoc.data() : null;
 
           const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
-          const parentDetails = parentDetailsDoc.exists() ? parentDetailsDoc.data() : null;
+          const parentDetails = parentDetailsDoc.exists()
+            ? parentDetailsDoc.data()
+            : null;
 
           if (parentData && postData && parentDetails) {
             // Update profile picture and name
-            document.getElementById("profilePicture").src = parentData.profilePictureUrl || '/api/placeholder/80/80';
-            document.getElementById("nannyName").innerHTML = `${parentData.firstName} ${parentData.lastName}`;
+            document.getElementById("profilePicture").src =
+              parentData.profilePictureUrl || "/api/placeholder/80/80";
+            document.getElementById(
+              "nannyName"
+            ).innerHTML = `${parentData.firstName} ${parentData.lastName}`;
 
             // Update parent details
             let detailsHTML = `
               <p><strong>Gender:</strong> ${parentData.gender}</p>
               <p><strong>Age:</strong> ${calculateAge(parentData.dob)}</p>
+              <p><strong>Location:</strong> ${locationInfo.displayLocation}</p>
+              <div id="map"></div>
             `;
 
             // Add children information
             if (parentDetails.children && parentDetails.children.length > 0) {
-              detailsHTML += '<h5>Children:</h5>';
+              detailsHTML += "<h5>Children:</h5>";
               parentDetails.children.forEach((child, index) => {
                 detailsHTML += `
-                  <p>Child ${index + 1}: ${calculateAge(child.dob)} years old</p>
+                  <p>Child ${index + 1}: ${calculateAge(
+                  child.dob
+                )} years old</p>
                 `;
               });
             }
 
             document.getElementById("jobDetails").innerHTML = detailsHTML;
 
+            // Initialise map with location
+            if (locationInfo.coordinates) {
+              setTimeout(() => initializeMap(locationInfo.coordinates), 100);
+            }
+
             // Update description section
             let descriptionHTML = `
               <h5>Job Description:</h5>
               <p>${postData.description}</p>
               <h5>About Parent:</h5>
-              <p>${parentDetails.aboutMe || 'No information provided'}</p>
+              <p>${parentDetails.aboutMe || "No information provided"}</p>
             `;
 
-            document.getElementById("jobDescription").innerHTML = descriptionHTML;
+            document.getElementById("jobDescription").innerHTML =
+              descriptionHTML;
           }
         } catch (error) {
           console.error("Error showing details:", error);
@@ -306,24 +438,26 @@
       }
 
       // Function to handle search
-      window.searchJobs = function() {
+      window.searchJobs = function () {
         const input = document.getElementById("jobSearch");
         const filter = input.value.toLowerCase();
         const jobCards = document.querySelectorAll(".job-card");
 
         jobCards.forEach((card) => {
           const title = card.querySelector("h5").textContent.toLowerCase();
-          const details = card.querySelector(".job-description").textContent.toLowerCase();
+          const details = card
+            .querySelector(".job-description")
+            .textContent.toLowerCase();
           if (title.includes(filter) || details.includes(filter)) {
             card.style.display = "";
           } else {
             card.style.display = "none";
           }
         });
-      }
+      };
 
       // Load posts when the page loads
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         loadPosts();
       });
     </script>
