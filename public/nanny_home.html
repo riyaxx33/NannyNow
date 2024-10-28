@@ -101,23 +101,6 @@
         margin-right: 20px;
         object-fit: cover;
       }
-
-      .location-badge {
-        background-color: #e9ecef;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 0.9em;
-        margin-top: 5px;
-        display: inline-block;
-      }
-
-      #map {
-        height: 200px;
-        width: 100%;
-        margin-top: 15px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-      }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
   </head>
@@ -249,66 +232,6 @@
         return age;
       }
 
-      let map = null;
-      let currentMarker = null;
-
-      // Geocoding function
-      async function getApproximateLocation(address) {
-        return new Promise((resolve, reject) => {
-          const geocoder = new google.maps.Geocoder();
-
-          geocoder.geocode({ address }, (results, status) => {
-            if (status === "OK") {
-              const result = results[0];
-              const { address_components, geometry } = result;
-
-              const neighbourhood = address_components.find(
-                (component) =>
-                  component.types.includes("neighborhood") ||
-                  component.types.includes("sublocality")
-              );
-
-              const locality = address_components.find((component) =>
-                component.types.includes("locality")
-              );
-
-              resolve({
-                displayLocation: neighbourhood
-                  ? `${neighbourhood.long_name}, ${locality.long_name}`
-                  : locality.long_name,
-                coordinates: {
-                  lat: geometry.location.lat(),
-                  lng: geometry.location.lng(),
-                },
-              });
-            } else {
-              reject(new Error("Geocoding failed"));
-            }
-          });
-        });
-      }
-
-      // Function to initialise/update map
-      function initializeMap(coordinates) {
-        if (!map) {
-          map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 13,
-            center: coordinates,
-          });
-        }
-
-        if (currentMarker) {
-          currentMarker.setMap(null);
-        }
-
-        currentMarker = new google.maps.Marker({
-          position: coordinates,
-          map: map,
-        });
-
-        map.setCenter(coordinates);
-      }
-
       // Function to load all posts
       async function loadPosts() {
         try {
@@ -329,18 +252,6 @@
               : null;
 
             if (parentData && parentData.role === "parent" && parentDetails) {
-              // Get approximate location from address
-              let locationInfo = { displayLocation: "Location not available" };
-              try {
-                if (parentDetails.address) {
-                  locationInfo = await getApproximateLocation(
-                    parentDetails.address
-                  );
-                }
-              } catch (error) {
-                console.error("Error getting location:", error);
-              }
-
               const jobCard = document.createElement("div");
               jobCard.className = "list-group-item job-card";
               jobCard.onclick = () => showDetails(userId, postDoc.id);
@@ -355,11 +266,6 @@
                     <p>Time: ${postData.startTime} - ${postData.endTime}</p>
                     <p>Pay: $${postData.pay}/hr</p>
                     <p>Date: ${new Date(postData.date).toLocaleDateString()}</p>
-                    <div class="location-badge">
-                      <i class="bi bi-geo-alt"></i> ${
-                        locationInfo.displayLocation
-                      }
-                    </div>
                   </div>
                 </div>
               `;
@@ -398,8 +304,6 @@
             let detailsHTML = `
               <p><strong>Gender:</strong> ${parentData.gender}</p>
               <p><strong>Age:</strong> ${calculateAge(parentData.dob)}</p>
-              <p><strong>Location:</strong> ${locationInfo.displayLocation}</p>
-              <div id="map"></div>
             `;
 
             // Add children information
@@ -415,11 +319,6 @@
             }
 
             document.getElementById("jobDetails").innerHTML = detailsHTML;
-
-            // Initialise map with location
-            if (locationInfo.coordinates) {
-              setTimeout(() => initializeMap(locationInfo.coordinates), 100);
-            }
 
             // Update description section
             let descriptionHTML = `
