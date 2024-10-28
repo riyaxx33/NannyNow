@@ -150,6 +150,9 @@
       </div>
     </div>
 
+    <!-- API KEY -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5BjPBxo5PwTs6N2PAT0YCUvT66CIQuxw&libraries=places"></script>
+
     <!-- Scripts -->
     <script type="module">
       import { auth, db } from "./backend/firebase-config.js";
@@ -265,7 +268,7 @@
                     <h5>${parentData.firstName} ${parentData.lastName}</h5>
                     <p>Time: ${postData.startTime} - ${postData.endTime}</p>
                     <p>Pay: $${postData.pay}/hr</p>
-                    <p>Date: ${new Date(postData.date).toLocaleDateString()}</p>
+                    <p>Date: ${postData.date.toDate().toLocaleDateString()}</p>
                   </div>
                 </div>
               `;
@@ -310,11 +313,10 @@
             if (parentDetails.children && parentDetails.children.length > 0) {
               detailsHTML += "<h5>Children:</h5>";
               parentDetails.children.forEach((child, index) => {
-                detailsHTML += `
-                  <p>Child ${index + 1}: ${calculateAge(
-                  child.dob
-                )} years old</p>
-                `;
+                const age = child.age;
+                detailsHTML += `<p>Child ${index + 1}: ${
+                  child.name
+                }, ${age} years old</p>`;
               });
             }
 
@@ -330,10 +332,56 @@
 
             document.getElementById("jobDescription").innerHTML =
               descriptionHTML;
+
+            // Google Maps API
+            const address = parentDetails.homeAddress;
+            geocodeAddress(address);
           }
         } catch (error) {
           console.error("Error showing details:", error);
         }
+      }
+
+      // Geocoding API
+      function geocodeAddress(address) {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: address }, (results, status) => {
+          if (status === "OK") {
+            const location = results[0].geometry.location;
+
+            // Extract approximate location (neighbourhood or city)
+            const approxCityOrNeighbourhood =
+              results[0].address_components.find(
+                (component) =>
+                  component.types.includes("neighborhood") ||
+                  component.types.includes("locality")
+              )?.long_name || "Location unavailable";
+
+            document.getElementById("jobDescription").innerHTML += `
+              <h5>Approximate Location:</h5>
+              <p>${approxCityOrNeighbourhood}</p>
+              <div id="map" style="height: 300px;"></div>
+              `;
+
+            // Initialise the map
+            initialiseMap(location);
+          } else {
+            console.error("Geocode was not successful:", status);
+          }
+        });
+      }
+
+      // Initialise Google Map and place a marker
+      function initialiseMap(location) {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 14,
+          center: location,
+        });
+
+        new google.maps.Marker({
+          position: location,
+          map: map,
+        });
       }
 
       // Function to handle search
