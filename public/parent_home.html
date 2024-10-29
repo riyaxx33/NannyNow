@@ -9,7 +9,6 @@
       rel="stylesheet"
     />
     <style>
-
       /* Make the right details container fixed */
       #detailsContainer {
         position: sticky;
@@ -66,15 +65,6 @@
         flex-grow: 1;
       }
 
-      /* Optional: Styling for filters */
-      #dayFilter,
-      #timeFilter,
-      #salaryFilter {
-        border-radius: 4px;
-        padding: 10px;
-        margin-bottom: 10px;
-      }
-
       .chat-button-container {
         text-align: center;
         margin: 20px 0;
@@ -99,20 +89,191 @@
         background-color: #cccccc;
         cursor: not-allowed;
       }
+
+      .search-container {
+        position: relative;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .search-bar {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+      }
+
+      .search-input-group {
+        flex-grow: 1;
+        position: relative;
+      }
+
+      .search-input-group i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+      }
+
+      .search-input {
+        padding-left: 40px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        height: 45px;
+      }
+
+      .filter-dropdown {
+        position: relative;
+        min-width: 200px;
+      }
+
+      .filter-button {
+        width: 100%;
+        height: 45px;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 0 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #495057;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .filter-button:hover {
+        border-color: #adb5bd;
+        background-color: #f8f9fa;
+      }
+
+      .filter-button i {
+        color: #6c757d;
+      }
+
+      .filter-menu {
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 0;
+        right: 0;
+        margin-top: 5px;
+        background-color: white;
+        border-radius: 6px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        border: 1px solid #dee2e6;
+        display: none;
+      }
+
+      .filter-menu.show {
+        display: block;
+      }
+
+      .filter-option {
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .filter-option:hover {
+        background-color: #f8f9fa;
+      }
+
+      .filter-option.active {
+        background-color: #e9ecef;
+        color: #007bff;
+      }
+
+      .filter-option:first-child {
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+      }
+
+      .filter-option:last-child {
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+
+      .active-filter {
+        display: inline-block;
+        padding: 4px 12px;
+        background-color: #e7f3ff;
+        color: #007bff;
+        border-radius: 20px;
+        font-size: 0.9em;
+        margin-top: 10px;
+        margin-right: 10px;
+      }
+
+      .active-filter i {
+        margin-left: 5px;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <div id="app">
-      <div id="navbar"></div> <!-- Placeholder for navbar -->
+      <div id="navbar"></div>
+      <!-- Placeholder for navbar -->
 
       <div class="container mt-3">
-        <input
-          type="text"
-          v-model="searchQuery"
-          class="form-control"
-          placeholder="Search for NANNY..."
-          @input="searchJobs"
-        />
+        <div class="search-container">
+          <div class="search-bar">
+            <div class="search-input-group">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                v-model="searchQuery"
+                class="form-control"
+                placeholder="Search for NANNY..."
+                @input="searchJobs"
+              />
+            </div>
+
+            <div class="filter-dropdown" @click.stop>
+              <button class="filter-button" @click="toggleFilterMenu">
+                <span
+                  >{{ experienceFilter ? `${experienceFilter} Experience` :
+                  `Experience Level` }}</span
+                >
+                <i
+                  class="fas"
+                  :class="showFilterMenu ? 'fa-chevron-up' :
+                'fa-chevron-down' "
+                ></i>
+              </button>
+
+              <div class="filter-menu" :class="{ show: showFilterMenu }">
+                <div
+                  class="filter-option"
+                  :class="{ active: experienceFilter === '' }"
+                  @click="setExperienceFilter('')"
+                >
+                  All Experience Levels
+                </div>
+                <div
+                  v-for="option in experienceOptions"
+                  :key="option.value"
+                  class="filter-option"
+                  :class="{ active: experienceFilter === option.value }"
+                  @click="setExperienceFilter(option.value)"
+                >
+                  {{ option.label }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active filters display -->
+          <div v-if="experienceFilter" class="active-filter">
+            {{ experienceFilter }} Experience
+            <i class="fas fa-times" @click="clearExperienceFilter"></i>
+          </div>
+        </div>
       </div>
 
       <!-- Main Content Section -->
@@ -180,6 +341,7 @@
         ref,
         computed,
         onMounted,
+        onUnmounted,
       } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
       import { db, auth } from "./backend/firebase-config.js"; // Make sure auth is imported
       import {
@@ -199,6 +361,54 @@
           const selectedNanny = ref(null);
           const searchQuery = ref("");
           const currentUserId = ref(null);
+          const experienceFilter = ref("");
+          const showFilterMenu = ref(false);
+
+          const experienceOptions = [
+            { value: "0-2", label: "0-2 years" },
+            { value: "3-5", label: "3-5 years" },
+            { value: "6-10", label: "6-10 years" },
+            { value: "10+", label: "10+ years" },
+          ];
+
+          const toggleFilterMenu = () => {
+            showFilterMenu.value = !showFilterMenu.value;
+          };
+
+          const setExperienceFilter = (value) => {
+            experienceFilter.value = value;
+            showFilterMenu.value = false;
+          };
+
+          const clearExperienceFilter = () => {
+            experienceFilter.value = "";
+          };
+
+          const handleClickOutside = (event) => {
+            const filterDropdown = document.querySelector(".filter-dropdown");
+            if (filterDropdown && !filterDropdown.contains(e.target)) {
+              showFilterMenu.value = false;
+            }
+          };
+
+          // Helper function to check if experience matches filter
+          const matchesExperienceFilter = (nanny, filter) => {
+            if (!filter) return true;
+            const exp = Number(nanny.yrsExperience) || 0;
+
+            switch (filter) {
+              case "0-2":
+                return exp >= 0 && exp <= 2;
+              case "3-5":
+                return exp >= 3 && exp <= 5;
+              case "6-10":
+                return exp >= 6 && exp <= 10;
+              case "10+":
+                return exp >= 10;
+              default:
+                return true;
+            }
+          };
 
           const fetchNannies = async () => {
             try {
@@ -247,13 +457,18 @@
 
           const filteredNannies = computed(() => {
             const query = searchQuery.value.toLowerCase();
-            return nannies.value.filter(
-              (nanny) =>
+            return nannies.value.filter((nanny) => {
+              const matchesSearch =
                 nanny.firstName?.toLowerCase().includes(query) ||
-                nanny.lastName?.toLowerCase().includes(query) ||
-                (nanny.yrsExperience &&
-                  nanny.yrsExperience.toString().includes(query))
-            );
+                nanny.lastName?.toLowerCase().includes(query);
+
+              const matchesExperience = matchesExperienceFilter(
+                nanny,
+                experienceFilter.value
+              );
+
+              return matchesSearch && matchesExperience;
+            });
           });
 
           const showDetails = (nanny) => {
@@ -266,6 +481,7 @@
 
           // Combine both onMounted operations into one
           onMounted(() => {
+            document.addEventListener("click", handleClickOutside);
             // Set up auth state listener
             auth.onAuthStateChanged((user) => {
               currentUserId.value = user ? user.uid : null;
@@ -273,6 +489,10 @@
 
             // Fetch nannies
             fetchNannies();
+          });
+
+          onUnmounted(() => {
+            document.removeEventListener("click", handleClickOutside);
           });
 
           return {
@@ -284,69 +504,78 @@
             searchJobs,
             sendMessage,
             currentUserId,
+            experienceFilter,
+            showFilterMenu,
+            experienceOptions,
+            toggleFilterMenu,
+            setExperienceFilter,
+            clearExperienceFilter,
           };
         },
       }).mount("#app");
     </script>
 
-<script type="module">
-    import { auth, db } from "./backend/firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-    import { logout } from './backend/auth.js';
-    
-    async function loadNavbar(user) {
-        let fileToLoad = 'unloggedin_navbar_template.html';
+    <script type="module">
+      import { auth, db } from "./backend/firebase-config.js";
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+      import { logout } from "./backend/auth.js";
+
+      async function loadNavbar(user) {
+        let fileToLoad = "unloggedin_navbar_template.html";
 
         if (user) {
-            try {
-                const userDoc = await getDoc(doc(db, "USER", user.uid));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    if (userData.role === 'parent') {
-                        fileToLoad = 'parent_navbar_template.html';
-                    } else if (userData.role === 'nanny') {
-                        fileToLoad = 'nanny_navbar_template.html';
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching user role:', error);
+          try {
+            const userDoc = await getDoc(doc(db, "USER", user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              if (userData.role === "parent") {
+                fileToLoad = "parent_navbar_template.html";
+              } else if (userData.role === "nanny") {
+                fileToLoad = "nanny_navbar_template.html";
+              }
             }
+          } catch (error) {
+            console.error("Error fetching user role:", error);
+          }
         }
 
         try {
-            const response = await fetch(fileToLoad);
-            if (!response.ok) throw new Error('Network response was not ok');
+          const response = await fetch(fileToLoad);
+          if (!response.ok) throw new Error("Network response was not ok");
 
-            const navbarHTML = await response.text();
-            document.getElementById('navbar').innerHTML = navbarHTML;
+          const navbarHTML = await response.text();
+          document.getElementById("navbar").innerHTML = navbarHTML;
 
-            // Add event listener to logout link after navbar is loaded
-            const logoutLink = document.querySelector('#logoutBtn');
-            if (logoutLink) {
-                logoutLink.addEventListener('click', async (e) => {
-                    e.preventDefault(); // Prevent the default link behavior
-                    console.log("Logout clicked");
-                    try {
-                        await logout(); // The redirect is now handled in the logout function
-                    } catch (error) {
-                        console.error('Logout failed:', error);
-                    }
-                });
-            } else {
-                console.log('Logout link not found');
-            }
+          // Add event listener to logout link after navbar is loaded
+          const logoutLink = document.querySelector("#logoutBtn");
+          if (logoutLink) {
+            logoutLink.addEventListener("click", async (e) => {
+              e.preventDefault(); // Prevent the default link behavior
+              console.log("Logout clicked");
+              try {
+                await logout(); // The redirect is now handled in the logout function
+              } catch (error) {
+                console.error("Logout failed:", error);
+              }
+            });
+          } else {
+            console.log("Logout link not found");
+          }
         } catch (error) {
-            console.error('Failed to load navbar:', error);
+          console.error("Failed to load navbar:", error);
         }
-    }
+      }
 
-    onAuthStateChanged(auth, (user) => {
-        console.log('Auth state changed');
+      onAuthStateChanged(auth, (user) => {
+        console.log("Auth state changed");
         loadNavbar(user);
-    });
-</script>
+      });
+    </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
