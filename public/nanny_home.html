@@ -357,8 +357,8 @@ function initializeChatButton(currentUserId, parentId) {
       try {
         const chatData = {
           to_user_id: parentId,
-          from_user_id: currentUserId,
-          timestamp: serverTimestamp(),
+          from_user_id: auth.currentUser.uid,
+          timestamp: new Date(),
           message: "Hi, I'm interested in your job posting and would like to discuss details.",
         };
 
