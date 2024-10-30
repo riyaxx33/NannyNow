@@ -4,103 +4,193 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nanny Home - Parent Posts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <style>
-      body {
-        padding-top: 60px;
-      }
+#detailsContainer {
+  position: sticky;
+  top: 60px;
+  background-color: white;
+  border-left: 1px solid #ccc;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  height: calc(100vh - 60px);
+  overflow-y: hidden;
+  font-family: 'Poppins', sans-serif;
+}
 
-      #detailsContainer {
-        position: sticky;
-        top: 60px;
-        border-left: 1px solid #ccc;
-        border: 2px solid #ddd;
-        border-radius: 5px;
-        padding: 20px;
-        height: calc(100vh - 60px);
-        overflow-y: hidden;
-      }
+#jobDescriptionContainer {
+  height: calc(100% - 70px);
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin-top: 15px;
+}
 
-      #jobDescriptionContainer {
-        height: calc(100% - 70px);
-        overflow-y: auto;
-        padding: 10px;
-        border: 1px solid #ddd;
-        margin-top: 15px;
-      }
+.job-card {
+  cursor: pointer;
+  margin-bottom: 10px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  height: auto;
+}
 
-      .job-card {
-        cursor: pointer;
-        margin-bottom: 10px;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: background-color 0.3s ease;
-        height: auto;
-      }
+.job-card:hover {
+  background-color: #f8f9fa;
+}
 
-      .job-card:hover {
-        background-color: #f8f9fa;
-      }
+.job-card img {
+  width: 80px;
+  height: 80px;
+  margin-right: 15px;
+  border-radius: 50%;
+  object-fit: cover;
+}
 
-      .job-card img {
-        width: 60px;
-        height: 60px;
-        margin-right: 15px;
-        border-radius: 50%;
-        object-fit: cover;
-      }
+.job-card-content img {
+  position: relative;
+  top: -25px;
+}
 
-      .job-card-content {
-        display: flex;
-        align-items: center;
-        width: 100%;
-      }
+.job-card-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+}
 
-      .job-description {
-        flex-grow: 1;
-      }
+.job-card-content p {
+  font-size: 15px;
+}
 
-      #jobSearch {
-        width: 100%;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        padding: 10px;
-        box-shadow: none;
-        margin-bottom: 20px;
-      }
+.job-description {
+  flex-grow: 1;
+}
 
-      .parent-info {
-        margin-bottom: 20px;
-      }
+#jobSearch {
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: none;
+  margin-bottom: 20px;
+}
 
-      .children-info {
-        margin: 20px 0;
-      }
+/* Updated compact styles for parent info and children sections */
+.parent-info {
+  margin-bottom: 8px;
+}
 
-      .description-section {
-        margin-top: 20px;
-      }
+.parent-info h5 {
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
 
-      .profile-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
-      }
+.parent-info p {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
 
-      .profile-header img {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin-right: 20px;
-        object-fit: cover;
-      }
+/* Job Description styles to match other sections */
+#jobDescription h5 {
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+#jobDescription p {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+#jobDescription h5:not(:first-child) {
+  margin-top: 12px;
+}
+
+#jobDescription p:last-child {
+  margin-bottom: 12px;
+}
+
+.children-section {
+  margin: 12px 0;
+}
+
+.children-title {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #212529;
+}
+
+.children-container {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.child-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 8px 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.child-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #212529;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.child-age {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.profile-header img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 20px;
+  object-fit: cover;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-info h4 {
+  font-size: 1.8rem;  /* Increased size for name */
+  margin-bottom: 2px;
+}
+
+.profile-subtext {
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
   </head>
@@ -134,7 +224,10 @@
               src="/api/placeholder/80/80"
               alt="Profile Picture"
             />
-            <h4 id="nannyName">Select a post to view details</h4>
+            <div class="profile-info">
+              <h4 id="nannyName">Select a post to view details</h4>
+              <span id="profileSubtext" class="profile-subtext"></span>
+            </div>
           </div>
 
           <div class="parent-info" id="jobDetails">
@@ -242,6 +335,9 @@
           const jobListContainer = document.querySelector(".list-group");
           jobListContainer.innerHTML = "";
 
+          let firstPostUserId = null;
+          let firstPostId = null;
+
           for (const postDoc of postsSnapshot.docs) {
             const postData = postDoc.data();
             const userId = postData.userId;
@@ -266,15 +362,26 @@
                   }" alt="Profile" />
                   <div class="job-description">
                     <h5>${parentData.firstName} ${parentData.lastName}</h5>
-                    <p>Time: ${postData.startTime} - ${postData.endTime}</p>
-                    <p>Pay: $${postData.pay}/hr</p>
-                    <p>Date: ${postData.date.toDate().toLocaleDateString()}</p>
+                    <p>Time of Job: ${postData.startTime} - ${postData.endTime}<br>
+                      Expected Pay: $${postData.pay}/hr<br>
+                      Date of Job: ${postData.date.toDate().toLocaleDateString()}</p>
                   </div>
                 </div>
               `;
 
               jobListContainer.appendChild(jobCard);
+
+              // Store the userId and postId of the first post
+              if (!firstPostUserId && !firstPostId) {
+                firstPostUserId = userId;
+                firstPostId = postDoc.id;
+              }
             }
+          }
+
+          // Show details of the first post after all posts have been loaded
+          if (firstPostUserId && firstPostId) {
+            showDetails(firstPostUserId, firstPostId);
           }
         } catch (error) {
           console.error("Error loading posts:", error);
@@ -302,23 +409,30 @@
             document.getElementById(
               "nannyName"
             ).innerHTML = `${parentData.firstName} ${parentData.lastName}`;
+            document.getElementById(
+              "profileSubtext"
+            ).innerHTML = `${parentData.gender} | ${calculateAge(parentData.dob)} years old`;
 
             // Update parent details
-            let detailsHTML = `
-              <p><strong>Gender:</strong> ${parentData.gender}</p>
-              <p><strong>Age:</strong> ${calculateAge(parentData.dob)}</p>
-            `;
+            let detailsHTML = `<h5>About:</h5>
+              <p>${parentDetails.aboutMe || "No information provided"}</p>`;
 
-            // Add children information
-            if (parentDetails.children && parentDetails.children.length > 0) {
-              detailsHTML += "<h5>Children:</h5>";
-              parentDetails.children.forEach((child, index) => {
-                const age = child.age;
-                detailsHTML += `<p>Child ${index + 1}: ${
-                  child.name
-                }, ${age} years old</p>`;
-              });
-            }
+// Add children information
+if (parentDetails.children && parentDetails.children.length > 0) {
+  detailsHTML += `
+    <div class="children-section">
+      <div class="children-title">Children:</div>
+      <div class="children-container">
+        ${parentDetails.children.map((child, index) => `
+          <div class="child-card">
+            <div class="child-name">${child.name}</div>
+            <div class="child-age">${child.age} years old</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
 
             document.getElementById("jobDetails").innerHTML = detailsHTML;
 
@@ -326,9 +440,7 @@
             let descriptionHTML = `
               <h5>Job Description:</h5>
               <p>${postData.description}</p>
-              <h5>About Parent:</h5>
-              <p>${parentDetails.aboutMe || "No information provided"}</p>
-            `;
+                      `;
 
             document.getElementById("jobDescription").innerHTML =
               descriptionHTML;
