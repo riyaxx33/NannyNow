@@ -10,6 +10,9 @@
       rel="stylesheet"
     />
     <style>
+        #jobSearch::placeholder {
+      font-family: 'Poppins', sans-serif;
+    }
 #detailsContainer {
   position: sticky;
   top: 60px;
@@ -322,7 +325,6 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5BjPBxo5PwTs6N2PAT0YCUvT66CIQuxw&libraries=places"></script>
 
     <!-- Scripts -->
-    // First script tag - Firebase Integration
 <script type="module">
 import { auth, db } from "./backend/firebase-config.js";
 import {
@@ -335,7 +337,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
 // Function to calculate age from DOB
-function calculateAge(dob) {
+function calculateAge(dob,gender) {
   const birthDate = new Date(dob);
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
@@ -343,7 +345,9 @@ function calculateAge(dob) {
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
     age--;
   }
-  return age;
+  gender = gender.charAt(0).toUpperCase() + gender.slice(1);
+
+  return { age, gender };
 }
 
 // Function to initialize chat button
@@ -376,58 +380,69 @@ function initializeChatButton(currentUserId, parentId) {
 
 // Function to load all posts
 async function loadPosts() {
-  try {
-    const postsSnapshot = await getDocs(collection(db, "POSTS"));
-    const jobListContainer = document.querySelector(".list-group");
-    jobListContainer.innerHTML = "";
+        try {
+          const postsSnapshot = await getDocs(collection(db, "POSTS"));
+          const jobListContainer = document.querySelector(".list-group");
+          jobListContainer.innerHTML = "";
 
-    let firstPostUserId = null;
-    let firstPostId = null;
+          let postsArray = [];
 
-    for (const postDoc of postsSnapshot.docs) {
-      const postData = postDoc.data();
-      const userId = postData.userId;
+          for (const postDoc of postsSnapshot.docs) {
+            const postData = postDoc.data();
+            const userId = postData.userId;
 
-      const parentDoc = await getDoc(doc(db, "USER", userId));
-      const parentData = parentDoc.exists() ? parentDoc.data() : null;
+            const parentDoc = await getDoc(doc(db, "USER", userId));
+            const parentData = parentDoc.exists() ? parentDoc.data() : null;
 
-      const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
-      const parentDetails = parentDetailsDoc.exists() ? parentDetailsDoc.data() : null;
+            const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
+            const parentDetails = parentDetailsDoc.exists()
+              ? parentDetailsDoc.data()
+              : null;
 
-      if (parentData && parentData.role === "parent" && parentDetails) {
-        const jobCard = document.createElement("div");
-        jobCard.className = "list-group-item job-card";
-        jobCard.onclick = () => showDetails(userId, postDoc.id);
+            if (parentData && parentData.role === "parent" && parentDetails) {
+              postsArray.push({
+                postDoc,
+                postData,
+                parentData,
+                parentDetails,
+              });
+            }
+          }
 
-        jobCard.innerHTML = `
-          <div class="job-card-content">
-            <img src="${parentData.profilePictureUrl || "/api/placeholder/60/60"}" alt="Profile" />
-            <div class="job-description">
-              <h5>${parentData.firstName} ${parentData.lastName}</h5>
-              <p>Time of Job: ${postData.startTime} - ${postData.endTime}<br>
-                Expected Pay: $${postData.pay}/hr<br>
-                Date of Job: ${postData.date.toDate().toLocaleDateString()}</p>
-            </div>
-          </div>
-        `;
+          postsArray.sort((a, b) => {
+            const dateA = a.postData.date.toDate();
+            const dateB = b.postData.date.toDate();
+            return dateA - dateB;
+          });
 
-        jobListContainer.appendChild(jobCard);
+          postsArray.forEach(({ postDoc, postData, parentData }) => {
+            const jobCard = document.createElement("div");
+            jobCard.className = "list-group-item job-card";
+            jobCard.onclick = () => showDetails(postData.userId, postDoc.id);
 
-        if (!firstPostUserId && !firstPostId) {
-          firstPostUserId = userId;
-          firstPostId = postDoc.id;
+            jobCard.innerHTML = `
+              <div class="job-card-content">
+                <img src="${parentData.profilePictureUrl || "/api/placeholder/60/60"}" alt="Profile" />
+                <div class="job-description">
+                  <h5>${parentData.firstName} ${parentData.lastName}</h5>
+                  <p>Time of Job: ${postData.startTime} - ${postData.endTime}<br>
+                    Expected Pay: $${postData.pay}/hr<br>
+                    Date of Job: ${postData.date.toDate().toLocaleDateString()}</p>
+                </div>
+              </div>
+            `;
+
+            jobListContainer.appendChild(jobCard);
+          });
+
+          if (postsArray.length > 0) {
+            const firstPost = postsArray[0];
+            showDetails(firstPost.postData.userId, firstPost.postDoc.id);
+          }
+        } catch (error) {
+          console.error("Error loading posts:", error);
         }
       }
-    }
-
-    if (firstPostUserId && firstPostId) {
-      showDetails(firstPostUserId, firstPostId);
-    }
-  } catch (error) {
-    console.error("Error loading posts:", error);
-  }
-}
-
 // Function to show details when a card is clicked
 async function showDetails(userId, postId) {
   try {
@@ -444,7 +459,8 @@ async function showDetails(userId, postId) {
       // Update profile picture and name
       document.getElementById("profilePicture").src = parentData.profilePictureUrl || "/api/placeholder/80/80";
       document.getElementById("nannyName").innerHTML = `${parentData.firstName} ${parentData.lastName}`;
-      document.getElementById("profileSubtext").innerHTML = `${parentData.gender} | ${calculateAge(parentData.dob)} years old`;
+      const { age, gender } = calculateAge(parentData.dob, parentData.gender);
+      document.getElementById("profileSubtext").innerHTML = `${gender} | ${age} years old`;
 
       // Update parent details
       let detailsHTML = `<h5>About:</h5>
@@ -561,7 +577,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-// Second script tag - Navbar handling
 <script type="module">
 import { auth, db } from "./backend/firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
