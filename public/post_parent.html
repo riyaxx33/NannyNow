@@ -7,6 +7,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <title>Nanny Post Job</title>
     <style>
+      .custom-cancel-btn {
+  background-color: rgb(184, 184, 184); /* Custom background color */
+  color: white;   
+  font-family: 'Poppins', sans-serif;           /* Text color */         /* Bold text */
+  padding: 8px 16px;         /* Custom padding */
+  border-radius: 5px;        /* Rounded corners */
+  transition: background-color 0.3s ease; /* Smooth transition on hover */
+}
+
+.custom-cancel-btn:hover {
+  background-color: rgb(222, 222, 222); /* Darker color on hover */
+}
+
       .logoo {
         height: 60px;
         width: auto;
@@ -22,8 +35,8 @@
       }
       h3{
         font-family: 'Poppins', sans-serif;
-        font-size:30px;
-        margin-left:5px;
+        font-size: 30px;
+        margin-left: 5px;
       }
 
       .container {
@@ -109,7 +122,7 @@
     </header>
     <h2>Post a Job</h2>
     <div id="app" class="container">
-      <form @submit.prevent="handleSubmit" class="pt-2">
+      <form @submit.prevent="handleSubmit" class="pt-2" ref="jobForm">
         <div class="row">
           <div class="col-6">
             <label for="date" class="form-label">When do you need a nanny?</label>
@@ -117,7 +130,7 @@
           </div>
           <div class="col-6">
             <label for="pay" class="form-label">Pay per hour</label>
-            <input type="text" class="form-control" id="pay"  v-model="pay" required />
+            <input type="text" class="form-control" id="pay" v-model="pay" required />
           </div>
           <div class="col-4 mt-3">
             <label for="payNegotiation" class="form-label">Open to Pay Negotiation</label>
@@ -151,13 +164,18 @@
         </div>
 
         <div class="col-12 mt-4 text-end">
-          <button id="submit" type="submit" class="btn btn-primary">Post Job</button>
+          <button v-if="editingPostId" @click.prevent="cancelEdit" type="button" class="btn btn-secondary custom-cancel-btn me-2">
+            Cancel
+          </button>
+          <button id="submit" type="submit" class="btn btn-primary">
+            {{ editingPostId ? 'Update Job' : 'Post Job' }}
+          </button>
         </div>
 
         <p v-if="errorMessage" class="text-danger text-end">{{ errorMessage }}</p>
       </form>
 
-      <h3 class="mt-5">Posted Jobs</h3>
+      <h3 class="mt-5" ref="postsSection">Posted Jobs</h3>
       <div class="posts-container">
         <div v-if="posts.length === 0" class="no-posts-message">
           No posts at the moment.
@@ -165,10 +183,10 @@
         
         <div v-for="post in posts" :key="post.id" class="post-item">
           <h5>Date: {{ post.formattedDate }}</h5>
-          <p>Pay: {{ post.pay }}</p>
-          <p>Pay Negotiable: {{ post.payNegotiation ? 'Yes' : 'No' }}</p>
-          <p>Time: {{ post.startTime }} - {{ post.endTime }}</p>
-          <p>Notes: {{ post.description }}</p>
+          <p>Pay: {{ post.pay }}<br>
+          Pay Negotiable: {{ post.payNegotiation ? 'Yes' : 'No' }}<br>
+          Time: {{ post.startTime }} - {{ post.endTime }}<br>
+          Notes: {{ post.description }}</p>
           <div class="button-container">
             <button @click="editPost(post)" class="btn btn-warning btn-sm">Edit</button>
             <button @click="deletePost(post.id)" class="btn btn-danger btn-sm">Delete</button>
@@ -199,16 +217,45 @@
         },
         computed: {
           isPostValid() {
-            return this.date && this.pay && this.payNegotiation && this.request && this.startTime && this.endTime;
+            return this.date && this.pay && this.payNegotiation && this.request && 
+                   this.startTime && this.endTime;
           }
         },
         methods: {
           formatDate(timestamp) {
-            if (timestamp && timestamp.seconds) {
-              const date = new Date(timestamp.seconds * 1000);
-              return date.toLocaleDateString('en-GB', { timeZone: 'UTC' });
-            }
-            return "";
+  if (timestamp && timestamp.seconds) {
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toLocaleDateString('en-GB', { timeZone: 'UTC' });
+  } else if (timestamp && typeof timestamp === 'string') {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-GB', { timeZone: 'UTC' });
+  }
+  return "";
+},
+
+          scrollToElement(element) {
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          },
+
+          scrollToTop() {
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          },
+
+          cancelEdit() {
+            this.editingPostId = null;
+            this.date = "";
+            this.pay = "";
+            this.payNegotiation = "";
+            this.startTime = "";
+            this.endTime = "";
+            this.request = "";
+            this.errorMessage = "";
           },
 
           async handleSubmit() {
@@ -227,9 +274,9 @@
 
             try {
               const postData = {
-                date: this.date,
+                date: new Date(this.date),
                 pay: this.pay,
-                payNegotiation: this.payNegotiation,
+                payNegotiation: this.payNegotiation === 'true',
                 startTime: this.startTime,
                 endTime: this.endTime,
                 description: this.request
@@ -237,20 +284,19 @@
 
               if (this.editingPostId) {
                 await updatePostData(this.editingPostId, postData);
-                this.editingPostId = null;
+                console.log("Post updated successfully");
               } else {
                 await storePostData(currentUser, postData);
+                console.log("New post created successfully");
               }
 
+              this.cancelEdit(); // Reset form
               await this.fetchPosts(currentUser.uid);
 
-              this.date = "";
-              this.pay = "";
-              this.payNegotiation = "";
-              this.startTime = "";
-              this.endTime = "";
-              this.request = "";
-              this.errorMessage = "";
+              // Scroll to posts section after successful submission
+              this.$nextTick(() => {
+                this.scrollToElement(this.$refs.postsSection);
+              });
             } catch (error) {
               this.errorMessage = error.message;
               console.error("Error during post submission:", error);
@@ -266,14 +312,13 @@
               }));
 
               this.posts.sort((a, b) => {
-                const dateA = new Date(a.date.seconds * 1000);
-                const dateB = new Date(b.date.seconds * 1000);
+                const dateA = a.date instanceof Date ? post.date : new Date(post.date.seconds * 1000);
+                const dateB = b.date instanceof Date ? post.date : new Date(post.date.seconds * 1000);
                 return dateB - dateA;
               });
 
               console.log("User's posts retrieved:", this.posts);
             } catch (error) {
-              this.errorMessage = "Failed to fetch posts.";
               console.error("Error fetching posts:", error);
             }
           },
@@ -293,13 +338,25 @@
           },
 
           editPost(post) {
-            this.date = post.date;
+            // Set the editing state
+            this.editingPostId = post.id;
+            
+            // Convert Firestore timestamp to YYYY-MM-DD format for date input
+            const date = post.date.seconds ? 
+  new Date(post.date.seconds * 1000) : 
+  new Date(post.date);
+            const formattedDate = date.toISOString().split('T')[0];
+            
+            // Populate form with post data
+            this.date = formattedDate;
             this.pay = post.pay;
-            this.payNegotiation = post.payNegotiation;
+            this.payNegotiation = String(post.payNegotiation); // Convert boolean to string for select
             this.startTime = post.startTime;
             this.endTime = post.endTime;
             this.request = post.description;
-            this.editingPostId = post.id;
+
+            // Scroll to form
+            this.scrollToTop();
           }
         },
         mounted() {
@@ -359,8 +416,6 @@
                 console.error('Logout failed:', error);
               }
             });
-          } else {
-            console.log('Logout link not found');
           }
         } catch (error) {
           console.error('Failed to load navbar:', error);
@@ -376,4 +431,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
-
