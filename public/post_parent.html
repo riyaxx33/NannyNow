@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <title>Nanny Post Job</title>
     <style>
-
       .logoo {
         height: 60px;
         width: auto;
@@ -40,42 +39,41 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       }
       .button-container {
-  display: flex;
-  justify-content: flex-end; /* Aligns items to the right */
-  margin-top: 10px; /* Adds space above the buttons */
-}
-.posts-container {
-  margin-top: 20px; /* Adds space above the posts container */
-}
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 10px;
+        gap: 10px;
+      }
+      .posts-container {
+        margin-top: 20px;
+      }
 
-.no-posts-message {
-  background-color: white;
-  font-family: 'Poppins', sans-serif;
-  text-align: center; /* Centers the message horizontally */
-  color: #666; /* Gray color for the message */
-  padding: 20px; /* Adds padding around the message */
-  font-weight: bold; /* Makes the message bold */
-  padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  margin-top: 20px;
-  height: 100px;
-  display: flex;
-  align-items: center; /* Centers vertically */
-  justify-content: center; /* Centers horizontally */
-  margin-bottom: 20px;
-}
-
+      .no-posts-message {
+        background-color: white;
+        font-family: 'Poppins', sans-serif;
+        text-align: center;
+        color: #666;
+        padding: 20px;
+        font-weight: bold;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        margin-top: 20px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
 
       .post-item {
         font-family: 'Poppins', sans-serif;
         background-color: white;
         padding: 15px;
         border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         margin-top: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       }
 
       .post-item h5 {
@@ -89,31 +87,28 @@
         color: red;
         margin-top: 10px;
       }
-      input, textarea, button {
-      font-family: 'Poppins', sans-serif;
-    }
-    /* Add this to your existing CSS */
-label.form-label {
-  font-family: 'Poppins', sans-serif;
-}
+      input, textarea, button, select {
+        font-family: 'Poppins', sans-serif;
+      }
+      label.form-label {
+        font-family: 'Poppins', sans-serif;
+      }
 
-.form-control {
-  font-family: 'Poppins', sans-serif;
-}
-#submit{
-  font-family: 'Poppins', sans-serif;
-}
-
+      .form-control {
+        font-family: 'Poppins', sans-serif;
+      }
+      #submit {
+        font-family: 'Poppins', sans-serif;
+      }
     </style>
   </head>
 
   <body class="background">
     <header>
-      <div id="navbar"></div> <!-- Placeholder for navbar -->
+      <div id="navbar"></div>
     </header>
     <h2>Post a Job</h2>
     <div id="app" class="container">
-      <!-- Form to Post a Job -->
       <form @submit.prevent="handleSubmit" class="pt-2">
         <div class="row">
           <div class="col-6">
@@ -128,8 +123,8 @@ label.form-label {
             <label for="payNegotiation" class="form-label">Open to Pay Negotiation</label>
             <select class="form-control" id="payNegotiation" v-model="payNegotiation" required>
               <option value="" disabled selected>Select an option</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
             </select>
           </div>
 
@@ -162,9 +157,8 @@ label.form-label {
         <p v-if="errorMessage" class="text-danger text-end">{{ errorMessage }}</p>
       </form>
 
-      <!-- List of posted jobs -->
       <h3 class="mt-5">Posted Jobs</h3>
-      <div class="posts-container"> <!-- Container for all posts -->
+      <div class="posts-container">
         <div v-if="posts.length === 0" class="no-posts-message">
           No posts at the moment.
         </div>
@@ -172,6 +166,7 @@ label.form-label {
         <div v-for="post in posts" :key="post.id" class="post-item">
           <h5>Date: {{ post.formattedDate }}</h5>
           <p>Pay: {{ post.pay }}</p>
+          <p>Pay Negotiable: {{ post.payNegotiation ? 'Yes' : 'No' }}</p>
           <p>Time: {{ post.startTime }} - {{ post.endTime }}</p>
           <p>Notes: {{ post.description }}</p>
           <div class="button-container">
@@ -193,26 +188,27 @@ label.form-label {
           return {
             date: "",
             pay: "",
-            startTime: "",  // Added start time
-            endTime: "",    // Added end time
+            payNegotiation: "",
+            startTime: "",
+            endTime: "",
             request: "",
             errorMessage: "",
-            posts: [], // Array to store posts
-            editingPostId: null // ID of the post being edited
+            posts: [],
+            editingPostId: null
           };
         },
         computed: {
           isPostValid() {
-            return this.date && this.pay && this.request && this.startTime && this.endTime;
+            return this.date && this.pay && this.payNegotiation && this.request && this.startTime && this.endTime;
           }
         },
         methods: {
           formatDate(timestamp) {
             if (timestamp && timestamp.seconds) {
-              const date = new Date(timestamp.seconds * 1000); // Convert seconds to milliseconds
-              return date.toLocaleDateString('en-GB', { timeZone: 'UTC' }); // Format as dd/mm/yyyy
+              const date = new Date(timestamp.seconds * 1000);
+              return date.toLocaleDateString('en-GB', { timeZone: 'UTC' });
             }
-            return ""; // Fallback in case there's no timestamp
+            return "";
           },
 
           async handleSubmit() {
@@ -230,34 +226,29 @@ label.form-label {
             }
 
             try {
+              const postData = {
+                date: this.date,
+                pay: this.pay,
+                payNegotiation: this.payNegotiation,
+                startTime: this.startTime,
+                endTime: this.endTime,
+                description: this.request
+              };
+
               if (this.editingPostId) {
-                // If editing an existing post, update it
-                await updatePostData(this.editingPostId, {
-                  date: this.date,
-                  pay: this.pay,
-                  startTime: this.startTime,
-                  endTime: this.endTime,
-                  description: this.request
-                });
-                this.editingPostId = null; // Reset editing ID
+                await updatePostData(this.editingPostId, postData);
+                this.editingPostId = null;
               } else {
-                // Otherwise, create a new post
-                await storePostData(currentUser, {
-                  date: this.date,
-                  pay: this.pay,
-                  startTime: this.startTime,
-                  endTime: this.endTime,
-                  description: this.request
-                });
+                await storePostData(currentUser, postData);
               }
 
-              // Fetch updated posts after successful submission
-              await this.fetchPosts(currentUser.uid); // Fetch user's posts
+              await this.fetchPosts(currentUser.uid);
 
               this.date = "";
               this.pay = "";
-              this.startTime = ""; // Reset start time
-              this.endTime = ""; // Reset end time
+              this.payNegotiation = "";
+              this.startTime = "";
+              this.endTime = "";
               this.request = "";
               this.errorMessage = "";
             } catch (error) {
@@ -268,17 +259,16 @@ label.form-label {
 
           async fetchPosts(userId) {
             try {
-              const postsData = await fetchPosts(userId); // Fetch user's posts
+              const postsData = await fetchPosts(userId);
               this.posts = postsData.map((post) => ({
                 ...post,
-                formattedDate: this.formatDate(post.date) // Format the date
+                formattedDate: this.formatDate(post.date)
               }));
 
-              // Sort posts by date in descending order (latest first)
               this.posts.sort((a, b) => {
-                const dateA = new Date(a.date.seconds * 1000); // Convert seconds to milliseconds
-                const dateB = new Date(b.date.seconds * 1000); // Convert seconds to milliseconds
-                return dateB - dateA; // Sort in descending order
+                const dateA = new Date(a.date.seconds * 1000);
+                const dateB = new Date(b.date.seconds * 1000);
+                return dateB - dateA;
               });
 
               console.log("User's posts retrieved:", this.posts);
@@ -293,7 +283,7 @@ label.form-label {
             if (confirmation) {
               try {
                 await deletePostData(postId);
-                this.fetchPosts(auth.currentUser.uid); // Refresh posts
+                await this.fetchPosts(auth.currentUser.uid);
                 console.log("Post deleted successfully.");
               } catch (error) {
                 this.errorMessage = "Failed to delete the post.";
@@ -303,19 +293,19 @@ label.form-label {
           },
 
           editPost(post) {
-            this.date = this.formatDate(post.date);
+            this.date = post.date;
             this.pay = post.pay;
+            this.payNegotiation = post.payNegotiation;
             this.startTime = post.startTime;
             this.endTime = post.endTime;
             this.request = post.description;
-            this.editingPostId = post.id; // Set the ID of the post being edited
+            this.editingPostId = post.id;
           }
         },
         mounted() {
-          // Using onAuthStateChanged to ensure we detect authentication state changes
           onAuthStateChanged(auth, (user) => {
             if (user) {
-              this.fetchPosts(user.uid); // Fetch posts for the logged-in user when the auth state changes
+              this.fetchPosts(user.uid);
             } else {
               console.error("No user is logged in.");
             }
@@ -326,66 +316,64 @@ label.form-label {
       app.mount("#app");
     </script>
 
-<script type="module">
-  import { auth, db } from "./backend/firebase-config.js";
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-  import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-  import { logout } from './backend/auth.js';
-  
-  async function loadNavbar(user) {
-    let fileToLoad = 'unloggedin_navbar_template.html';
+    <script type="module">
+      import { auth, db } from "./backend/firebase-config.js";
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+      import { logout } from './backend/auth.js';
+      
+      async function loadNavbar(user) {
+        let fileToLoad = 'unloggedin_navbar_template.html';
 
-    if (user) {
-      try {
-        const userDoc = await getDoc(doc(db, "USER", user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          if (userData.role === 'parent') {
-            fileToLoad = 'parent_navbar_template.html';
-          } else if (userData.role === 'nanny') {
-            fileToLoad = 'nanny_navbar_template.html';
+        if (user) {
+          try {
+            const userDoc = await getDoc(doc(db, "USER", user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              if (userData.role === 'parent') {
+                fileToLoad = 'parent_navbar_template.html';
+              } else if (userData.role === 'nanny') {
+                fileToLoad = 'nanny_navbar_template.html';
+              }
+            }
+          } catch (error) {
+            console.error('Error fetching user role:', error);
           }
         }
-      } catch (error) {
-        console.error('Error fetching user role:', error);
-      }
-    }
 
-    try {
-      const response = await fetch(fileToLoad);
-      if (!response.ok) throw new Error('Network response was not ok');
+        try {
+          const response = await fetch(fileToLoad);
+          if (!response.ok) throw new Error('Network response was not ok');
 
-      const navbarHTML = await response.text();
-      document.getElementById('navbar').innerHTML = navbarHTML;
+          const navbarHTML = await response.text();
+          document.getElementById('navbar').innerHTML = navbarHTML;
 
-      // Add event listener to logout link after navbar is loaded
-      const logoutLink = document.querySelector('#logoutBtn');
-      if (logoutLink) {
-        logoutLink.addEventListener('click', async (e) => {
-          e.preventDefault(); // Prevent the default link behavior
-          console.log("Logout clicked");
-          try {
-            await logout(); // The redirect is now handled in the logout function
-          } catch (error) {
-            console.error('Logout failed:', error);
+          const logoutLink = document.querySelector('#logoutBtn');
+          if (logoutLink) {
+            logoutLink.addEventListener('click', async (e) => {
+              e.preventDefault();
+              console.log("Logout clicked");
+              try {
+                await logout();
+              } catch (error) {
+                console.error('Logout failed:', error);
+              }
+            });
+          } else {
+            console.log('Logout link not found');
           }
-        });
-      } else {
-        console.log('Logout link not found');
+        } catch (error) {
+          console.error('Failed to load navbar:', error);
+        }
       }
-    } catch (error) {
-      console.error('Failed to load navbar:', error);
-    }
-  }
 
-  onAuthStateChanged(auth, (user) => {
-    console.log('Auth state changed');
-    loadNavbar(user);
-  });
-</script>
+      onAuthStateChanged(auth, (user) => {
+        console.log('Auth state changed');
+        loadNavbar(user);
+      });
+    </script>
 
-<!-- External libraries like Bootstrap should be loaded separately -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body></html>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
 

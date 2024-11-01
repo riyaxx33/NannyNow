@@ -189,26 +189,30 @@ export function handleFileUpload(event) {
 }
 
 // Store post data
+// Store post data
+// Store post data
 export async function storePostData(user, postData) {
   try {
-    // Create a unique ID for the post using the user's UID and the current timestamp
     const postId = `${user.uid}_${Date.now()}`;
 
-    // Store POST data in the Firestore "POSTS" collection
+    // Convert payNegotiation string to boolean before storing
+    const payNegotiationBool = postData.payNegotiation === 'true';
+
     await setDoc(doc(db, "POSTS", postId), {
-      userId: user.uid, // Store the user's UID
-      date: postData.date ? Timestamp.fromDate(new Date(postData.date)) : null, // Convert to Firestore Timestamp
-      pay: postData.pay, // Store the pay per hour
-      startTime: postData.startTime, // Store the start time
-      endTime: postData.endTime, // Store the end time
-      description: postData.description, // Store the job description
-      createdAt: Timestamp.now(), // Store the timestamp of when the post was created
+      userId: user.uid,
+      date: postData.date ? Timestamp.fromDate(new Date(postData.date)) : null,
+      pay: postData.pay,
+      payNegotiation: payNegotiationBool, // Store as boolean
+      startTime: postData.startTime,
+      endTime: postData.endTime,
+      description: postData.description,
+      createdAt: Timestamp.now(),
     });
 
     console.log("Post data stored successfully");
   } catch (error) {
     console.error("Error storing post data:", error);
-    throw error; // Rethrow the error to handle it in the calling function
+    throw error;
   }
 }
 
