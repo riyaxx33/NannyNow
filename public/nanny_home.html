@@ -611,7 +611,7 @@
           // Date filter
           const matchesDate =
             !activeFilters.date ||
-            checkDateMatch(post.postData.date.toDate(), activeFilters.date);
+            checkDateMatch(post.postData.date, activeFilters.date);
 
           // Pay filter
           const matchesPay =
@@ -625,7 +625,8 @@
       }
 
       // Helper function to check date matches
-      function checkDateMatch(postDate, filterValue) {
+      function checkDateMatch(postDateString, filterValue) {
+        const postDate = new Date(postDateString);
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -678,39 +679,102 @@
         return date >= nextWeekStart && date <= nextWeekEnd;
       }
 
+      // Populate the location filter dropdown
+      async function populateLocationFilter(allPosts) {
+        try {
+          const uniqueAddresses = [
+            ...new Set(allPosts.map((post) => post.parentDetails.homeAddress)),
+          ];
+          const locationCache = new Map();
+
+          const geocodingPromises = uniqueAddresses.map(async (address) => {
+            if (!locationCache.has(address)) {
+              const approxLocation = await getApproximateLocation(address);
+              locationCache.set(address, approxLocation);
+            }
+            return locationCache.get(address);
+          });
+
+          const locations = await Promise.all(geocodingPromises);
+          const uniqueLocations = [...new Set(locations)]
+            .filter((location) => location !== "Location unavailable")
+            .sort();
+
+          const locationMenu = document.getElementById("locationMenu");
+          locationMenu.innerHTML = ""; // Clear existing options
+
+          uniqueLocations.forEach((location) => {
+            const option = document.createElement("div");
+            option.className = "filter-option";
+            option.dataset.value = location;
+            option.textContent = location;
+            locationMenu.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Error populating location filter:", error);
+        }
+      }
+
+      // Helper function for the location filter
+      async function getApproximateLocation(address) {
+        return new Promise((resolve, reject) => {
+          const geocoder = new google.maps.Geocoder();
+          geocoder.geocode({ address: address }, (results, status) => {
+            if (status === "OK") {
+              const approxLocation =
+                results[0].address_components.find(
+                  (component) =>
+                    component.types.includes("neighborhood") ||
+                    component.types.includes("locality")
+                )?.long_name || "Location unavailable";
+              resolve(approxLocation);
+            } else {
+              console.error(
+                "Geocode was not successful for address:",
+                address,
+                status
+              );
+              resolve("Location unavailable");
+            }
+          });
+        });
+      }
+
       // Display filtered posts
       function displayFilteredPosts(posts) {
         const jobListContainer = document.querySelector(".list-group");
         jobListContainer.innerHTML = "";
 
-        posts.forEach(({ postData, parentData }) => {
+        posts.forEach(({ postData, parentData, postDoc }) => {
+          const profileImage =
+            parentData.profilePictureUrl || "/api/placeholder/60/60";
+          const { firstName, lastName } = parentData;
+
           const jobCard = document.createElement("div");
           jobCard.className = "list-group-item job-card";
-          jobCard.onclick = () => showDetails(postData.userId, postDoc.id);
+          jobCard.onclick = () => showDetails(postData.userId, postDoc.id); // Ensure postDoc.id is accessible
 
           jobCard.innerHTML = `
-            <div class="job-card-content">
-              <img src="${
-                parentData.profilePictureUrl || "/api/placeholder/60/60"
-              }" alt="Profile" />
-              <div class="job-description">
-                <h5>${parentData.firstName} ${parentData.lastName}</h5>
-                <p>Time of Job: ${postData.startTime} - ${postData.endTime}<br>
-                  Expected Pay: $${postData.pay}/hr<br>
-                  Pay Negotiable: ${postData.payNegotiation ? "Yes" : "No"}<br>
-                  Date of Job: ${new Date(
-                    postData.date
-                  ).toLocaleDateString()}</p>
-              </div>
-            </div>
-          `;
+      <div class="job-card-content">
+        <img src="${profileImage}" alt="Profile" />
+        <div class="job-description">
+          <h5>${firstName} ${lastName}</h5>
+          <p>
+            Time of Job: ${postData.startTime} - ${postData.endTime}<br>
+            Expected Pay: $${postData.pay}/hr<br>
+            Pay Negotiable: ${postData.payNegotiation ? "Yes" : "No"}<br>
+            Date of Job: ${new Date(postData.date).toLocaleDateString()}
+          </p>
+        </div>
+      </div>
+    `;
 
           jobListContainer.appendChild(jobCard);
         });
 
         // If there are filtered posts, show details of the first one
         if (posts.length > 0) {
-          showDetails(posts[0].postData.userId, posts[0].postDoc.id);
+          showDetails(posts[0].postData.userId, posts[0].postDoc.id); // Accessing the first postDoc
         }
       }
 
@@ -805,32 +869,12 @@
           // Display all posts initially
           displayFilteredPosts(allPosts);
 
-          // Populate location filter with unique locations
-          const locations = [
-            ...new Set(
-              allPosts.map((post) =>
-                post.parentDetails.homeAddress.split(",")[1].trim()
-              )
-            ),
-          ];
-
-          const locationMenu = document.getElementById("locationMenu");
-          locations.forEach((location) => {
-            const option = document.createElement("div");
-            option.className = "filter-option";
-            option.dataset.value = location;
-            option.textContent = location;
-            locationMenu.appendChild(option);
-          });
+          // Location filter dropdown
+          await populateLocationFilter(allPosts);
         } catch (error) {
           console.error("Error loading posts:", error);
         }
       }
-
-      // Load posts when the page loads
-      document.addEventListener("DOMContentLoaded", () => {
-        loadPosts();
-      });
 
       // Function to show details when a card is clicked
       async function showDetails(userId, postId) {
