@@ -82,14 +82,125 @@
         flex-grow: 1;
       }
 
+      .search-container {
+        position: relative;
+        padding: 10px;
+        margin: 0px;
+      }
+
+      .search-bar {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .search-input-group {
+        flex-grow: 1;
+        position: relative;
+      }
+
+      .filter-dropdown {
+        position: relative;
+        min-width: 200px;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .filter-button {
+        width: 100%;
+        height: 45px;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 0 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #495057;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .filter-button:hover {
+        border-color: #adb5bd;
+        background-color: #f8f9fa;
+      }
+
+      .filter-menu {
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 0;
+        right: 0;
+        background-color: white;
+        border-radius: 6px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        border: 1px solid #dee2e6;
+        display: none;
+      }
+
+      .filter-menu.show {
+        display: block;
+      }
+
+      .filter-option {
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .filter-option:hover {
+        background-color: #f8f9fa;
+      }
+
+      .filter-option.active {
+        background-color: #e9ecef;
+        color: #007bff;
+      }
+
+      .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .active-filter {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        background-color: #e7f3ff;
+        color: #007bff;
+        border-radius: 20px;
+        font-size: 0.9em;
+      }
+
+      .active-filter button {
+        background: none;
+        border: none;
+        color: #007bff;
+        margin-left: 8px;
+        padding: 0;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
       #jobSearch {
+        height: 45px;
+        border-radius: 6px;
+        padding: 0 15px;
+        border: 1px solid #dee2e6;
+      }
+
+      /* #jobSearch {
         width: 100%;
         border-radius: 4px;
         border: 1px solid #ccc;
         padding: 10px;
         box-shadow: none;
         margin-bottom: 20px;
-      }
+      } */
 
       /* Updated compact styles for parent info and children sections */
       .parent-info {
@@ -274,13 +385,56 @@
     <div id="navbar"></div>
 
     <div class="container mt-3">
-      <input
-        type="text"
-        id="jobSearch"
-        class="form-control"
-        placeholder="Search posts..."
-        onkeyup="searchJobs()"
-      />
+      <div class="search-container">
+        <div class="search-bar">
+          <div class="search-input-group">
+            <input
+              type="text"
+              id="jobSearch"
+              class="form-control"
+              placeholder="Search posts..."
+              onkeyup="searchJobs()"
+            />
+          </div>
+
+          <div class="filter-dropdown">
+            <button id="locationFilter" class="filter-button">
+              Location
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="filter-menu" id="locationMenu">
+              <!-- Will figure out how to filter based on East, West, Central etc. -->
+            </div>
+          </div>
+
+          <div class="filter-dropdown">
+            <button id="dateFilter" class="filter-button">
+              Date
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="filter-menu" id="dateMenu">
+              <div class="filter-option" data-value="today">Today</div>
+              <div class="filter-option" data-value="tomorrow">Tomorrow</div>
+              <div class="filter-option" data-value="this-week">This Week</div>
+              <div class="filter-option" data-value="next-week">Next Week</div>
+            </div>
+          </div>
+
+          <div class="filter-dropdown">
+            <button id="payFilter" class="filter-button">
+              Pay Range
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="filter-menu" id="payMenu">
+              <div class="filter-option" data-value="0-15">$0-15/hr</div>
+              <div class="filter-option" data-value="15-25">$15-25/hr</div>
+              <div class="filter-option" data-value="25-35">$25-35/hr</div>
+              <div class="filter-option" data-value="35+">$35+/hr</div>
+            </div>
+          </div>
+        </div>
+        <div class="active-filters" id="activeFilters"></div>
+      </div>
     </div>
 
     <div class="container mt-4">
@@ -341,6 +495,225 @@
         serverTimestamp,
       } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
+      // Filter state
+      let activeFilters = {
+        location: null,
+        date: null,
+        pay: null,
+      };
+
+      // Store all posts for filtering
+      let allPosts = [];
+
+      // Initialise filters
+      function initializeFilters() {
+        const filterButtons = document.querySelectorAll(".filter-button");
+        const filterOptions = document.querySelectorAll(".filter-option");
+
+        // Handle filter button clicks
+        filterButtons.forEach((button) => {
+          button.addEventListener("click", (e) => {
+            const menu = e.currentTarget.nextElementSibling;
+            const isShown = menu.classList.contains("show");
+
+            // Hide all menus first
+            document.querySelectorAll(".filter-menu").forEach((m) => {
+              m.classList.remove("show");
+            });
+
+            // Toggle current menu
+            if (!isShown) {
+              menu.classList.add("show");
+            }
+          });
+        });
+
+        // Handle filter option selection
+        filterOptions.forEach((option) => {
+          option.addEventListener("click", (e) => {
+            const value = e.target.dataset.value;
+            const filterType = e.target
+              .closest(".filter-menu")
+              .previousElementSibling.id.replace("Filter", "");
+
+            // Update active filters
+            activeFilters[filterType] = value;
+
+            // Update UI
+            updateActiveFiltersUI();
+
+            // Apply filters
+            applyFilters();
+
+            // Hide menu
+            e.target.closest(".filter-menu").classList.remove("show");
+          });
+        });
+
+        // Close menus when clicking outside
+        document.addEventListener("click", (e) => {
+          if (!e.target.closest(".filter-dropdown")) {
+            document.querySelectorAll(".filter-menu").forEach((menu) => {
+              menu.classList.remove("show");
+            });
+          }
+        });
+
+        // Initialize search functionality
+        document.getElementById("jobSearch").addEventListener("input", (e) => {
+          applyFilters();
+        });
+      }
+
+      // Update active filters UI
+      function updateActiveFiltersUI() {
+        const container = document.getElementById("activeFilters");
+        container.innerHTML = "";
+
+        Object.entries(activeFilters).forEach(([type, value]) => {
+          if (value) {
+            const filter = document.createElement("div");
+            filter.className = "active-filter";
+            filter.innerHTML = `
+              ${type}: ${value}
+              <button onclick="removeFilter('${type}')">×</button>
+            `;
+            container.appendChild(filter);
+          }
+        });
+      }
+
+      // Remove filter
+      window.removeFilter = function (type) {
+        activeFilters[type] = null;
+        updateActiveFiltersUI();
+        applyFilters();
+      };
+
+      // Apply filters to posts
+      function applyFilters() {
+        const searchQuery = document
+          .getElementById("jobSearch")
+          .value.toLowerCase();
+
+        const filteredPosts = allPosts.filter((post) => {
+          // Search text filter
+          const matchesSearch =
+            post.parentData.firstName.toLowerCase().includes(searchQuery) ||
+            post.parentData.lastName.toLowerCase().includes(searchQuery) ||
+            post.postData.description.toLowerCase().includes(searchQuery);
+
+          // Location filter
+          const matchesLocation =
+            !activeFilters.location ||
+            post.parentDetails.homeAddress.includes(activeFilters.location);
+
+          // Date filter
+          const matchesDate =
+            !activeFilters.date ||
+            checkDateMatch(post.postData.date.toDate(), activeFilters.date);
+
+          // Pay filter
+          const matchesPay =
+            !activeFilters.pay ||
+            checkPayMatch(post.postData.pay, activeFilters.pay);
+
+          return matchesSearch && matchesLocation && matchesDate && matchesPay;
+        });
+
+        displayFilteredPosts(filteredPosts);
+      }
+
+      // Helper function to check date matches
+      function checkDateMatch(postDate, filterValue) {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        switch (filterValue) {
+          case "today":
+            return isSameDay(postDate, today);
+          case "tomorrow":
+            return isSameDay(postDate, tomorrow);
+          case "this-week":
+            return isThisWeek(postDate);
+          case "next-week":
+            return isNextWeek(postDate);
+          default:
+            return true;
+        }
+      }
+
+      // Helper function to check pay range matches
+      function checkPayMatch(postPay, filterValue) {
+        const [min, max] = filterValue.split("-").map(Number);
+        if (filterValue === "35+") {
+          return postPay >= 35;
+        }
+        return postPay >= min && postPay <= max;
+      }
+
+      // Helper date functions
+      function isSameDay(d1, d2) {
+        return (
+          d1.getDate() === d2.getDate() &&
+          d1.getMonth() === d2.getMonth() &&
+          d1.getFullYear() === d2.getFullYear()
+        );
+      }
+
+      function isThisWeek(date) {
+        const today = new Date();
+        const weekEnd = new Date(today);
+        weekEnd.setDate(today.getDate() + (6 - today.getDay()));
+        return date >= today && date <= weekEnd;
+      }
+
+      function isNextWeek(date) {
+        const today = new Date();
+        const nextWeekStart = new Date(today);
+        nextWeekStart.setDate(today.getDate() + (7 - today.getDay()));
+        const nextWeekEnd = new Date(nextWeekStart);
+        nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
+        return date >= nextWeekStart && date <= nextWeekEnd;
+      }
+
+      // Display filtered posts
+      function displayFilteredPosts(posts) {
+        const jobListContainer = document.querySelector(".list-group");
+        jobListContainer.innerHTML = "";
+
+        posts.forEach(({ postData, parentData }) => {
+          const jobCard = document.createElement("div");
+          jobCard.className = "list-group-item job-card";
+          jobCard.onclick = () => showDetails(postData.userId, postDoc.id);
+
+          jobCard.innerHTML = `
+            <div class="job-card-content">
+              <img src="${
+                parentData.profilePictureUrl || "/api/placeholder/60/60"
+              }" alt="Profile" />
+              <div class="job-description">
+                <h5>${parentData.firstName} ${parentData.lastName}</h5>
+                <p>Time of Job: ${postData.startTime} - ${postData.endTime}<br>
+                  Expected Pay: $${postData.pay}/hr<br>
+                  Pay Negotiable: ${postData.payNegotiation ? "Yes" : "No"}<br>
+                  Date of Job: ${new Date(
+                    postData.date
+                  ).toLocaleDateString()}</p>
+              </div>
+            </div>
+          `;
+
+          jobListContainer.appendChild(jobCard);
+        });
+
+        // If there are filtered posts, show details of the first one
+        if (posts.length > 0) {
+          showDetails(posts[0].postData.userId, posts[0].postDoc.id);
+        }
+      }
+
       // Function to calculate age from DOB
       function calculateAge(dob, gender) {
         const birthDate = new Date(dob);
@@ -394,7 +767,7 @@
           const jobListContainer = document.querySelector(".list-group");
           jobListContainer.innerHTML = "";
 
-          let postsArray = [];
+          allPosts = [];
 
           for (const postDoc of postsSnapshot.docs) {
             const postData = postDoc.data();
@@ -409,7 +782,7 @@
               : null;
 
             if (parentData && parentData.role === "parent" && parentDetails) {
-              postsArray.push({
+              allPosts.push({
                 postDoc,
                 postData,
                 parentData,
@@ -418,7 +791,7 @@
             }
           }
 
-          postsArray.sort((a, b) => {
+          allPosts.sort((a, b) => {
             // Directly convert the date string to a Date object
             const dateA = new Date(a.postData.date);
             const dateB = new Date(b.postData.date);
@@ -426,43 +799,39 @@
             return dateA - dateB;
           });
 
-          postsArray.forEach(({ postDoc, postData, parentData }) => {
-            const jobCard = document.createElement("div");
-            jobCard.className = "list-group-item job-card";
-            jobCard.onclick = () => showDetails(postData.userId, postDoc.id);
+          // Initialize filters after loading posts
+          initializeFilters();
 
-            jobCard.innerHTML = `
-              <div class="job-card-content">
-                <img src="${
-                  parentData.profilePictureUrl || "/api/placeholder/60/60"
-                }" alt="Profile" />
-                <div class="job-description">
-                  <h5>${parentData.firstName} ${parentData.lastName}</h5>
-                  <p>Time of Job: ${postData.startTime} - ${
-              postData.endTime
-            }<br>
-                    Expected Pay: $${postData.pay}/hr<br>
-                    Pay Negotiable: ${
-                      postData.payNegotiation ? "Yes" : "No"
-                    }<br>
-                    Date of Job: ${new Date(
-                      postData.date
-                    ).toLocaleDateString()}</p>
-                </div>
-              </div>
-            `;
+          // Display all posts initially
+          displayFilteredPosts(allPosts);
 
-            jobListContainer.appendChild(jobCard);
+          // Populate location filter with unique locations
+          const locations = [
+            ...new Set(
+              allPosts.map((post) =>
+                post.parentDetails.homeAddress.split(",")[1].trim()
+              )
+            ),
+          ];
+
+          const locationMenu = document.getElementById("locationMenu");
+          locations.forEach((location) => {
+            const option = document.createElement("div");
+            option.className = "filter-option";
+            option.dataset.value = location;
+            option.textContent = location;
+            locationMenu.appendChild(option);
           });
-
-          if (postsArray.length > 0) {
-            const firstPost = postsArray[0];
-            showDetails(firstPost.postData.userId, firstPost.postDoc.id);
-          }
         } catch (error) {
           console.error("Error loading posts:", error);
         }
       }
+
+      // Load posts when the page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        loadPosts();
+      });
+
       // Function to show details when a card is clicked
       async function showDetails(userId, postId) {
         try {
