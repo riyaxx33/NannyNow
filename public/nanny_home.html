@@ -508,7 +508,10 @@
       // Initialise filters
       function initializeFilters() {
         const filterButtons = document.querySelectorAll(".filter-button");
-        const filterOptions = document.querySelectorAll(".filter-option");
+        // Only select filter options from date and pay menus
+        const filterOptions = document.querySelectorAll(
+          "#dateMenu .filter-option, #payMenu .filter-option"
+        );
 
         // Handle filter button clicks
         filterButtons.forEach((button) => {
@@ -603,10 +606,10 @@
             post.parentData.lastName.toLowerCase().includes(searchQuery) ||
             post.postData.description.toLowerCase().includes(searchQuery);
 
-          // Location filter
+          // Location filter - now using geocoded location
           const matchesLocation =
             !activeFilters.location ||
-            post.parentDetails.homeAddress.includes(activeFilters.location);
+            post.geocodedLocation === activeFilters.location;
 
           // Date filter
           const matchesDate =
@@ -708,6 +711,15 @@
             option.className = "filter-option";
             option.dataset.value = location;
             option.textContent = location;
+
+            // Add click event listener directly to the option
+            option.addEventListener("click", (e) => {
+              activeFilters.location = location;
+              updateActiveFiltersUI();
+              applyFilters();
+              e.target.closest(".filter-menu").classList.remove("show");
+            });
+
             locationMenu.appendChild(option);
           });
         } catch (error) {
@@ -862,6 +874,21 @@
 
             return dateA - dateB;
           });
+
+          // Add geocoded locations to posts
+          const geocoder = new google.maps.Geocoder();
+          // Add geocoded locations to posts
+          await Promise.all(
+            allPosts.map(async (post) => {
+              const location = await getApproximateLocation(
+                post.parentDetails.homeAddress
+              );
+              post.geocodedLocation = location;
+              console.log(
+                `Post address: ${post.parentDetails.homeAddress}, Geocoded location: ${location}`
+              ); // For debugging
+            })
+          );
 
           // Initialize filters after loading posts
           initializeFilters();
