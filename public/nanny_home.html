@@ -4,266 +4,269 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nanny Home - Parent Posts</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <style>
-        #jobSearch::placeholder {
-      font-family: 'Poppins', sans-serif;
-    }
-#detailsContainer {
-  position: sticky;
-  top: 60px;
-  background-color: white;
-  border-left: 1px solid #ccc;
-  border: 2px solid #ddd;
-  border-radius: 5px;
-  padding: 20px;
-  height: calc(100vh - 60px);
-  overflow-y: hidden;
-  font-family: 'Poppins', sans-serif;
-}
+      #jobSearch::placeholder {
+        font-family: "Poppins", sans-serif;
+      }
+      #detailsContainer {
+        position: sticky;
+        top: 60px;
+        background-color: white;
+        border-left: 1px solid #ccc;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        height: calc(100vh - 60px);
+        overflow-y: hidden;
+        font-family: "Poppins", sans-serif;
+      }
 
-#jobDescriptionContainer {
-  height: calc(100% - 70px);
-  overflow-y: auto;
-  padding: 10px;
-  border: 1px solid #ddd;
-  margin-top: 15px;
-}
+      #jobDescriptionContainer {
+        height: calc(100% - 70px);
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid #ddd;
+        margin-top: 15px;
+      }
 
-.job-card {
-  cursor: pointer;
-  margin-bottom: 10px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: background-color 0.3s ease;
-  height: auto;
-}
+      .job-card {
+        cursor: pointer;
+        margin-bottom: 10px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.3s ease;
+        height: auto;
+      }
 
-.job-card:hover {
-  background-color: #f8f9fa;
-}
+      .job-card:hover {
+        background-color: #f8f9fa;
+      }
 
-.job-card img {
-  width: 80px;
-  height: 80px;
-  margin-right: 15px;
-  border-radius: 50%;
-  object-fit: cover;
-}
+      .job-card img {
+        width: 80px;
+        height: 80px;
+        margin-right: 15px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
 
-.job-card-content img {
-  position: relative;
-  top: -25px;
-}
+      .job-card-content img {
+        position: relative;
+        top: -25px;
+      }
 
-.job-card-content {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  font-family: 'Poppins', sans-serif;
-}
+      .job-card-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        font-family: "Poppins", sans-serif;
+      }
 
-.job-card-content p {
-  font-size: 15px;
-}
+      .job-card-content p {
+        font-size: 15px;
+      }
 
-.job-description {
-  flex-grow: 1;
-}
+      .job-description {
+        flex-grow: 1;
+      }
 
-#jobSearch {
-  width: 100%;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  box-shadow: none;
-  margin-bottom: 20px;
-}
+      #jobSearch {
+        width: 100%;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        box-shadow: none;
+        margin-bottom: 20px;
+      }
 
-/* Updated compact styles for parent info and children sections */
-.parent-info {
-  margin-bottom: 8px;
-}
+      /* Updated compact styles for parent info and children sections */
+      .parent-info {
+        margin-bottom: 8px;
+      }
 
-.parent-info h5 {
-  font-size: 1rem;
-  margin-bottom: 6px;
-}
+      .parent-info h5 {
+        font-size: 1rem;
+        margin-bottom: 6px;
+      }
 
-.parent-info p {
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
+      .parent-info p {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        line-height: 1.4;
+      }
 
-/* Job Description styles to match other sections */
-#jobDescription h5 {
-  font-size: 1rem;
-  margin-bottom: 6px;
-}
+      /* Job Description styles to match other sections */
+      #jobDescription h5 {
+        font-size: 1rem;
+        margin-bottom: 6px;
+      }
 
-#jobDescription p {
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
+      #jobDescription p {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        line-height: 1.4;
+      }
 
-#jobDescription h5:not(:first-child) {
-  margin-top: 12px;
-}
+      #jobDescription h5:not(:first-child) {
+        margin-top: 12px;
+      }
 
-#jobDescription p:last-child {
-  margin-bottom: 12px;
-}
+      #jobDescription p:last-child {
+        margin-bottom: 12px;
+      }
 
-.children-section {
-  margin: 12px 0;
-}
+      .children-section {
+        margin: 12px 0;
+      }
 
-.children-title {
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: #212529;
-}
+      .children-title {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #212529;
+      }
 
-.children-container {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-start;
-}
+      .children-container {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-start;
+      }
 
-.child-card {
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 6px;
-  padding: 8px 12px;
-  flex: 1;
-  min-width: 0;
-}
+      .child-card {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        padding: 8px 12px;
+        flex: 1;
+        min-width: 0;
+      }
 
-.child-name {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #212529;
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+      .child-name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #212529;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-.child-age {
-  color: #6c757d;
-  font-size: 0.8rem;
-}
+      .child-age {
+        color: #6c757d;
+        font-size: 0.8rem;
+      }
 
-.profile-header {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 30px;
-  padding: 20px 0;
-  width: 100%;
-  gap: 20px;
-}
+      .profile-header {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 30px;
+        padding: 20px 0;
+        width: 100%;
+        gap: 20px;
+      }
 
-.profile-header img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
+      .profile-header img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
 
-.profile-info-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex: 1;
-}
+      .profile-info-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex: 1;
+      }
 
-.profile-info {
-  display: flex;
-  flex-direction: column;
-}
+      .profile-info {
+        display: flex;
+        flex-direction: column;
+      }
 
-.profile-info h4 {
-  font-size: 2.2rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-  color: #333;
-}
+      .profile-info h4 {
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #333;
+      }
 
-.profile-subtext {
-  color: #666;
-  font-size: 1.1rem;
-  margin-top: 2px;
-}
+      .profile-subtext {
+        color: #666;
+        font-size: 1.1rem;
+        margin-top: 2px;
+      }
 
-.chat-button-container {
-  margin-left: auto;
-}
+      .chat-button-container {
+        margin-left: auto;
+      }
 
-.chat-button {
-  padding: 12px 30px;
-  font-size: 1.2rem;
-  background-color: #f0f0f0;
-  color: #333;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  white-space: nowrap;
-}
+      .chat-button {
+        padding: 12px 30px;
+        font-size: 1.2rem;
+        background-color: #f0f0f0;
+        color: #333;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        white-space: nowrap;
+      }
 
-.chat-button:hover {
-  background-color: #e0e0e0;
-}
+      .chat-button:hover {
+        background-color: #e0e0e0;
+      }
 
-.chat-button:disabled {
-  background-color: #f0f0f0;
-  color: #999;
-  cursor: not-allowed;
-}
+      .chat-button:disabled {
+        background-color: #f0f0f0;
+        color: #999;
+        cursor: not-allowed;
+      }
 
-#detailsContainer {
-  background-color: white;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 20px 30px;
-  height: calc(100vh - 60px);
-  overflow-y: auto;
-  font-family: 'Poppins', sans-serif;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-.info-and-chat-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-  margin-bottom: 20px;
-}
+      #detailsContainer {
+        background-color: white;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 20px 30px;
+        height: calc(100vh - 60px);
+        overflow-y: auto;
+        font-family: "Poppins", sans-serif;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      .info-and-chat-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
 
-.parent-info {
-  flex: 1;
-  margin-bottom: 0; /* Override existing margin */
-}
+      .parent-info {
+        flex: 1;
+        margin-bottom: 0; /* Override existing margin */
+      }
 
-.chat-button-container {
-  flex-shrink: 0;
-  margin: 0; /* Override existing margin */
-}
+      .chat-button-container {
+        flex-shrink: 0;
+        margin: 0; /* Override existing margin */
+      }
 
-.chat-button {
-  white-space: nowrap;
-}
+      .chat-button {
+        white-space: nowrap;
+      }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
   </head>
@@ -303,15 +306,17 @@
                 <span id="profileSubtext" class="profile-subtext"></span>
               </div>
               <div class="chat-button-container">
-                <button id="chatButton" class="chat-button" disabled>Chat Now</button>
+                <button id="chatButton" class="chat-button" disabled>
+                  Chat Now
+                </button>
               </div>
             </div>
           </div>
-        
+
           <div class="parent-info" id="jobDetails">
             <!-- Parent details will be inserted here -->
           </div>
-        
+
           <div id="jobDescriptionContainer">
             <div id="jobDescription">
               <!-- Job description and about me will be inserted here -->
@@ -325,61 +330,65 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5BjPBxo5PwTs6N2PAT0YCUvT66CIQuxw&libraries=places"></script>
 
     <!-- Scripts -->
-<script type="module">
-import { auth, db } from "./backend/firebase-config.js";
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  addDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+    <script type="module">
+      import { auth, db } from "./backend/firebase-config.js";
+      import {
+        collection,
+        getDocs,
+        doc,
+        getDoc,
+        addDoc,
+        serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-// Function to calculate age from DOB
-function calculateAge(dob,gender) {
-  const birthDate = new Date(dob);
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  gender = gender.charAt(0).toUpperCase() + gender.slice(1);
+      // Function to calculate age from DOB
+      function calculateAge(dob, gender) {
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
+          age--;
+        }
+        gender = gender.charAt(0).toUpperCase() + gender.slice(1);
 
-  return { age, gender };
-}
-
-// Function to initialize chat button
-function initializeChatButton(currentUserId, parentId) {
-  const chatButton = document.getElementById('chatButton');
-  
-  if (currentUserId) {
-    chatButton.disabled = false;
-    
-    chatButton.addEventListener('click', async () => {
-      try {
-        const chatData = {
-          to_user_id: parentId,
-          from_user_id: auth.currentUser.uid,
-          timestamp: new Date(),
-          message: "Hi, I'm interested in your job posting and would like to discuss details.",
-        };
-
-        await addDoc(collection(db, "CHATS"), chatData);
-        alert("Message sent successfully!");
-      } catch (error) {
-        console.error("Error sending message:", error);
-        alert("Failed to send message. Please try again.");
+        return { age, gender };
       }
-    });
-  } else {
-    chatButton.disabled = true;
-  }
-}
 
-// Function to load all posts
-async function loadPosts() {
+      // Function to initialize chat button
+      function initializeChatButton(currentUserId, parentId) {
+        const chatButton = document.getElementById("chatButton");
+
+        if (currentUserId) {
+          chatButton.disabled = false;
+
+          chatButton.addEventListener("click", async () => {
+            try {
+              const chatData = {
+                to_user_id: parentId,
+                from_user_id: auth.currentUser.uid,
+                timestamp: new Date(),
+                message:
+                  "Hi, I'm interested in your job posting and would like to discuss details.",
+              };
+
+              await addDoc(collection(db, "CHATS"), chatData);
+              alert("Message sent successfully!");
+            } catch (error) {
+              console.error("Error sending message:", error);
+              alert("Failed to send message. Please try again.");
+            }
+          });
+        } else {
+          chatButton.disabled = true;
+        }
+      }
+
+      // Function to load all posts
+      async function loadPosts() {
         try {
           const postsSnapshot = await getDocs(collection(db, "POSTS"));
           const jobListContainer = document.querySelector(".list-group");
@@ -410,8 +419,10 @@ async function loadPosts() {
           }
 
           postsArray.sort((a, b) => {
-            const dateA = a.postData.date.toDate();
-            const dateB = b.postData.date.toDate();
+            // Directly convert the date string to a Date object
+            const dateA = new Date(a.postData.date);
+            const dateB = new Date(b.postData.date);
+
             return dateA - dateB;
           });
 
@@ -422,13 +433,21 @@ async function loadPosts() {
 
             jobCard.innerHTML = `
               <div class="job-card-content">
-                <img src="${parentData.profilePictureUrl || "/api/placeholder/60/60"}" alt="Profile" />
+                <img src="${
+                  parentData.profilePictureUrl || "/api/placeholder/60/60"
+                }" alt="Profile" />
                 <div class="job-description">
                   <h5>${parentData.firstName} ${parentData.lastName}</h5>
-                  <p>Time of Job: ${postData.startTime} - ${postData.endTime}<br>
+                  <p>Time of Job: ${postData.startTime} - ${
+              postData.endTime
+            }<br>
                     Expected Pay: $${postData.pay}/hr<br>
-                    Pay Negotiable: ${postData.payNegotiation ? "Yes" : "No"}<br>
-                    Date of Job: ${postData.date.toDate().toLocaleDateString()}</p>
+                    Pay Negotiable: ${
+                      postData.payNegotiation ? "Yes" : "No"
+                    }<br>
+                    Date of Job: ${new Date(
+                      postData.date
+                    ).toLocaleDateString()}</p>
                 </div>
               </div>
             `;
@@ -444,192 +463,213 @@ async function loadPosts() {
           console.error("Error loading posts:", error);
         }
       }
-// Function to show details when a card is clicked
-async function showDetails(userId, postId) {
-  try {
-    const parentDoc = await getDoc(doc(db, "USER", userId));
-    const parentData = parentDoc.exists() ? parentDoc.data() : null;
+      // Function to show details when a card is clicked
+      async function showDetails(userId, postId) {
+        try {
+          const parentDoc = await getDoc(doc(db, "USER", userId));
+          const parentData = parentDoc.exists() ? parentDoc.data() : null;
 
-    const postDoc = await getDoc(doc(db, "POSTS", postId));
-    const postData = postDoc.exists() ? postDoc.data() : null;
+          const postDoc = await getDoc(doc(db, "POSTS", postId));
+          const postData = postDoc.exists() ? postDoc.data() : null;
 
-    const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
-    const parentDetails = parentDetailsDoc.exists() ? parentDetailsDoc.data() : null;
+          const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
+          const parentDetails = parentDetailsDoc.exists()
+            ? parentDetailsDoc.data()
+            : null;
 
-    if (parentData && postData && parentDetails) {
-      // Update profile picture and name
-      document.getElementById("profilePicture").src = parentData.profilePictureUrl || "/api/placeholder/80/80";
-      document.getElementById("nannyName").innerHTML = `${parentData.firstName} ${parentData.lastName}`;
-      const { age, gender } = calculateAge(parentData.dob, parentData.gender);
-      document.getElementById("profileSubtext").innerHTML = `${gender} | ${age} years old`;
+          if (parentData && postData && parentDetails) {
+            // Update profile picture and name
+            document.getElementById("profilePicture").src =
+              parentData.profilePictureUrl || "/api/placeholder/80/80";
+            document.getElementById(
+              "nannyName"
+            ).innerHTML = `${parentData.firstName} ${parentData.lastName}`;
+            const { age, gender } = calculateAge(
+              parentData.dob,
+              parentData.gender
+            );
+            document.getElementById(
+              "profileSubtext"
+            ).innerHTML = `${gender} | ${age} years old`;
 
-      // Update parent details
-      let detailsHTML = `<h5>About:</h5>
+            // Update parent details
+            let detailsHTML = `<h5>About:</h5>
         <p>${parentDetails.aboutMe || "No information provided"}</p>`;
 
-      // Add children information
-      if (parentDetails.children && parentDetails.children.length > 0) {
-        detailsHTML += `
+            // Add children information
+            if (parentDetails.children && parentDetails.children.length > 0) {
+              detailsHTML += `
           <div class="children-section">
             <div class="children-title">Children:</div>
             <div class="children-container">
-              ${parentDetails.children.map((child, index) => `
+              ${parentDetails.children
+                .map(
+                  (child, index) => `
                 <div class="child-card">
                   <div class="child-name">${child.name}</div>
                   <div class="child-age">${child.age} years old</div>
                 </div>
-              `).join('')}
+              `
+                )
+                .join("")}
             </div>
           </div>
         `;
-      }
+            }
 
-      document.getElementById("jobDetails").innerHTML = detailsHTML;
+            document.getElementById("jobDetails").innerHTML = detailsHTML;
 
-      // Update description section
-      let descriptionHTML = `
+            // Update description section
+            let descriptionHTML = `
         <h5>Job Description:</h5>
         <p>${postData.description}</p>
       `;
 
-      document.getElementById("jobDescription").innerHTML = descriptionHTML;
+            document.getElementById("jobDescription").innerHTML =
+              descriptionHTML;
 
-      // Initialize chat button
-      initializeChatButton(auth.currentUser?.uid, userId);
+            // Initialize chat button
+            initializeChatButton(auth.currentUser?.uid, userId);
 
-      // Google Maps API
-      const address = parentDetails.homeAddress;
-      geocodeAddress(address);
-    }
-  } catch (error) {
-    console.error("Error showing details:", error);
-  }
-}
+            // Google Maps API
+            const address = parentDetails.homeAddress;
+            geocodeAddress(address);
+          }
+        } catch (error) {
+          console.error("Error showing details:", error);
+        }
+      }
 
-// Geocoding API
-function geocodeAddress(address) {
-  const geocoder = new google.maps.Geocoder();
-  geocoder.geocode({ address: address }, (results, status) => {
-    if (status === "OK") {
-      const location = results[0].geometry.location;
+      // Geocoding API
+      function geocodeAddress(address) {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: address }, (results, status) => {
+          if (status === "OK") {
+            const location = results[0].geometry.location;
 
-      const approxCityOrNeighbourhood = results[0].address_components.find(
-        (component) =>
-          component.types.includes("neighborhood") ||
-          component.types.includes("locality")
-      )?.long_name || "Location unavailable";
+            const approxCityOrNeighbourhood =
+              results[0].address_components.find(
+                (component) =>
+                  component.types.includes("neighborhood") ||
+                  component.types.includes("locality")
+              )?.long_name || "Location unavailable";
 
-      document.getElementById("jobDescription").innerHTML += `
+            document.getElementById("jobDescription").innerHTML += `
         <h5>Approximate Location:</h5>
         <p>${approxCityOrNeighbourhood}</p>
         <div id="map" style="height: 300px;"></div>
       `;
 
-      initialiseMap(location);
-    } else {
-      console.error("Geocode was not successful:", status);
-    }
-  });
-}
-
-// Initialize Google Map and place a marker
-function initialiseMap(location) {
-  const map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 14,
-    center: location,
-  });
-
-  new google.maps.Marker({
-    position: location,
-    map: map,
-  });
-}
-
-// Function to handle search
-window.searchJobs = function() {
-  const input = document.getElementById("jobSearch");
-  const filter = input.value.toLowerCase();
-  const jobCards = document.querySelectorAll(".job-card");
-
-  jobCards.forEach((card) => {
-    const title = card.querySelector("h5").textContent.toLowerCase();
-    const details = card.querySelector(".job-description").textContent.toLowerCase();
-    if (title.includes(filter) || details.includes(filter)) {
-      card.style.display = "";
-    } else {
-      card.style.display = "none";
-    }
-  });
-};
-
-// Auth state listener
-auth.onAuthStateChanged((user) => {
-  const chatButton = document.getElementById('chatButton');
-  if (user) {
-    chatButton.disabled = false;
-  } else {
-    chatButton.disabled = true;
-  }
-});
-
-// Load posts when the page loads
-document.addEventListener("DOMContentLoaded", () => {
-  loadPosts();
-});
-</script>
-
-<script type="module">
-import { auth, db } from "./backend/firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-import { logout } from "./backend/auth.js";
-
-async function loadNavbar(user) {
-  let fileToLoad = "unloggedin_navbar_template.html";
-
-  if (user) {
-    try {
-      const userDoc = await getDoc(doc(db, "USER", user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        if (userData.role === "parent") {
-          fileToLoad = "parent_navbar_template.html";
-        } else if (userData.role === "nanny") {
-          fileToLoad = "nanny_navbar_template.html";
-        }
+            initialiseMap(location);
+          } else {
+            console.error("Geocode was not successful:", status);
+          }
+        });
       }
-    } catch (error) {
-      console.error("Error fetching user role:", error);
-    }
-  }
 
-  try {
-    const response = await fetch(fileToLoad);
-    if (!response.ok) throw new Error("Network response was not ok");
+      // Initialize Google Map and place a marker
+      function initialiseMap(location) {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 14,
+          center: location,
+        });
 
-    const navbarHTML = await response.text();
-    document.getElementById("navbar").innerHTML = navbarHTML;
+        new google.maps.Marker({
+          position: location,
+          map: map,
+        });
+      }
 
-    const logoutLink = document.querySelector("#logoutBtn");
-    if (logoutLink) {
-      logoutLink.addEventListener("click", async (e) => {
-        e.preventDefault();
-        try {
-          await logout();
-        } catch (error) {
-          console.error("Logout failed:", error);
+      // Function to handle search
+      window.searchJobs = function () {
+        const input = document.getElementById("jobSearch");
+        const filter = input.value.toLowerCase();
+        const jobCards = document.querySelectorAll(".job-card");
+
+        jobCards.forEach((card) => {
+          const title = card.querySelector("h5").textContent.toLowerCase();
+          const details = card
+            .querySelector(".job-description")
+            .textContent.toLowerCase();
+          if (title.includes(filter) || details.includes(filter)) {
+            card.style.display = "";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      };
+
+      // Auth state listener
+      auth.onAuthStateChanged((user) => {
+        const chatButton = document.getElementById("chatButton");
+        if (user) {
+          chatButton.disabled = false;
+        } else {
+          chatButton.disabled = true;
         }
       });
-    }
-  } catch (error) {
-    console.error("Failed to load navbar:", error);
-  }
-}
 
-onAuthStateChanged(auth, (user) => {
-  loadNavbar(user);
-});
-</script>
+      // Load posts when the page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        loadPosts();
+      });
+    </script>
+
+    <script type="module">
+      import { auth, db } from "./backend/firebase-config.js";
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+      import { logout } from "./backend/auth.js";
+
+      async function loadNavbar(user) {
+        let fileToLoad = "unloggedin_navbar_template.html";
+
+        if (user) {
+          try {
+            const userDoc = await getDoc(doc(db, "USER", user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              if (userData.role === "parent") {
+                fileToLoad = "parent_navbar_template.html";
+              } else if (userData.role === "nanny") {
+                fileToLoad = "nanny_navbar_template.html";
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching user role:", error);
+          }
+        }
+
+        try {
+          const response = await fetch(fileToLoad);
+          if (!response.ok) throw new Error("Network response was not ok");
+
+          const navbarHTML = await response.text();
+          document.getElementById("navbar").innerHTML = navbarHTML;
+
+          const logoutLink = document.querySelector("#logoutBtn");
+          if (logoutLink) {
+            logoutLink.addEventListener("click", async (e) => {
+              e.preventDefault();
+              try {
+                await logout();
+              } catch (error) {
+                console.error("Logout failed:", error);
+              }
+            });
+          }
+        } catch (error) {
+          console.error("Failed to load navbar:", error);
+        }
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        loadNavbar(user);
+      });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
-</html> 
+</html>
