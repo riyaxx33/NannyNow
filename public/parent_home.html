@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NANYNow - Nanny Listing Page</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -19,7 +22,7 @@
         border: 2px solid #ddd;
         border-radius: 5px;
         padding: 20px;
-        font-family: 'Poppins', sans-serif;
+        font-family: "Poppins", sans-serif;
         height: calc(
           100vh - 60px
         ); /* Ensures it takes full height minus the navbar */
@@ -46,7 +49,7 @@
         justify-content: space-between;
         align-items: center;
         transition: background-color 0.3s ease;
-        font-family: 'Poppins', sans-serif;
+        font-family: "Poppins", sans-serif;
       }
 
       .job-card:hover {
@@ -67,7 +70,7 @@
 
       .job-description {
         flex-grow: 1;
-        font-family: 'Poppins', sans-serif;
+        font-family: "Poppins", sans-serif;
       }
 
       .chat-button-container {
@@ -84,7 +87,7 @@
         border-radius: 5px;
         cursor: pointer;
         transition: background-color 0.3s ease;
-        font-family: 'Poppins', sans-serif;
+        font-family: "Poppins", sans-serif;
       }
 
       .chat-button:hover {
@@ -99,14 +102,14 @@
       .search-container {
         position: relative;
         padding: 10px;
-        margin:0px;
+        margin: 0px;
       }
 
       .search-bar {
         display: flex;
         gap: 15px;
         align-items: center;
-        font-family: 'Poppins', sans-serif;
+        font-family: "Poppins", sans-serif;
         height: 30px;
       }
 
@@ -133,7 +136,7 @@
       .filter-dropdown {
         position: relative;
         min-width: 200px;
-        font-family: 'Poppins', sans-serif;
+        font-family: "Poppins", sans-serif;
       }
 
       .filter-button {
@@ -236,7 +239,7 @@
                 v-model="searchQuery"
                 class="form-control"
                 placeholder="Search for NANNY..."
-                @input="searchJobs"
+                @input="searchNanny"
               />
             </div>
 
@@ -272,12 +275,45 @@
                 </div>
               </div>
             </div>
-          </div> 
+
+            <!-- Gender filter -->
+            <div class="filter-dropdown" @click.stop>
+              <button class="filter-button" @click="toggleFilterMenu('gender')">
+                <span>{{ genderFilter || 'Gender' }}</span>
+                <i
+                  class="fas"
+                  :class="showFilterMenu.gender ? 'fa-chevron-up' : 'fa-chevron-down'"
+                ></i>
+              </button>
+              <div class="filter-menu" :class="{ show: showFilterMenu.gender }">
+                <div
+                  class="filter-option"
+                  :class="{ active: genderFilter === '' }"
+                  @click="setGenderFilter('')"
+                >
+                  All Genders
+                </div>
+                <div
+                  v-for="option in genderOptions"
+                  :key="option"
+                  class="filter-option"
+                  :class="{ active: genderFilter === option }"
+                  @click="setGenderFilter(option)"
+                >
+                  {{ option }}
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- Active filters display -->
           <div v-if="experienceFilter" class="active-filter">
             {{ experienceFilter }} Experience
             <i class="fas fa-times" @click="clearExperienceFilter"></i>
+          </div>
+          <div v-if="genderFilter" class="active-filter">
+            {{ genderFilter }}
+            <i class="fas fa-times" @click="clearGenderFilter"></i>
           </div>
         </div>
       </div>
@@ -369,7 +405,11 @@
           const searchQuery = ref("");
           const currentUserId = ref(null);
           const experienceFilter = ref("");
-          const showFilterMenu = ref(false);
+          const genderFilter = ref("");
+          const showFilterMenu = ref({
+            experience: false,
+            gender: false,
+          });
 
           const experienceOptions = [
             { value: "0-2", label: "0-2 years" },
@@ -378,24 +418,46 @@
             { value: "10+", label: "10+ years" },
           ];
 
-          const toggleFilterMenu = () => {
-            showFilterMenu.value = !showFilterMenu.value;
+          const genderOptions = ["Male", "Female"];
+
+          const toggleFilterMenu = (filterType) => {
+            // Close other filter menus
+            Object.keys(showFilterMenu.value).forEach((key) => {
+              if (key !== filterType) showFilterMenu.value[key] = false;
+            });
+            // Toggle the selected filter menu
+            showFilterMenu.value[filterType] =
+              !showFilterMenu.value[filterType];
           };
 
           const setExperienceFilter = (value) => {
             experienceFilter.value = value;
-            showFilterMenu.value = false;
+            showFilterMenu.value.experience = false;
+          };
+
+          const setGenderFilter = (value) => {
+            genderFilter.value = value;
+            showFilterMenu.value.gender = false;
           };
 
           const clearExperienceFilter = () => {
             experienceFilter.value = "";
           };
 
+          const clearGenderFilter = () => {
+            genderFilter.value = "";
+          };
+
           const handleClickOutside = (event) => {
-            const filterDropdown = document.querySelector(".filter-dropdown");
-            if (filterDropdown && !filterDropdown.contains(event.target)) {
-              showFilterMenu.value = false;
-            }
+            const filterDropdowns =
+              document.querySelectorAll(".filter-dropdown");
+            filterDropdowns.forEach((dropdown) => {
+              if (!dropdown.contains(event.target)) {
+                Object.keys(showFilterMenu.value).forEach((key) => {
+                  showFilterMenu.value[key] = false;
+                });
+              }
+            });
           };
 
           const matchesExperienceFilter = (nanny, filter) => {
@@ -416,6 +478,11 @@
             }
           };
 
+          const matchesGenderFilter = (nanny, filter) => {
+            if (!filter) return true;
+            return nanny.gender === filter;
+          };
+
           const fetchNannies = async () => {
             try {
               const userCollectionRef = collection(db, "USER");
@@ -433,12 +500,12 @@
               );
 
               nannies.value = nannyData;
-              
+
               // Automatically select the first nanny if there are any nannies
               if (nannyData.length > 0) {
                 selectedNanny.value = nannyData[0];
               }
-              
+
               console.log("Fetched nannies:", nannyData);
             } catch (error) {
               console.error("Error fetching nanny data:", error);
@@ -460,19 +527,19 @@
                 message: `Hi, I would like to hire you and discuss details.`,
                 // Add these additional fields for better date handling
                 localTimestamp: new Date().toISOString(),
-                status: 'sent'
+                status: "sent",
               };
 
               // Add the document to the CHATS collection
               const chatRef = await addDoc(collection(db, "CHATS"), chatData);
-              
+
               // Optionally, you can update the document after creation to confirm the server timestamp
               const chatDoc = await getDoc(chatRef);
               if (chatDoc.exists()) {
                 const serverTime = chatDoc.data().timestamp;
                 if (serverTime) {
                   await updateDoc(chatRef, {
-                    confirmedTimestamp: serverTime.toDate().toISOString()
+                    confirmedTimestamp: serverTime.toDate().toISOString(),
                   });
                 }
               }
@@ -483,6 +550,7 @@
               alert("Failed to send message. Please try again.");
             }
           };
+
           const filteredNannies = computed(() => {
             const query = searchQuery.value.toLowerCase();
             return nannies.value.filter((nanny) => {
@@ -495,14 +563,19 @@
                 experienceFilter.value
               );
 
-              return matchesSearch && matchesExperience;
+              const matchesGender = matchesGenderFilter(
+                nanny,
+                genderFilter.value
+              );
+
+              return matchesSearch && matchesExperience && matchesGender;
             });
           });
 
           const showDetails = (nanny) => {
             selectedNanny.value = nanny;
           };
-          const searchJobs = () => {
+          const searchNanny = () => {
             // If search results in no matches, clear selected nanny
             if (filteredNannies.value.length === 0) {
               selectedNanny.value = null;
@@ -531,15 +604,19 @@
             searchQuery,
             filteredNannies,
             showDetails,
-            searchJobs,
+            searchNanny,
             sendMessage,
             currentUserId,
             experienceFilter,
+            genderFilter,
             showFilterMenu,
             experienceOptions,
+            genderOptions,
             toggleFilterMenu,
             setExperienceFilter,
+            setGenderFilter,
             clearExperienceFilter,
+            clearGenderFilter,
           };
         },
       }).mount("#app");
