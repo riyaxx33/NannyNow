@@ -251,12 +251,15 @@
                 >
                 <i
                   class="fas"
-                  :class="showFilterMenu ? 'fa-chevron-up' :
+                  :class="showFilterMenu.experience ? 'fa-chevron-up' :
                 'fa-chevron-down' "
                 ></i>
               </button>
 
-              <div class="filter-menu" :class="{ show: showFilterMenu }">
+              <div
+                class="filter-menu"
+                :class="{ show: showFilterMenu.experience }"
+              >
                 <div
                   class="filter-option"
                   :class="{ active: experienceFilter === '' }"
@@ -307,13 +310,15 @@
           </div>
 
           <!-- Active filters display -->
-          <div v-if="experienceFilter" class="active-filter">
-            {{ experienceFilter }} Experience
-            <i class="fas fa-times" @click="clearExperienceFilter"></i>
-          </div>
-          <div v-if="genderFilter" class="active-filter">
-            {{ genderFilter }}
-            <i class="fas fa-times" @click="clearGenderFilter"></i>
+          <div class="active-filters">
+            <div v-if="experienceFilter" class="active-filter">
+              {{ experienceFilter }} Experience
+              <i class="fas fa-times" @click="clearExperienceFilter"></i>
+            </div>
+            <div v-if="genderFilter" class="active-filter">
+              {{ genderFilter }}
+              <i class="fas fa-times" @click="clearGenderFilter"></i>
+            </div>
           </div>
         </div>
       </div>
