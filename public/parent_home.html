@@ -210,8 +210,8 @@
       .active-filters {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 10px;
+        gap: 10px;
+        margin-top: 15px;
       }
 
       .active-filter {
@@ -224,14 +224,38 @@
         font-size: 0.9em;
       }
 
-      .active-filter button {
+      .active-filter i {
+        margin-left: 5px;
+        cursor: pointer;
+      }
+
+      .filter-tag {
+        display: inline-flex;
+        align-items: center;
+        background-color: #e7f3ff;
+        color: #007bff;
+        padding: 6px 12px;
+        border-radius: 20px;
+        margin-right: 8px;
+        margin-top: 8px;
+        font-size: 0.9em;
+      }
+
+      .filter-tag span {
+        margin-right: 8px;
+      }
+
+      .remove-filter {
+        cursor: pointer;
         background: none;
         border: none;
         color: #007bff;
-        margin-left: 8px;
-        padding: 0;
-        cursor: pointer;
-        font-size: 14px;
+        padding: 0 4px;
+        font-weight: bold;
+      }
+
+      .remove-filter:hover {
+        color: #0056b3;
       }
     </style>
   </head>
@@ -265,8 +289,7 @@
                 >
                 <i
                   class="fas"
-                  :class="showFilterMenu.experience ? 'fa-chevron-up' :
-                'fa-chevron-down' "
+                  :class="{'fa-chevron-up': showFilterMenu.experience, 'fa-chevron-down': !showFilterMenu.experience}"
                 ></i>
               </button>
 
@@ -299,7 +322,7 @@
                 <span>{{ genderFilter || 'Gender' }}</span>
                 <i
                   class="fas"
-                  :class="showFilterMenu.gender ? 'fa-chevron-up' : 'fa-chevron-down'"
+                  :class="{'fa-chevron-up': showFilterMenu.gender, 'fa-chevron-down': !showFilterMenu.gender}"
                 ></i>
               </button>
               <div class="filter-menu" :class="{ show: showFilterMenu.gender }">
@@ -326,12 +349,16 @@
           <!-- Active filters display -->
           <div class="active-filters">
             <div v-if="experienceFilter" class="active-filter">
-              {{ experienceFilter }} Experience
-              <i class="fas fa-times" @click="clearExperienceFilter"></i>
+              <span>Experience: {{ experienceFilter }}</span>
+              <button class="remove-filter" @click="clearExperienceFilter">
+                ×
+              </button>
             </div>
             <div v-if="genderFilter" class="active-filter">
-              {{ genderFilter }}
-              <i class="fas fa-times" @click="clearGenderFilter"></i>
+              <span>Gender: {{ genderFilter }}</span>
+              <button class="remove-filter" @click="clearGenderFilter">
+                ×
+              </button>
             </div>
           </div>
         </div>
