@@ -207,20 +207,31 @@
         border-bottom-right-radius: 6px;
       }
 
+      .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
       .active-filter {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
         padding: 4px 12px;
         background-color: #e7f3ff;
         color: #007bff;
         border-radius: 20px;
         font-size: 0.9em;
-        margin-top: 10px;
-        margin-right: 10px;
       }
 
-      .active-filter i {
-        margin-left: 5px;
+      .active-filter button {
+        background: none;
+        border: none;
+        color: #007bff;
+        margin-left: 8px;
+        padding: 0;
         cursor: pointer;
+        font-size: 14px;
       }
     </style>
   </head>
@@ -244,7 +255,10 @@
             </div>
 
             <div class="filter-dropdown" @click.stop>
-              <button class="filter-button" @click="toggleFilterMenu">
+              <button
+                class="filter-button"
+                @click="toggleFilterMenu('experience')"
+              >
                 <span
                   >{{ experienceFilter ? `${experienceFilter} Experience` :
                   `Experience Level` }}</span
