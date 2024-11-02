@@ -358,6 +358,7 @@
         doc,
         getDoc,
         addDoc,
+        updateDoc,
         serverTimestamp,
       } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
@@ -392,7 +393,7 @@
 
           const handleClickOutside = (event) => {
             const filterDropdown = document.querySelector(".filter-dropdown");
-            if (filterDropdown && !filterDropdown.contains(e.target)) {
+            if (filterDropdown && !filterDropdown.contains(event.target)) {
               showFilterMenu.value = false;
             }
           };
@@ -451,21 +452,37 @@
             }
 
             try {
+              // Create a chat document reference
               const chatData = {
                 to_user_id: selectedNanny.value.id,
                 from_user_id: currentUserId.value,
-                timestamp: serverTimestamp(),
+                timestamp: serverTimestamp(), // Firebase server timestamp
                 message: `Hi, I would like to hire you and discuss details.`,
+                // Add these additional fields for better date handling
+                localTimestamp: new Date().toISOString(),
+                status: 'sent'
               };
 
-              await addDoc(collection(db, "CHATS"), chatData);
+              // Add the document to the CHATS collection
+              const chatRef = await addDoc(collection(db, "CHATS"), chatData);
+              
+              // Optionally, you can update the document after creation to confirm the server timestamp
+              const chatDoc = await getDoc(chatRef);
+              if (chatDoc.exists()) {
+                const serverTime = chatDoc.data().timestamp;
+                if (serverTime) {
+                  await updateDoc(chatRef, {
+                    confirmedTimestamp: serverTime.toDate().toISOString()
+                  });
+                }
+              }
+
               alert("Message sent successfully!");
             } catch (error) {
               console.error("Error sending message:", error);
               alert("Failed to send message. Please try again.");
             }
           };
-
           const filteredNannies = computed(() => {
             const query = searchQuery.value.toLowerCase();
             return nannies.value.filter((nanny) => {

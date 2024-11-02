@@ -121,9 +121,16 @@
         }
 
         .timestamp {
-            font-size: 0.8em;
-            color: #8e8e8e;
-            margin-top: 5px;
+        font-size: 0.8em;
+        margin-top: 5px;
+        }
+
+        .message.sent .timestamp {
+            color: rgba(255, 255, 255, 0.9); /* Light color for sent messages */
+        }
+
+        .message.received .timestamp {
+            color: #666666; /* Darker grey for received messages */
         }
 
         .no-chat-selected {
@@ -198,7 +205,8 @@
                     selectedChat: null,
                     selectedChatMessages: [],
                     newMessage: '',
-                    unsubscribe: null
+                    unsubscribe: null,
+                    messageUnsubscribe: null
                 }
             },
             computed: {
@@ -264,40 +272,68 @@
                 async loadChatMessages() {
                     if (!this.selectedChat) return;
                     
-                    // Get messages between current user and selected user
-                    const messages = await db.collection('CHATS')
+                    // Clean up previous message listener if it exists
+                    if (this.messageUnsubscribe) {
+                        this.messageUnsubscribe();
+                    }
+                    
+                    // Set up real-time listener for messages
+                    this.messageUnsubscribe = db.collection('CHATS')
                         .where('from_user_id', 'in', [this.currentUserId, this.selectedChat.userId])
                         .where('to_user_id', 'in', [this.currentUserId, this.selectedChat.userId])
                         .orderBy('timestamp', 'asc')
-                        .get();
-                    
-                    this.selectedChatMessages = messages.docs.map(doc => doc.data());
-                    
-                    // Scroll to bottom of messages
-                    this.$nextTick(() => {
-                        const container = this.$refs.messageContainer;
-                        if (container) {
-                            container.scrollTop = container.scrollHeight;
-                        }
-                    });
-                },
+                        .onSnapshot(snapshot => {
+                            // Convert all timestamps to numbers for consistent comparison
+                            this.selectedChatMessages = snapshot.docs.map(doc => {
+                                const data = doc.data();
+                                const timestamp = data.timestamp?.seconds 
+                                    ? data.timestamp.seconds * 1000
+                                    : typeof data.timestamp === 'number' 
+                                        ? data.timestamp 
+                                        : Date.now();
+                                
+                                return {
+                                    ...data,
+                                    timestamp
+                                };
+                            }).sort((a, b) => a.timestamp - b.timestamp);
+                            
+                            // Scroll to bottom when new messages arrive
+                            this.$nextTick(() => {
+                                const container = this.$refs.messageContainer;
+                                if (container) {
+                                    container.scrollTop = container.scrollHeight;
+                                }
+                            });
+                        });
+                    },
+
                 async sendMessage() {
                     if (!this.newMessage.trim() || !this.selectedChat) return;
                     
-                    // Add new message to database
+                    // Add new message to database using server timestamp
                     await db.collection('CHATS').add({
                         from_user_id: this.currentUserId,
                         to_user_id: this.selectedChat.userId,
                         message: this.newMessage,
-                        timestamp: Date.now()
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp() // Use server timestamp
                     });
                     
                     this.newMessage = '';
                     await this.loadChatMessages();
                 },
+
                 formatTimestamp(timestamp) {
-                    return new Date(timestamp).toLocaleString();
+                    if (!timestamp) return 'Invalid Date';
+                    
+                    // Convert to number if it's a Firestore timestamp
+                    const timestampMs = timestamp?.seconds 
+                        ? timestamp.seconds * 1000 
+                        : timestamp;
+                    
+                    return new Date(timestampMs).toLocaleString();
                 }
+
             },
             mounted() {
                 // Check if user is logged in
@@ -313,7 +349,10 @@
             beforeUnmount() {
                 // Clean up listener
                 if (this.unsubscribe) {
-                    this.unsubscribe();
+                this.unsubscribe();
+                }
+                if (this.messageUnsubscribe) {
+                    this.messageUnsubscribe();
                 }
             }
         });
