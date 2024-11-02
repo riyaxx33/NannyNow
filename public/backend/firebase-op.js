@@ -188,43 +188,57 @@ export function handleFileUpload(event) {
   return null;
 }
 
-// Store post data
-// Store post data
-// Store post data
 export async function storePostData(user, postData) {
   try {
-    const postId = `${user.uid}_${Date.now()}`;
+    // Create a shorter jobId using the last 4 chars of userId + timestamp last 6 digits
+    const shortUserId = user.uid.slice(-4); // Get last 4 characters of user ID
+    const timestamp = Date.now();
+    const shortTimestamp = timestamp.toString().slice(-6); // Get last 6 digits of timestamp
+    const jobId = `${shortUserId}_${shortTimestamp}`; // Format: "Kx23_994631"
+    
+    // Format the date as YYYY-MM-DD
+    const formattedDate = new Date(postData.date).toISOString().split('T')[0];
 
     // Convert payNegotiation string to boolean before storing
     const payNegotiationBool = postData.payNegotiation === 'true';
 
-    await setDoc(doc(db, "POSTS", postId), {
+    await setDoc(doc(db, "POSTS", jobId), {
       userId: user.uid,
-      date: postData.date ? Timestamp.fromDate(new Date(postData.date)) : null,
+      jobId: jobId,  // Will be much shorter now
+      status: true,
+      date: formattedDate,
       pay: postData.pay,
-      payNegotiation: payNegotiationBool, // Store as boolean
+      payNegotiation: payNegotiationBool,
       startTime: postData.startTime,
       endTime: postData.endTime,
       description: postData.description,
       createdAt: Timestamp.now(),
     });
 
-    console.log("Post data stored successfully");
+    console.log("Post data stored successfully with jobId:", jobId);
   } catch (error) {
     console.error("Error storing post data:", error);
     throw error;
   }
 }
 
-// Fetch posts for a specific user
+// Update the fetchPosts function to handle the new date format
 export async function fetchPosts(userId) {
   try {
     const postsCollection = collection(db, "POSTS");
     const postSnapshot = await getDocs(postsCollection);
 
     const posts = postSnapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter((post) => post.userId === userId); // Filter by userId
+      .map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          // No need to convert date as it's already in YYYY-MM-DD format
+          formattedDate: data.date
+        };
+      })
+      .filter((post) => post.userId === userId);
 
     console.log("User's posts fetched successfully:", posts);
     return posts;
@@ -234,12 +248,18 @@ export async function fetchPosts(userId) {
   }
 }
 
-// Update post data
+// Update the updatePostData function to handle the new date format
 export async function updatePostData(postId, updatedData) {
   try {
     const postRef = doc(db, "POSTS", postId);
-    await setDoc(postRef, updatedData, { merge: true }); // Update specific fields only
+    
+    // Format the date as YYYY-MM-DD if it exists in the updated data
+    const dataToUpdate = {
+      ...updatedData,
+      date: updatedData.date ? new Date(updatedData.date).toISOString().split('T')[0] : undefined
+    };
 
+    await setDoc(postRef, dataToUpdate, { merge: true });
     console.log("Post data updated successfully");
   } catch (error) {
     console.error("Error updating post data:", error);
