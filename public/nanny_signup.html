@@ -158,7 +158,7 @@
               type="file"
               id="profilePicture"
               v-model="profilePicture"
-              @change="handleFileUpload"
+              @change="handleProfilePictureUpload"
               accept="image/*"
               class="form-control-file"
             />
@@ -285,7 +285,7 @@
               );
               const user = userCredential.user;
 
-              await storeNannyData(user, {
+              await storeNannyData(user, { 
                 email: this.email,
                 firstName: this.firstName,
                 lastName: this.lastName,

@@ -37,7 +37,13 @@
         border: 1px solid #ddd; /* Optional: Add a border around the scrollable area */
         margin-top: 15px;
       }
-
+      .nanny-profile-pic {
+    width: 80px;
+    height: 80px;
+    margin-right: 15px;
+    border-radius: 50%;
+    object-fit: cover;
+}
       /* Job card styling */
       .job-card {
         cursor: pointer;
@@ -51,17 +57,9 @@
         transition: background-color 0.3s ease;
         font-family: "Poppins", sans-serif;
       }
-
       .job-card:hover {
         background-color: #f8f9fa;
       }
-
-      .job-card img {
-        width: 100px;
-        height: 100px;
-        margin-right: 15px;
-      }
-
       .job-card-content {
         display: flex;
         align-items: center;
@@ -257,6 +255,9 @@
       .remove-filter:hover {
         color: #0056b3;
       }
+      .details{
+        color: grey;
+      }
     </style>
   </head>
   <body>
@@ -378,9 +379,11 @@
               >
                 <div class="job-card-content">
                   <img
-                    :src="nanny.profilePictureURL || 'https://via.placeholder.com/60'"
-                    :alt="nanny.firstName + ' ' + nanny.lastName"
-                  />
+                  :src="nanny.profilePictureUrl || '/api/placeholder/80/80'"
+                  :alt="nanny.firstName + ' ' + nanny.lastName"
+                  class="nanny-profile-pic"
+                />
+                
                   <div class="job-description">
                     <h5>{{ nanny.firstName }} {{ nanny.lastName }}</h5>
                     <p>Experience: {{ nanny.yrsExperience || 'N/A' }} years</p>
@@ -390,35 +393,48 @@
             </div>
           </div>
 
-          <!-- Nanny Details Section -->
-          <div class="col-md-6" id="detailsContainer">
-            <h4>
-              {{ selectedNanny ? selectedNanny.firstName + ' ' +
-              selectedNanny.lastName : 'Select a nanny to view details' }}
-            </h4>
-            <div v-if="selectedNanny">
-              <p>Email: {{ selectedNanny.email }}</p>
-              <p>Gender: {{ selectedNanny.gender }}</p>
-              <p>Date of Birth: {{ selectedNanny.dob }}</p>
-              <p>
-                Years of Experience: {{ selectedNanny.yrsExperience || 'N/A' }}
-              </p>
+                  <!-- Nanny Details Section -->
+        <!-- Nanny Details Section -->
+        <div class="col-md-6" id="detailsContainer">
+
+          <div v-if="selectedNanny">
+            <div class="d-flex align-items-start gap-4 mb-4">
+              <img
+                :src="selectedNanny.profilePictureUrl || '/api/placeholder/100/100'"
+                :alt="selectedNanny.firstName + ' ' + selectedNanny.lastName"
+                class="rounded-circle"
+                style="width: 100px; height: 100px; object-fit: cover; border:none;"
+              />
+              
+              <div>
+                <h2 class="text-4xl font-bold mb-2">{{ selectedNanny.firstName }} {{ selectedNanny.lastName }}</h2>
+                <div class="text-xl text-gray-600">
+                  <span class="details">{{ selectedNanny.gender.charAt(0).toUpperCase() + selectedNanny.gender.slice(1) }} | {{ calculateAge(selectedNanny.dob) }} years old</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-2">
+              <p>Experience: {{ selectedNanny.yrsExperience || 'N/A' }} years<br>
+                About Me: {{ selectedNanny.description }}</p>
+            </div>
+              
               <div class="chat-button-container">
-                <button
+                <button 
                   class="chat-button"
                   @click="sendMessage"
-                  :disabled="!currentUserId || !selectedNanny"
-                >
+                  :disabled="!currentUserId || !selectedNanny">
                   Chat Now
                 </button>
               </div>
-            </div>
-            <div id="jobDescriptionContainer">
-              <div id="jobDescription">
-                {{ selectedNanny ? selectedNanny.description : '' }}
-              </div>
-            </div>
+            
           </div>
+          <div v-else>
+            <p>Select a nanny to view details</p>
+          </div>
+        </div>
+
+
         </div>
       </div>
     </div>
@@ -445,17 +461,17 @@
       } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
       createApp({
-        setup() {
-          const nannies = ref([]);
-          const selectedNanny = ref(null);
-          const searchQuery = ref("");
-          const currentUserId = ref(null);
-          const experienceFilter = ref("");
-          const genderFilter = ref("");
-          const showFilterMenu = ref({
-            experience: false,
-            gender: false,
-          });
+  setup() {
+    const nannies = ref([]);
+    const selectedNanny = ref(null);
+    const searchQuery = ref("");
+    const currentUserId = ref(null);
+    const experienceFilter = ref("");
+    const genderFilter = ref("");
+    const showFilterMenu = ref({
+      experience: false,
+      gender: false,
+    });
 
           const experienceOptions = [
             { value: "0-2", label: "0-2 years" },
@@ -464,7 +480,12 @@
             { value: "10+", label: "10+ years" },
           ];
 
-          const genderOptions = ["male", "female"];
+          const genderOptions = ["Male", "Female"];
+
+          const calculateAge = (dob) => {
+      if (!dob) return 'N/A';
+      return Math.floor((new Date() - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000));
+    };
 
           const toggleFilterMenu = (filterType) => {
             // Close other filter menus
@@ -525,38 +546,42 @@
           };
 
           const matchesGenderFilter = (nanny, filter) => {
-            if (!filter) return true;
-            return nanny.gender === filter;
-          };
+    if (!filter) return true;
+    return nanny.gender.charAt(0).toUpperCase() + nanny.gender.slice(1) === filter;
+};
 
-          const fetchNannies = async () => {
-            try {
-              const userCollectionRef = collection(db, "USER");
-              const q = query(userCollectionRef, where("role", "==", "nanny"));
-              const userSnapshot = await getDocs(q);
+const fetchNannies = async () => {
+  try {
+    const userCollectionRef = collection(db, "USER");
+    const q = query(userCollectionRef, where("role", "==", "nanny"));
+    const userSnapshot = await getDocs(q);
 
-              const nannyData = await Promise.all(
-                userSnapshot.docs.map(async (userDoc) => {
-                  const userData = userDoc.data();
-                  const nannyDocRef = doc(db, "NANNY", userDoc.id);
-                  const nannySnapshot = await getDoc(nannyDocRef);
-                  const nannyDetails = nannySnapshot.data();
-                  return { ...userData, ...nannyDetails, id: userDoc.id };
-                })
-              );
+    const nannyData = await Promise.all(
+      userSnapshot.docs.map(async (userDoc) => {
+        const userData = userDoc.data();
+        const nannyDocRef = doc(db, "NANNY", userDoc.id);
+        const nannySnapshot = await getDoc(nannyDocRef);
+        const nannyDetails = nannySnapshot.exists() ? nannySnapshot.data() : {};
 
-              nannies.value = nannyData;
+        // Combine userData and nannyDetails, including profilePictureURL from userData
+        return { ...userData, ...nannyDetails, id: userDoc.id };
+      })
+    );
 
-              // Automatically select the first nanny if there are any nannies
-              if (nannyData.length > 0) {
-                selectedNanny.value = nannyData[0];
-              }
+    nannies.value = nannyData;
 
-              console.log("Fetched nannies:", nannyData);
-            } catch (error) {
-              console.error("Error fetching nanny data:", error);
-            }
-          };
+    // Automatically select the first nanny if there are any nannies
+    if (nannyData.length > 0) {
+      selectedNanny.value = nannyData[0];
+    }
+
+    console.log("Fetched nannies:", nannyData);
+  } catch (error) {
+    console.error("Error fetching nanny data:", error);
+  }
+};
+
+
 
           const sendMessage = async () => {
             if (!currentUserId.value || !selectedNanny.value) {
@@ -663,6 +688,7 @@
             setGenderFilter,
             clearExperienceFilter,
             clearGenderFilter,
+            calculateAge,
           };
         },
       }).mount("#app");
