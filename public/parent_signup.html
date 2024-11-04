@@ -96,22 +96,38 @@
             />
             <label for="email">Email Address</label>
           </div>
-          <div class="col-md-6 mb-3">
+        </div>
+        <div class="row mb-3">
+          <div class="col-12 mb-3">
             <div class="form-group">
               <label for="profilePicture" class="form-label d-block fw-bold"
-                >Upload Your Profile Picture</label
+                >Profile Picture</label
               >
+              <!-- Show current profile picture in edit mode -->
+              <img
+                v-if="isEditMode && currentProfilePicture"
+                :src="currentProfilePicture"
+                alt="Current Profile Picture"
+                class="mb-3"
+                style="
+                  width: 100px;
+                  height: 100px;
+                  object-fit: cover;
+                  border-radius: 50%;
+                "
+              />
               <input
                 type="file"
                 id="profilePicture"
-                v-model="profilePicture"
                 @change="handleProfilePictureUpload"
                 accept="image/*"
-                class="form-control-file"
+                class="form-control"
               />
-              <small class="text-muted d-block mt-2"
-                >Only image files of sizes smaller than 5MB are accepted.</small
-              >
+              <small class="text-muted d-block mt-2">
+                {{ isEditMode ? "Upload a new picture to change your current
+                profile picture" : "Only image files of sizes smaller than 5MB
+                are accepted" }}
+              </small>
             </div>
           </div>
         </div>
@@ -353,7 +369,8 @@
             confirmPassword: "",
             passwordError: "",
             confirmPasswordError: "",
-            profilePicture: null,
+            currentprofilePicture: null,
+            existingProfilePictureUrl: null,
             aboutMe: "",
             errorMessage: "",
             isEditMode: false,
@@ -442,6 +459,12 @@
               this.phoneNumber = data.phoneNumber;
               this.aboutMe = data.aboutMe;
 
+              // Handle profile picture
+              if (data.profilePicture) {
+                this.currentProfilePicture = data.profilePicture;
+                this.existingProfilePictureUrl = data.profilePictureUrl;
+              }
+
               // Handle children data
               if (data.children && data.children.length > 0) {
                 this.children = data.children;
@@ -480,6 +503,15 @@
                   aboutMe: this.aboutMe,
                 });
 
+                // Only include profile picture if a new one was uploaded
+                if (this.profilePicture) {
+                  updateData.profilePicture = this.profilePicture;
+                } else {
+                  // Keep the existing profile picture URL
+                  updateData.profilePictureUrl = this.existingProfilePictureUrl;
+                }
+
+                await storeParentData(user, updateData);
                 console.log("Profile updated successfully");
                 window.location.href = "parent_profilePage.html";
               } else {
