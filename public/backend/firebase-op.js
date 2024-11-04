@@ -101,7 +101,6 @@ export async function storeParentData(user, formData) {
   }
 }
 
-// Store nanny data
 export async function storeNannyData(user, formData) {
   try {
     let profilePictureUrl = null;
@@ -116,7 +115,6 @@ export async function storeNannyData(user, formData) {
 
         console.log("Uploading profile picture...");
         const snapshot = await uploadBytes(storageRef, formData.profilePicture);
-        // console.log("Profile picture uploaded successfully");
 
         profilePictureUrl = await getDownloadURL(snapshot.ref);
         console.log(
@@ -146,10 +144,11 @@ export async function storeNannyData(user, formData) {
       profilePictureUrl: profilePictureUrl,
     });
 
-    // Store NANNY data
+    // Store NANNY data with noJobs field initialized to 0
     await setDoc(doc(db, "NANNY", user.uid), {
       yrsExperience: formData.yrsExperience,
       description: formData.description,
+      noJobs: 0  // Initialize number of jobs to 0
     });
 
     console.log("Nanny data stored successfully");
@@ -161,7 +160,7 @@ export async function storeNannyData(user, formData) {
     throw error;
   }
 }
-
+ 
 // Handle file upload
 export function handleFileUpload(event) {
   const file = event.target.files[0];

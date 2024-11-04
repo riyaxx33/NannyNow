@@ -274,7 +274,7 @@
                 type="text"
                 v-model="searchQuery"
                 class="form-control"
-                placeholder="Search for NANNY..."
+                placeholder="Search for Nanny..."
                 @input="searchNanny"
               />
             </div>
@@ -411,6 +411,14 @@
                 <div class="text-xl text-gray-600">
                   <span class="details">{{ selectedNanny.gender.charAt(0).toUpperCase() + selectedNanny.gender.slice(1) }} | {{ calculateAge(selectedNanny.dob) }} years old</span>
                 </div>
+                <div class="chat-button-container">
+                  <button 
+                    class="chat-button"
+                    @click="sendMessage"
+                    :disabled="!currentUserId || !selectedNanny">
+                    Chat Now
+                  </button>
+                </div>
               </div>
             </div>
             
@@ -419,14 +427,6 @@
                 About Me: {{ selectedNanny.description }}</p>
             </div>
               
-              <div class="chat-button-container">
-                <button 
-                  class="chat-button"
-                  @click="sendMessage"
-                  :disabled="!currentUserId || !selectedNanny">
-                  Chat Now
-                </button>
-              </div>
             
           </div>
           <div v-else>
