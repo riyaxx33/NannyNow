@@ -116,49 +116,43 @@ export async function storeNannyData(user, formData) {
   try {
     let profilePictureUrl = formData.profilePictureUrl;
 
-    // Upload profile picture if provided
+    // Handle profile picture upload
     if (formData.profilePicture instanceof File) {
       try {
         const fileName = `${user.uid}_${Date.now()}_${
           formData.profilePicture.name
         }`;
         const storageRef = ref(storage, `profile_pictures/${fileName}`);
-
-        console.log("Uploading profile picture...");
         const snapshot = await uploadBytes(storageRef, formData.profilePicture);
-
         profilePictureUrl = await getDownloadURL(snapshot.ref);
-        console.log(
-          "Custom profile picture uploaded successfully:",
-          profilePictureUrl
-        );
       } catch (uploadError) {
-        console.error("Error uploading custom profile picture:", uploadError);
+        console.error("Error uploading profile picture:", uploadError);
         profilePictureUrl = null;
       }
     }
 
-    // If no custom picture was provided or upload failed, use default picture
+    // Use default picture only for new signups if no picture is provided
     if (!profilePictureUrl && !formData.isEditMode) {
       profilePictureUrl = await getDefaultProfilePicURL();
-      console.log("Using default profile picture");
     }
 
     // Store USER data
-    await setDoc(
-      doc(db, "USER", user.uid),
-      {
-        email: formData.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        dob: formData.dob,
-        gender: formData.gender,
-        role: "nanny",
-        profilePictureUrl: profilePictureUrl,
-        phoneNumber: formData.phoneNumber,
-      },
-      { merge: true } // Add merge: true for updating
-    );
+    const userData = {
+      email: formData.email,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      dob: formData.dob,
+      gender: formData.gender,
+      role: "nanny",
+      phoneNumber: formData.phoneNumber,
+    };
+
+    // Only update profilePictureUrl if we have a new one
+    if (profilePictureUrl) {
+      userData.profilePictureUrl = profilePictureUrl;
+    }
+
+    await setDoc(doc(db, "USER", user.uid), userData, { merge: true });
 
     // Store NANNY data
     const nannyData = {
@@ -166,20 +160,15 @@ export async function storeNannyData(user, formData) {
       description: formData.description,
     };
 
-    // Only initialize noJobs to 0 for new signups
+    // Only set noJobs for new signups
     if (!formData.isEditMode) {
       nannyData.noJobs = 0;
     }
 
-    await setDoc(
-      doc(db, "NANNY", user.uid),
-      nannyData,
-      { merge: true } // Add merge: true for updating
-    );
+    await setDoc(doc(db, "NANNY", user.uid), nannyData, { merge: true });
 
     console.log("Nanny data stored successfully");
 
-    // Only redirect for new signups
     if (!formData.isEditMode) {
       redirectToNannyHome();
     }
