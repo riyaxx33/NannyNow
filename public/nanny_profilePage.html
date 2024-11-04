@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nanny Profile</title>
-
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <!-- Bootstrap 5 CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -13,36 +17,158 @@
     <script src="https://unpkg.com/vue@3/dist/vue.esm-browser.js"></script>
 
     <style>
-      .profile-header {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        margin-top: 20px;
+      :root {
+        --linkedin-blue: #0a66c2;
+        --linkedin-light-blue: #70b5f9;
+        --linkedin-background: #f3f2ef;
+        --card-border: #e0e0e0;
+      }
+
+      body {
+        background-color: var(--linkedin-background);
+        font-family: "Poppins", sans-serif;
+      }
+
+      .profile-background {
+        height: 200px;
+        background-color: var(--linkedin-light-blue);
+        border-radius: 8px 8px 0 0;
+        position: relative;
+      }
+
+      @media (max-width: 767px) {
+        .profile-background {
+          height: 160px;
+        }
+      }
+
+      .profile-section {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid var(--card-border);
+        margin-bottom: 20px;
+        padding: 24px;
+      }
+
+      .avatar-container {
+        position: relative;
+        margin-top: -72px;
+        padding-left: 24px;
       }
 
       .avatar {
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
+        width: 152px;
+        height: 152px;
+        border: 4px solid white;
         border-radius: 50%;
-        border: 3px solid #0073b1; /* LinkedIn's blue */
+        object-fit: cover;
       }
 
-      .profile-card {
-        margin-top: 20px;
+      @media (max-width: 767px) {
+        .avatar {
+          width: 120px;
+          height: 120px;
+        }
+
+        .avatar-container {
+          margin-top: -60px;
+        }
       }
 
-      .card-title {
-        color: #0073b1;
+      .profile-info {
+        padding-top: 24px;
       }
 
-      ul {
+      @media (min-width: 768px) {
+        .profile-info {
+          padding-top: 80px;
+        }
+      }
+
+      .profile-name {
+        font-size: 24px;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.9);
+        margin-bottom: 4px;
+      }
+
+      .profile-headline {
+        font-size: 16px;
+        color: rgba(0, 0, 0, 0.9);
+        margin-bottom: 8px;
+      }
+
+      .profile-location {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.6);
+        margin-bottom: 4px;
+      }
+
+      .profile-contact {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.6);
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      @media (max-width: 767px) {
+        .profile-contact {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+      }
+
+      .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.9);
+        margin-bottom: 16px;
+      }
+
+      .info-list {
         padding-left: 0;
         list-style: none;
       }
 
-      .child-list li::before {
-      content: "👶 ";
+      .info-list li {
+        margin-bottom: 12px;
+        display: flex;
+        gap: 8px;
+        align-items: baseline;
+      }
+
+      .info-list li strong {
+        min-width: 140px;
+        color: rgba(0, 0, 0, 0.6);
+      }
+
+      .btn-primary {
+        background-color: var(--linkedin-blue);
+        border-color: var(--linkedin-blue);
+      }
+
+      .btn-outline-primary {
+        color: var(--linkedin-blue);
+        border-color: var(--linkedin-blue);
+      }
+
+      .btn-outline-primary:hover {
+        background-color: rgba(112, 181, 249, 0.2);
+        border-color: var(--linkedin-blue);
+        color: var(--linkedin-blue);
+      }
+      .btn-edit {
+        background-color: var(--linkedin-blue);
+        border-color: var(--linkedin-blue);
+        color: white;
+      }
+
+      .btn-edit:hover {
+        background-color: #004182;
+        border-color: #004182;
       }
     </style>
   </head>
@@ -58,48 +184,77 @@
 
       <div v-else-if="error" class="alert alert-danger mt-3">{{ error }}</div>
 
-      <div v-else class="profile-card card shadow-sm">
-        <div class="card-body">
-          <div class="profile-header">
-            <!-- Profile Picture -->
-            <img
-              :src="profileData.profilePicture"
-              alt="Profile Picture"
-              class="avatar"
-            />
-            <div>
-              <h1 class="card-title">
-                {{ profileData.firstName }} {{ profileData.lastName }}
-              </h1>
-              <p class="text-muted">{{ profileData.email }}</p>
+      <div v-else>
+        <!-- Main Profile Card -->
+        <div class="profile-section p-0">
+          <!-- Background Cover -->
+          <div class="profile-background"></div>
+
+          <div class="container-fluid px-0">
+            <div class="row">
+              <div class="col-12">
+                <div class="avatar-container">
+                  <img
+                    :src="profileData.profilePicture"
+                    alt="Profile Picture"
+                    class="avatar"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="profile-info px-3 px-md-4 pb-4">
+              <div class="row align-items-start">
+                <div class="col-md-8">
+                  <h1 class="profile-name">
+                    {{ profileData.firstName }} {{ profileData.lastName }}
+                  </h1>
+                  <p class="profile-headline">
+                    Nanny • {{ profileData.yrsExperience }} Years Experience
+                  </p>
+                  <div class="profile-contact">
+                    <span>📧 {{ profileData.email }}</span>
+                    <span>📱 {{ profileData.phoneNumber }}</span>
+                  </div>
+                </div>
+                <div
+                  class="col-md-4 d-flex justify-content-md-end mt-3 mt-md-0 gap-2"
+                >
+                  <button class="btn btn-edit" @click="editProfile">
+                    Edit Profile
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
-          <hr />
+        <!-- About Section -->
+        <div class="profile-section">
+          <h2 class="section-title">About</h2>
+          <div class="row">
+            <div class="col-12">
+              <p>{{ profileData.description }}</p>
+            </div>
+          </div>
+        </div>
 
-          <div class="row mt-3">
+        <!-- Personal Information Section -->
+        <div class="profile-section">
+          <h2 class="section-title">Personal Information</h2>
+          <div class="row">
             <div class="col-md-6">
-              <h5>Personal Information</h5>
-              <ul class="child-list">
+              <ul class="info-list">
                 <li><strong>Date of Birth:</strong> {{ profileData.dob }}</li>
                 <li><strong>Gender:</strong> {{ profileData.gender }}</li>
-                <li><strong>Phone:</strong> {{ profileData.phoneNumber }}</li>
                 <li>
-                  <strong>Years of Experience</strong> {{
+                  <strong>Years of Experience:</strong> {{
                   profileData.yrsExperience }}
                 </li>
               </ul>
             </div>
-
-            <div class="col-md-6">
-              <h5>About Me</h5>
-              <p>{{ profileData.description }}</p>
-            </div>
           </div>
-
-          <button class="btn btn-outline-danger mt-3" @click="logout">
-            Logout
-          </button>
         </div>
       </div>
     </div>
@@ -201,13 +356,19 @@
             const storageRef = ref(storage, filePath);
             return await getDownloadURL(storageRef);
           },
-          async logout() {
-            try {
-              await logout();
-              window.location.href = "login.html";
-            } catch (error) {
-              this.error = "Logout failed: " + error.message;
-            }
+          editProfile() {
+            // Store the current profile data in sessionStorage
+            const profileDataToStore = {
+              ...this.profileData,
+              profilePicture: this.profileData.profilePicture,
+              profilePictureUrl: this.profileData.profilePictureUrl,
+            };
+            sessionStorage.setItem(
+              "editProfileData",
+              JSON.stringify(profileDataToStore)
+            );
+            // Redirect to nanny signup page in edit mode
+            window.location.href = "nanny_signup.html?mode=edit";
           },
         },
       }).mount("#app");
@@ -215,61 +376,63 @@
     <script type="module">
       import { auth, db } from "./backend/firebase-config.js";
       import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-      import { logout } from './backend/auth.js';
-      
+      import {
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+      import { logout } from "./backend/auth.js";
+
       async function loadNavbar(user) {
-          let fileToLoad = 'unloggedin_navbar_template.html';
-  
-          if (user) {
-              try {
-                  const userDoc = await getDoc(doc(db, "USER", user.uid));
-                  if (userDoc.exists()) {
-                      const userData = userDoc.data();
-                      if (userData.role === 'parent') {
-                          fileToLoad = 'parent_navbar_template.html';
-                      } else if (userData.role === 'nanny') {
-                          fileToLoad = 'nanny_navbar_template.html';
-                      }
-                  }
-              } catch (error) {
-                  console.error('Error fetching user role:', error);
-              }
-          }
-  
+        let fileToLoad = "unloggedin_navbar_template.html";
+
+        if (user) {
           try {
-              const response = await fetch(fileToLoad);
-              if (!response.ok) throw new Error('Network response was not ok');
-  
-              const navbarHTML = await response.text();
-              document.getElementById('navbar').innerHTML = navbarHTML;
-  
-              // Add event listener to logout link after navbar is loaded
-              const logoutLink = document.querySelector('#logoutBtn');
-              if (logoutLink) {
-                  logoutLink.addEventListener('click', async (e) => {
-                      e.preventDefault(); // Prevent the default link behavior
-                      console.log("Logout clicked");
-                      try {
-                          await logout(); // The redirect is now handled in the logout function
-                      } catch (error) {
-                          console.error('Logout failed:', error);
-                      }
-                  });
-              } else {
-                  console.log('Logout link not found');
+            const userDoc = await getDoc(doc(db, "USER", user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              if (userData.role === "parent") {
+                fileToLoad = "parent_navbar_template.html";
+              } else if (userData.role === "nanny") {
+                fileToLoad = "nanny_navbar_template.html";
               }
+            }
           } catch (error) {
-              console.error('Failed to load navbar:', error);
+            console.error("Error fetching user role:", error);
           }
+        }
+
+        try {
+          const response = await fetch(fileToLoad);
+          if (!response.ok) throw new Error("Network response was not ok");
+
+          const navbarHTML = await response.text();
+          document.getElementById("navbar").innerHTML = navbarHTML;
+
+          // Add event listener to logout link after navbar is loaded
+          const logoutLink = document.querySelector("#logoutBtn");
+          if (logoutLink) {
+            logoutLink.addEventListener("click", async (e) => {
+              e.preventDefault(); // Prevent the default link behavior
+              console.log("Logout clicked");
+              try {
+                await logout(); // The redirect is now handled in the logout function
+              } catch (error) {
+                console.error("Logout failed:", error);
+              }
+            });
+          } else {
+            console.log("Logout link not found");
+          }
+        } catch (error) {
+          console.error("Failed to load navbar:", error);
+        }
       }
-  
+
       onAuthStateChanged(auth, (user) => {
-          console.log('Auth state changed');
-          loadNavbar(user);
+        console.log("Auth state changed");
+        loadNavbar(user);
       });
     </script>
-  
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
