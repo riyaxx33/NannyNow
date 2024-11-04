@@ -17,7 +17,7 @@
     />
 
     <style>
-      .form-floating > label { 
+      .form-floating > label {
         left: 0.75rem;
         padding: 1rem 0.75rem;
       }
@@ -78,10 +78,12 @@
   <body class="background">
     <div id="app" class="container">
       <form @submit.prevent="handleSubmit" class="pt-2">
-        <h1 class="mb-4">Parent Signup Form</h1>
+        <h1 class="mb-4">
+          {{ isEditMode ? 'Edit Profile' : 'Parent Signup Form' }}
+        </h1>
 
         <!-- Email and Profile Picture row -->
-        <div class="row mb-3">
+        <div class="row mb-3" v-if="!isEditMode">
           <div class="col-md-6 mb-3 form-floating">
             <input
               type="email"
@@ -90,6 +92,7 @@
               placeholder="Email Address"
               v-model="email"
               required
+              :disabled="isEditMode"
             />
             <label for="email">Email Address</label>
           </div>
@@ -112,7 +115,7 @@
             </div>
           </div>
         </div>
-        <div class="row mb-3">
+        <div class="row mb-3" v-if="!isEditMode">
           <div class="col-md-6 mb-3 form-floating">
             <input
               type="password"
@@ -315,7 +318,9 @@
 
         <div class="row">
           <div class="col-12 mt-4">
-            <button type="submit" class="btn btn-primary">Sign Up</button>
+            <button type="submit" class="btn btn-primary">
+              {{ isEditMode ? 'Update Profile' : 'Sign Up' }}
+            </button>
           </div>
         </div>
 
@@ -351,26 +356,44 @@
             profilePicture: null,
             aboutMe: "",
             errorMessage: "",
+            isEditMode: false,
           };
         },
         computed: {
           isFormValid() {
-            return (
-              this.email &&
+            const commonValidation =
               this.firstName &&
               this.lastName &&
               this.dob &&
               this.homeAddress &&
               this.phoneNumber &&
-              this.aboutMe &&
-              this.password &&
-              this.confirmPassword &&
-              !this.passwordError &&
-              !this.confirmPasswordError
-            );
+              this.aboutMe;
+
+            if (this.isEditMode) {
+              // Don't check password fields in edit mode
+              return commonValidation;
+            } else {
+              // Check everything including passwords for new signups
+              return (
+                commonValidation &&
+                this.email &&
+                this.password &&
+                this.confirmPassword &&
+                !this.passwordError &&
+                !this.confirmPasswordError
+              );
+            }
           },
         },
+        created() {
+          // Check if we're in edit mode
+          const urlParams = new URLSearchParams(window.location.search);
+          this.isEditMode = urlParams.get("mode") === "edit";
 
+          if (this.isEditMode) {
+            this.loadExistingData();
+          }
+        },
         methods: {
           addChild() {
             this.children.push({ name: "", gender: "", age: null });
@@ -404,6 +427,30 @@
               this.profilePicture = null;
             }
           },
+          async loadExistingData() {
+            const storedData = sessionStorage.getItem("editProfileData");
+            if (storedData) {
+              const data = JSON.parse(storedData);
+
+              // Pre-fill the form with existing data
+              this.email = data.email;
+              this.firstName = data.firstName;
+              this.lastName = data.lastName;
+              this.dob = data.dob;
+              this.gender = data.gender;
+              this.homeAddress = data.homeAddress;
+              this.phoneNumber = data.phoneNumber;
+              this.aboutMe = data.aboutMe;
+
+              // Handle children data
+              if (data.children && data.children.length > 0) {
+                this.children = data.children;
+              }
+
+              // Clear session storage after loading
+              sessionStorage.removeItem("editProfileData");
+            }
+          },
 
           async handleSubmit() {
             if (!this.isFormValid) {
@@ -413,30 +460,54 @@
             }
 
             try {
-              const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                this.email,
-                this.password
-              );
-              const user = userCredential.user;
+              if (this.isEditMode) {
+                // Update existing user data
+                const user = auth.currentUser;
+                if (!user) {
+                  throw new Error("No authenticated user found");
+                }
 
-              await storeParentData(user, {
-                email: this.email,
-                firstName: this.firstName,
-                lastName: this.lastName,
-                dob: this.dob,
-                gender: this.gender,
-                homeAddress: this.homeAddress,
-                phoneNumber: this.phoneNumber,
-                children: this.children,
-                profilePicture: this.profilePicture,
-                aboutMe: this.aboutMe,
-              });
+                await storeParentData(user, {
+                  email: this.email,
+                  firstName: this.firstName,
+                  lastName: this.lastName,
+                  dob: this.dob,
+                  gender: this.gender,
+                  homeAddress: this.homeAddress,
+                  phoneNumber: this.phoneNumber,
+                  children: this.children,
+                  profilePicture: this.profilePicture,
+                  aboutMe: this.aboutMe,
+                });
 
-              console.log("User registered successfully");
-              redirectToParentHome();
+                console.log("Profile updated successfully");
+                window.location.href = "parent_profilePage.html";
+              } else {
+                const userCredential = await createUserWithEmailAndPassword(
+                  auth,
+                  this.email,
+                  this.password
+                );
+                const user = userCredential.user;
+
+                await storeParentData(user, {
+                  email: this.email,
+                  firstName: this.firstName,
+                  lastName: this.lastName,
+                  dob: this.dob,
+                  gender: this.gender,
+                  homeAddress: this.homeAddress,
+                  phoneNumber: this.phoneNumber,
+                  children: this.children,
+                  profilePicture: this.profilePicture,
+                  aboutMe: this.aboutMe,
+                });
+
+                console.log("User registered successfully");
+                redirectToParentHome();
+              }
             } catch (error) {
-              console.log("Error in signup process:", error);
+              console.log("Error:", error);
               this.errorMessage = error.message;
             }
           },
