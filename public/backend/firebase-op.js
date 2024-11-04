@@ -114,10 +114,10 @@ export async function storeParentData(user, formData) {
 
 export async function storeNannyData(user, formData) {
   try {
-    let profilePictureUrl = null;
+    let profilePictureUrl = formData.profilePictureUrl;
 
     // Upload profile picture if provided
-    if (formData.profilePicture) {
+    if (formData.profilePicture instanceof File) {
       try {
         const fileName = `${user.uid}_${Date.now()}_${
           formData.profilePicture.name
@@ -139,33 +139,50 @@ export async function storeNannyData(user, formData) {
     }
 
     // If no custom picture was provided or upload failed, use default picture
-    if (!profilePictureUrl) {
+    if (!profilePictureUrl && !formData.isEditMode) {
       profilePictureUrl = await getDefaultProfilePicURL();
       console.log("Using default profile picture");
     }
 
     // Store USER data
-    await setDoc(doc(db, "USER", user.uid), {
-      email: formData.email,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      dob: formData.dob,
-      gender: formData.gender,
-      role: "nanny",
-      profilePictureUrl: profilePictureUrl,
-    });
+    await setDoc(
+      doc(db, "USER", user.uid),
+      {
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        dob: formData.dob,
+        gender: formData.gender,
+        role: "nanny",
+        profilePictureUrl: profilePictureUrl,
+        phoneNumber: formData.phoneNumber,
+      },
+      { merge: true } // Add merge: true for updating
+    );
 
-    // Store NANNY data with noJobs field initialized to 0
-    await setDoc(doc(db, "NANNY", user.uid), {
+    // Store NANNY data
+    const nannyData = {
       yrsExperience: formData.yrsExperience,
       description: formData.description,
-      noJobs: 0, // Initialize number of jobs to 0
-    });
+    };
+
+    // Only initialize noJobs to 0 for new signups
+    if (!formData.isEditMode) {
+      nannyData.noJobs = 0;
+    }
+
+    await setDoc(
+      doc(db, "NANNY", user.uid),
+      nannyData,
+      { merge: true } // Add merge: true for updating
+    );
 
     console.log("Nanny data stored successfully");
 
-    // Redirect to nanny_home.html after successful signup
-    redirectToNannyHome();
+    // Only redirect for new signups
+    if (!formData.isEditMode) {
+      redirectToNannyHome();
+    }
   } catch (error) {
     console.error("Error storing nanny data:", error);
     throw error;
