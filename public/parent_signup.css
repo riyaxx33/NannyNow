@@ -38,25 +38,20 @@ header .auth-buttons {
 }
 
 /* Main Heading */
-h1.title {
-  font-size: 50px;
-  font-weight: bold;
+h1 {
+  font-size: 40px;
   color: #333; /* Match existing text color */
+  margin-bottom: 20px;
 }
 
 .container {
   padding-top: 20px;
 }
 
-.col-md-12 {
-  padding-left: 0;
-  padding-right: 0;
-}
-
 /* Signup Form */
 form {
-  /* display: flex; */
-  /* flex-direction: column; */
+  display: flex;
+  flex-direction: column;
   background-color: #faf9f6; /* Background for the form */
   padding: 40px;
   border-radius: 10px;
@@ -64,21 +59,20 @@ form {
 }
 
 /* Input Fields */
-/*
 input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="date"],
+input[type="number"],
 select {
   padding: 10px;
   margin-bottom: 15px;
   border: 1px solid #d3d3d3;
   border-radius: 5px;
-  width: 100%; 
-  max-width: 400px; 
+  width: 100%; /* Full width */
+  max-width: 400px; /* Maximum width */
   font-size: 16px;
 }
-*/
 
 /* Add Child Button */
 #addChildBtn {
