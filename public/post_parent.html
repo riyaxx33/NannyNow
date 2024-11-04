@@ -216,14 +216,19 @@
           </button>
         </li>
       </ul>
-      
+
       <div class="posts-container">
         <div v-if="filteredPosts.length === 0" class="no-posts-message">
           No {{ activeTab }} jobs at the moment.
         </div>
         
         <div v-for="post in filteredPosts" :key="post.id" class="post-item">
-          <h5>Job ID: {{ post.jobId }}</h5>
+          <div class="d-flex justify-content-between align-items-center">
+            <h5>Job ID: {{ post.jobId }}</h5>
+            <span v-if="post.interestedNannies && post.interestedNannies.length > 0" class="badge bg-primary">
+              {{ post.interestedNannies.length }} Nanny(ies) Interested
+            </span>
+          </div>
           <p>Date: {{ post.formattedDate }}<br>
             Pay: {{ post.pay }}<br>
             Pay Negotiable: {{ post.payNegotiation ? 'Yes' : 'No' }}<br>
@@ -233,6 +238,8 @@
             <button @click="editPost(post)" class="btn btn-warning btn-sm">Edit</button>
             <button @click="deletePost(post.id)" class="btn btn-danger btn-sm">Delete</button>
           </div>
+          <div v-if="post.completed" class="badge bg-success">Completed</div>
+          <div v-else-if="!post.status" class="badge bg-danger">Expired</div>
         </div>
       </div>
     </div>
@@ -260,13 +267,18 @@
         },
         computed: {
           isPostValid() {
-    return this.date && this.pay && this.payNegotiation && this.request && 
+          return this.date && this.pay && this.payNegotiation && this.request && 
            this.startTime && this.endTime;
   },
-  filteredPosts() {
-    return this.posts.filter(post => 
-      this.activeTab === 'active' ? post.status : !post.status
-    );}
+          filteredPosts() {
+            return this.posts.filter(post => {
+              if (this.activeTab === 'active') {
+                return post.status && !post.completed && post.userId === auth.currentUser.uid;
+              } else {
+                return (post.completed || !post.status) && post.userId === auth.currentUser.uid;
+              }
+            });
+          }
         },
         methods: {
           formatDate(date) {
