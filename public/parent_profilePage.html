@@ -250,12 +250,15 @@
           },
           */
           editProfile() {
-            // Store the current profile data in sessionStorage
+            const profileDataToStore = {
+              ...this.profileData,
+              profilePicture: this.profileData.profilePicture,
+              profilePictureUrl: this.profileData.profilePictureUrl,
+            };
             sessionStorage.setItem(
               "editProfileData",
-              JSON.stringify(this.profileData)
+              JSON.stringify(profileDataToStore)
             );
-            // Redirect to signup page in edit mode
             window.location.href = "parent_signup.html?mode=edit";
           },
         },
