@@ -5,16 +5,15 @@ import {
   getDocs,
   deleteDoc,
   Timestamp,
-  writeBatch
+  writeBatch,
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import {
   getStorage,
   ref,
   uploadBytes,
-  getDownloadURL
+  getDownloadURL,
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 import { db } from "./firebase-config.js";
-
 
 const storage = getStorage();
 
@@ -43,7 +42,7 @@ async function getDefaultProfilePicURL() {
 // Store parent data
 export async function storeParentData(user, formData) {
   try {
-    let profilePictureUrl = null;
+    let profilePictureUrl = formData.profilePictureUrl;
 
     // Upload profile picture if provided
     if (formData.profilePicture instanceof File) {
@@ -69,34 +68,44 @@ export async function storeParentData(user, formData) {
     }
 
     // If no custom picture was provided or upload failed, use default picture
-    if (!profilePictureUrl) {
+    if (!profilePictureUrl && !formData.isEditMode) {
       profilePictureUrl = await getDefaultProfilePicURL();
       console.log("Using default profile picture");
     }
 
     // Store USER data
-    await setDoc(doc(db, "USER", user.uid), {
-      email: formData.email,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      dob: formData.dob,
-      gender: formData.gender,
-      role: "parent",
-      profilePictureUrl: profilePictureUrl,
-      phoneNumber: formData.phoneNumber,
-    });
+    await setDoc(
+      doc(db, "USER", user.uid),
+      {
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        dob: formData.dob,
+        gender: formData.gender,
+        role: "parent",
+        profilePictureUrl: profilePictureUrl,
+        phoneNumber: formData.phoneNumber,
+      },
+      { merge: true }
+    );
 
     // Store PARENT data
-    await setDoc(doc(db, "PARENT", user.uid), {
-      homeAddress: formData.homeAddress,
-      children: formData.children,
-      aboutMe: formData.aboutMe,
-    });
+    await setDoc(
+      doc(db, "PARENT", user.uid),
+      {
+        homeAddress: formData.homeAddress,
+        children: formData.children,
+        aboutMe: formData.aboutMe,
+      },
+      { merge: true }
+    );
 
     console.log("Parent data stored successfully");
 
-    // Redirect to parent_home.html after successful signup
-    redirectToParentHome();
+    // Only redirect to parent_home.html for new signups
+    if (!formData.isEditMode) {
+      redirectToParentHome();
+    }
   } catch (error) {
     console.error("Error storing parent data:", error);
     throw error;
@@ -150,7 +159,7 @@ export async function storeNannyData(user, formData) {
     await setDoc(doc(db, "NANNY", user.uid), {
       yrsExperience: formData.yrsExperience,
       description: formData.description,
-      noJobs: 0  // Initialize number of jobs to 0
+      noJobs: 0, // Initialize number of jobs to 0
     });
 
     console.log("Nanny data stored successfully");
@@ -162,7 +171,7 @@ export async function storeNannyData(user, formData) {
     throw error;
   }
 }
- 
+
 // Handle file upload
 export function handleFileUpload(event) {
   const file = event.target.files[0];
@@ -195,9 +204,9 @@ export async function storePostData(user, postData) {
     const timestamp = Date.now();
     const shortTimestamp = timestamp.toString().slice(-6);
     const jobId = `${shortUserId}_${shortTimestamp}`;
-    
-    const formattedDate = new Date(postData.date).toISOString().split('T')[0];
-    const payNegotiationBool = postData.payNegotiation === 'true';
+
+    const formattedDate = new Date(postData.date).toISOString().split("T")[0];
+    const payNegotiationBool = postData.payNegotiation === "true";
 
     await setDoc(doc(db, "POSTS", jobId), {
       userId: user.uid,
@@ -212,7 +221,7 @@ export async function storePostData(user, postData) {
       createdAt: Timestamp.now(),
       completed: false,
       interestedNannies: [],
-      nanny_id: null  // Added this line to initialize nanny_id as null
+      nanny_id: null, // Added this line to initialize nanny_id as null
     });
 
     console.log("Post data stored successfully with jobId:", jobId);
@@ -235,7 +244,7 @@ export async function fetchPosts(userId) {
           id: doc.id,
           ...data,
           // No need to convert date as it's already in YYYY-MM-DD format
-          formattedDate: data.date
+          formattedDate: data.date,
         };
       })
       .filter((post) => post.userId === userId);
@@ -252,11 +261,13 @@ export async function fetchPosts(userId) {
 export async function updatePostData(postId, updatedData) {
   try {
     const postRef = doc(db, "POSTS", postId);
-    
+
     // Format the date as YYYY-MM-DD if it exists in the updated data
     const dataToUpdate = {
       ...updatedData,
-      date: updatedData.date ? new Date(updatedData.date).toISOString().split('T')[0] : undefined
+      date: updatedData.date
+        ? new Date(updatedData.date).toISOString().split("T")[0]
+        : undefined,
     };
 
     await setDoc(postRef, dataToUpdate, { merge: true });
@@ -282,8 +293,8 @@ export async function updateExpiredPosts() {
   try {
     const postsCollection = collection(db, "POSTS");
     const postSnapshot = await getDocs(postsCollection);
-    const today = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-    
+    const today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
+
     const batch = writeBatch(db); // Use batch write for better performance
     let updateCount = 0;
 
