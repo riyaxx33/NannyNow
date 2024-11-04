@@ -124,9 +124,7 @@
                 class="form-control"
               />
               <small class="text-muted d-block mt-2">
-                {{ isEditMode ? "Upload a new picture to change your current
-                profile picture" : "Only image files of sizes smaller than 5MB
-                are accepted" }}
+                {{ profilePictureHelperText }}
               </small>
             </div>
           </div>
@@ -377,6 +375,11 @@
           };
         },
         computed: {
+          profilePictureHelperText() {
+            return this.isEditMode
+              ? "Upload a new picture to change your current profile picture"
+              : "Only image files of sizes smaller than 5MB are accepted";
+          },
           isFormValid() {
             const commonValidation =
               this.firstName &&
