@@ -260,16 +260,17 @@
               : "Only image files of sizes smaller than 5MB are accepted.";
           },
           isFormValid() {
+            // Basic validation for fields required in both modes
             const commonValidation =
               this.firstName &&
               this.lastName &&
               this.dob &&
+              this.gender &&
               this.yrsExperience &&
               this.description;
 
-            if (this.isEditMode) {
-              return commonValidation;
-            } else {
+            // Additional validation for signup mode
+            if (!this.isEditMode) {
               return (
                 commonValidation &&
                 this.email &&
@@ -279,6 +280,9 @@
                 !this.confirmPasswordError
               );
             }
+
+            // Only check common validation for edit mode
+            return commonValidation;
           },
         },
         created() {
@@ -351,29 +355,62 @@
             }
 
             try {
-              const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                this.email,
-                this.password
-              );
-              const user = userCredential.user;
+              if (this.isEditMode) {
+                // Update existing user data
+                const user = auth.currentUser;
+                if (!user) {
+                  throw new Error("No authenticated user found");
+                }
 
-              await storeNannyData(user, {
-                email: this.email,
-                firstName: this.firstName,
-                lastName: this.lastName,
-                password: this.password,
-                dob: this.dob,
-                gender: this.gender,
-                profilePicture: this.profilePicture,
-                description: this.description,
-                yrsExperience: this.yrsExperience,
-              });
+                // Create update data object
+                const updateData = {
+                  firstName: this.firstName,
+                  lastName: this.lastName,
+                  dob: this.dob,
+                  gender: this.gender,
+                  yrsExperience: this.yrsExperience,
+                  description: this.description,
+                  phoneNumber: this.phoneNumber,
+                  isEditMode: true,
+                };
 
-              console.log("User registered successfully");
-              redirectToNannyHome();
+                // Only include profile picture if a new one was uploaded
+                if (this.profilePicture) {
+                  updateData.profilePicture = this.profilePicture;
+                } else {
+                  updateData.profilePictureUrl = this.existingProfilePictureUrl;
+                }
+
+                await storeNannyData(user, updateData);
+                console.log("Profile updated successfully");
+                window.location.href = "nanny_profilePage.html";
+              } else {
+                // Original signup logic
+                const userCredential = await createUserWithEmailAndPassword(
+                  auth,
+                  this.email,
+                  this.password
+                );
+                const user = userCredential.user;
+
+                await storeNannyData(user, {
+                  email: this.email,
+                  firstName: this.firstName,
+                  lastName: this.lastName,
+                  dob: this.dob,
+                  gender: this.gender,
+                  phoneNumber: this.phoneNumber,
+                  profilePicture: this.profilePicture,
+                  description: this.description,
+                  yrsExperience: this.yrsExperience,
+                  isEditMode: false,
+                });
+
+                console.log("User registered successfully");
+                redirectToNannyHome();
+              }
             } catch (error) {
-              console.log("Error in signup process:", error);
+              console.log("Error:", error);
               this.errorMessage = error.message;
             }
           },
