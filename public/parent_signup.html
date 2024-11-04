@@ -490,7 +490,8 @@
                   throw new Error("No authenticated user found");
                 }
 
-                await storeParentData(user, {
+                // Create the update data object
+                const updateData = {
                   email: this.email,
                   firstName: this.firstName,
                   lastName: this.lastName,
@@ -499,9 +500,9 @@
                   homeAddress: this.homeAddress,
                   phoneNumber: this.phoneNumber,
                   children: this.children,
-                  profilePicture: this.profilePicture,
                   aboutMe: this.aboutMe,
-                });
+                  isEditMode: true,
+                };
 
                 // Only include profile picture if a new one was uploaded
                 if (this.profilePicture) {
@@ -533,6 +534,7 @@
                   children: this.children,
                   profilePicture: this.profilePicture,
                   aboutMe: this.aboutMe,
+                  isEditMode: false,
                 });
 
                 console.log("User registered successfully");
