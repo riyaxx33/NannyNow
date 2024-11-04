@@ -328,21 +328,24 @@
             if (storedData) {
               const data = JSON.parse(storedData);
 
-              // Pre-fill the form
-              this.email = data.email;
-              this.firstName = data.firstName;
-              this.lastName = data.lastName;
-              this.dob = data.dob;
-              this.gender = data.gender;
-              this.phoneNumber = data.phoneNumber;
-              this.yrsExperience = data.yrsExperience;
-              this.description = data.description;
+              // Pre-fill all form fields
+              Object.keys(data).forEach((key) => {
+                if (
+                  key in this &&
+                  key !== "profilePicture" &&
+                  key !== "profilePictureUrl"
+                ) {
+                  this[key] = data[key];
+                }
+              });
 
+              // Handle profile picture separately
               if (data.profilePicture) {
                 this.currentProfilePicture = data.profilePicture;
                 this.existingProfilePictureUrl = data.profilePictureUrl;
               }
 
+              // Remove from session storage after loading
               sessionStorage.removeItem("editProfileData");
             }
           },
@@ -364,6 +367,7 @@
 
                 // Create update data object
                 const updateData = {
+                  email: this.email,
                   firstName: this.firstName,
                   lastName: this.lastName,
                   dob: this.dob,
