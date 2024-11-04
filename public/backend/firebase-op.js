@@ -14,6 +14,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 import { db } from "./firebase-config.js";
 
+
 const storage = getStorage();
 
 // Redirect to parent homepage
@@ -189,21 +190,17 @@ export function handleFileUpload(event) {
 
 export async function storePostData(user, postData) {
   try {
-    // Create a shorter jobId using the last 4 chars of userId + timestamp last 6 digits
-    const shortUserId = user.uid.slice(-4); // Get last 4 characters of user ID
+    const shortUserId = user.uid.slice(-4);
     const timestamp = Date.now();
-    const shortTimestamp = timestamp.toString().slice(-6); // Get last 6 digits of timestamp
-    const jobId = `${shortUserId}_${shortTimestamp}`; // Format: "Kx23_994631"
+    const shortTimestamp = timestamp.toString().slice(-6);
+    const jobId = `${shortUserId}_${shortTimestamp}`;
     
-    // Format the date as YYYY-MM-DD
     const formattedDate = new Date(postData.date).toISOString().split('T')[0];
-
-    // Convert payNegotiation string to boolean before storing
     const payNegotiationBool = postData.payNegotiation === 'true';
 
     await setDoc(doc(db, "POSTS", jobId), {
       userId: user.uid,
-      jobId: jobId,  // Will be much shorter now
+      jobId: jobId,
       status: true,
       date: formattedDate,
       pay: postData.pay,
@@ -212,6 +209,9 @@ export async function storePostData(user, postData) {
       endTime: postData.endTime,
       description: postData.description,
       createdAt: Timestamp.now(),
+      completed: false,
+      interestedNannies: [],
+      nanny_id: null  // Added this line to initialize nanny_id as null
     });
 
     console.log("Post data stored successfully with jobId:", jobId);
