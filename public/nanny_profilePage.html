@@ -24,11 +24,16 @@
         --card-border: #e0e0e0;
       }
 
+      body * {
+        font-family: "Poppins", sans-serif !important;
+      }
+
       body {
         background-color: var(--linkedin-background);
         font-family: "Poppins", sans-serif;
       }
 
+      /* Profile Background */
       .profile-background {
         height: 200px;
         background-color: var(--linkedin-light-blue);
@@ -36,12 +41,7 @@
         position: relative;
       }
 
-      @media (max-width: 767px) {
-        .profile-background {
-          height: 160px;
-        }
-      }
-
+      /* Profile Section */
       .profile-section {
         background: white;
         border-radius: 8px;
@@ -50,6 +50,7 @@
         padding: 24px;
       }
 
+      /* Avatar */
       .avatar-container {
         position: relative;
         margin-top: -72px;
@@ -64,25 +65,9 @@
         object-fit: cover;
       }
 
-      @media (max-width: 767px) {
-        .avatar {
-          width: 120px;
-          height: 120px;
-        }
-
-        .avatar-container {
-          margin-top: -60px;
-        }
-      }
-
+      /* Profile Info */
       .profile-info {
         padding-top: 24px;
-      }
-
-      @media (min-width: 768px) {
-        .profile-info {
-          padding-top: 80px;
-        }
       }
 
       .profile-name {
@@ -113,14 +98,7 @@
         gap: 16px;
       }
 
-      @media (max-width: 767px) {
-        .profile-contact {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 8px;
-        }
-      }
-
+      /* Section Styling */
       .section-title {
         font-size: 20px;
         font-weight: 600;
@@ -128,26 +106,12 @@
         margin-bottom: 16px;
       }
 
-      .info-list {
-        padding-left: 0;
-        list-style: none;
-      }
-
-      .info-list li {
-        margin-bottom: 12px;
-        display: flex;
-        gap: 8px;
-        align-items: baseline;
-      }
-
-      .info-list li strong {
-        min-width: 140px;
-        color: rgba(0, 0, 0, 0.6);
-      }
-
-      .btn-primary {
+      /* Buttons */
+      .btn-primary,
+      .btn-edit {
         background-color: var(--linkedin-blue);
         border-color: var(--linkedin-blue);
+        color: white;
       }
 
       .btn-outline-primary {
@@ -160,15 +124,37 @@
         border-color: var(--linkedin-blue);
         color: var(--linkedin-blue);
       }
-      .btn-edit {
-        background-color: var(--linkedin-blue);
-        border-color: var(--linkedin-blue);
-        color: white;
+
+      /* Responsive Breakpoints */
+      @media (min-width: 768px) {
+        .profile-info {
+          padding-top: 80px;
+        }
+
+        .w-md-auto {
+          width: auto !important;
+        }
       }
 
-      .btn-edit:hover {
-        background-color: #004182;
-        border-color: #004182;
+      @media (max-width: 767px) {
+        .profile-background {
+          height: 160px;
+        }
+
+        .avatar {
+          width: 120px;
+          height: 120px;
+        }
+
+        .avatar-container {
+          margin-top: -60px;
+        }
+
+        .profile-contact {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
       }
     </style>
   </head>
@@ -221,7 +207,10 @@
                 <div
                   class="col-md-4 d-flex justify-content-md-end mt-3 mt-md-0 gap-2"
                 >
-                  <button class="btn btn-edit" @click="editProfile">
+                  <button
+                    class="btn btn-primary w-100 w-md-auto"
+                    @click="editProfile"
+                  >
                     Edit Profile
                   </button>
                 </div>
@@ -248,10 +237,6 @@
               <ul class="info-list">
                 <li><strong>Date of Birth:</strong> {{ profileData.dob }}</li>
                 <li><strong>Gender:</strong> {{ profileData.gender }}</li>
-                <li>
-                  <strong>Years of Experience:</strong> {{
-                  profileData.yrsExperience }}
-                </li>
               </ul>
             </div>
           </div>
