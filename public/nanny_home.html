@@ -296,13 +296,6 @@
         flex-shrink: 0;
       }
 
-      .profile-info-wrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        flex: 1;
-      }
-
       .profile-info {
         display: flex;
         flex-direction: column;
@@ -319,22 +312,6 @@
         color: #666;
         font-size: 1.1rem;
         margin-top: 2px;
-      }
-
-      .chat-button-container {
-        margin-left: auto;
-      }
-
-      .chat-button {
-        padding: 12px 30px;
-        font-size: 1.2rem;
-        background-color: #f0f0f0;
-        color: #333;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        white-space: nowrap;
       }
 
       .chat-button:hover {
@@ -378,6 +355,27 @@
       .chat-button {
         white-space: nowrap;
       }
+      .chat-button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-button {
+  width: 100%;
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.profile-info-wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-grow: 1;
+}
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
   </head>
@@ -463,6 +461,9 @@
                 <button id="chatButton" class="chat-button" disabled>
                   Chat Now
                 </button>
+                <button id="requestButton" class="chat-button" disabled>
+                  Send Request
+                </button>
               </div>
             </div>
           </div>
@@ -493,6 +494,8 @@
         getDoc,
         addDoc,
         serverTimestamp,
+        updateDoc,
+        arrayUnion
       } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
       // Filter state
@@ -836,6 +839,66 @@
         }
       }
 
+      function initializeRequestButton(currentUserId, jobId) {
+  const requestButton = document.getElementById("requestButton");
+  
+  if (currentUserId) {
+    // First check if user has already sent a request
+    const checkExistingRequest = async () => {
+      try {
+        const postRef = doc(db, "POSTS", jobId);
+        const postDoc = await getDoc(postRef);
+        
+        if (postDoc.exists()) {
+          const postData = postDoc.data();
+          // Disable button if user already sent request
+          if (postData.interestedNannies.includes(currentUserId)) {
+            requestButton.disabled = true;
+            requestButton.textContent = "Request Sent";
+            return true;
+          }
+        }
+        return false;
+      } catch (error) {
+        console.error("Error checking existing request:", error);
+        return false;
+      }
+    };
+
+    // Enable button and add click handler
+    const initialize = async () => {
+      const hasExistingRequest = await checkExistingRequest();
+      if (!hasExistingRequest) {
+        requestButton.disabled = false;
+        
+        requestButton.addEventListener("click", async () => {
+          try {
+            const postRef = doc(db, "POSTS", jobId);
+            
+            // Update the post document to add the nanny's ID to interestedNannies array
+            await updateDoc(postRef, {
+              interestedNannies: arrayUnion(currentUserId)
+            });
+
+            // Disable button and update text after successful request
+            requestButton.disabled = true;
+            requestButton.textContent = "Request Sent";
+            
+            alert("Request sent successfully!");
+          } catch (error) {
+            console.error("Error sending request:", error);
+            alert("Failed to send request. Please try again.");
+          }
+        });
+      }
+    };
+
+    initialize();
+  } else {
+    requestButton.disabled = true;
+  }
+}
+
       // Function to load all posts
       async function loadPosts() {
         try {
@@ -970,6 +1033,7 @@
 
             // Initialize chat button
             initializeChatButton(auth.currentUser?.uid, userId);
+            initializeRequestButton(auth.currentUser?.uid, postData.jobId);
 
             // Google Maps API
             const address = parentDetails.homeAddress;
