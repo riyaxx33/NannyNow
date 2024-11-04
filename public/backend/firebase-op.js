@@ -4,13 +4,14 @@ import {
   collection,
   getDocs,
   deleteDoc,
-  Timestamp, // Ensure you import Timestamp
+  Timestamp,
+  writeBatch
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 import {
   getStorage,
   ref,
   uploadBytes,
-  getDownloadURL,
+  getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
 import { db } from "./firebase-config.js";
 
@@ -273,6 +274,38 @@ export async function deletePostData(postId) {
     console.log("Post data deleted successfully");
   } catch (error) {
     console.error("Error deleting post data:", error);
+    throw error;
+  }
+}
+
+export async function updateExpiredPosts() {
+  try {
+    const postsCollection = collection(db, "POSTS");
+    const postSnapshot = await getDocs(postsCollection);
+    const today = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+    
+    const batch = writeBatch(db); // Use batch write for better performance
+    let updateCount = 0;
+
+    postSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      // Check if post date has passed and status is still true
+      if (data.status && data.date < today) {
+        const postRef = doc.ref;
+        batch.update(postRef, { status: false });
+        updateCount++;
+      }
+    });
+
+    // Only commit the batch if there are updates to make
+    if (updateCount > 0) {
+      await batch.commit();
+      console.log(`Updated status for ${updateCount} expired posts`);
+    }
+
+    return updateCount;
+  } catch (error) {
+    console.error("Error updating expired posts:", error);
     throw error;
   }
 }
