@@ -326,7 +326,7 @@
 
       #detailsContainer {
         background-color: white;
-        border: 1px solid #eee; 
+        border: 1px solid #eee;
         border-radius: 12px;
         padding: 20px 30px;
         height: calc(100vh - 60px);
@@ -356,26 +356,26 @@
         white-space: nowrap;
       }
       .chat-button-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
-.chat-button {
-  width: 100%;
-  padding: 8px 16px;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  color: #4b5563;
-  font-size: 14px;
-}
+      .chat-button {
+        width: 100%;
+        padding: 8px 16px;
+        background-color: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        color: #4b5563;
+        font-size: 14px;
+      }
 
-.profile-info-wrapper {
-  display: flex;
-  justify-content: space-between;
-  flex-grow: 1;
-}
+      .profile-info-wrapper {
+        display: flex;
+        justify-content: space-between;
+        flex-grow: 1;
+      }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
   </head>
@@ -390,44 +390,57 @@
               type="text"
               id="jobSearch"
               class="form-control"
-              placeholder="Search posts..."
+              placeholder="Search postID..."
               onkeyup="searchJobs()"
             />
           </div>
 
+          <!-- Location filter -->
           <div class="filter-dropdown">
             <button id="locationFilter" class="filter-button">
               Location
               <i class="fas fa-chevron-down"></i>
             </button>
-            <div class="filter-menu" id="locationMenu">
-              <!-- Will figure out how to filter based on East, West, Central etc. -->
-            </div>
+            <div class="filter-menu" id="locationMenu"></div>
           </div>
 
+          <!-- Date filter -->
           <div class="filter-dropdown">
             <button id="dateFilter" class="filter-button">
               Date
               <i class="fas fa-chevron-down"></i>
             </button>
             <div class="filter-menu" id="dateMenu">
-              <div class="filter-option" data-value="today">Today</div>
-              <div class="filter-option" data-value="tomorrow">Tomorrow</div>
-              <div class="filter-option" data-value="this-week">This Week</div>
-              <div class="filter-option" data-value="next-week">Next Week</div>
+              <div class="filter-option" data-value="Today">Today</div>
+              <div class="filter-option" data-value="Tomorrow">Tomorrow</div>
+              <div class="filter-option" data-value="This Week">This Week</div>
+              <div class="filter-option" data-value="Next Week">Next Week</div>
             </div>
           </div>
 
+          <!-- Pay Negotiable? filter -->
+          <div class="filter-dropdown">
+            <button id="payNegotiableFilter" class="filter-button">
+              Pay Negotiable
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="filter-menu" id="payNegotiableMenu">
+              <div class="filter-option" data-value="Yes">Yes</div>
+              <div class="filter-option" data-value="No">No</div>
+            </div>
+          </div>
+
+          <!-- Pay Range filter -->
           <div class="filter-dropdown">
             <button id="payFilter" class="filter-button">
               Pay Range
               <i class="fas fa-chevron-down"></i>
             </button>
             <div class="filter-menu" id="payMenu">
-              <div class="filter-option" data-value="0-15">$0-15/hr</div>
-              <div class="filter-option" data-value="15-25">$15-25/hr</div>
-              <div class="filter-option" data-value="25-35">$25-35/hr</div>
-              <div class="filter-option" data-value="35+">$35+/hr</div>
+              <div class="filter-option" data-value="$0-15/hr">$0-15/hr</div>
+              <div class="filter-option" data-value="$15-25/hr">$15-25/hr</div>
+              <div class="filter-option" data-value="$25-35/hr">$25-35/hr</div>
+              <div class="filter-option" data-value="$35+/hr">$35+/hr</div>
             </div>
           </div>
         </div>
@@ -495,14 +508,15 @@
         addDoc,
         serverTimestamp,
         updateDoc,
-        arrayUnion
+        arrayUnion,
       } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
       // Filter state
       let activeFilters = {
-        location: null,
-        date: null,
-        pay: null,
+        Location: null,
+        Date: null,
+        Negotiable: null,
+        Pay: null,
       };
 
       // Store all posts for filtering
@@ -513,7 +527,7 @@
         const filterButtons = document.querySelectorAll(".filter-button");
         // Only select filter options from date and pay menus
         const filterOptions = document.querySelectorAll(
-          "#dateMenu .filter-option, #payMenu .filter-option"
+          "#dateMenu .filter-option, #payNegotiableMenu .filter-option, #payMenu .filter-option"
         );
 
         // Handle filter button clicks
@@ -611,20 +625,49 @@
 
           // Location filter - now using geocoded location
           const matchesLocation =
-            !activeFilters.location ||
-            post.geocodedLocation === activeFilters.location;
+            !activeFilters.Location ||
+            post.geocodedLocation === activeFilters.Location;
 
           // Date filter
           const matchesDate =
-            !activeFilters.date ||
-            checkDateMatch(post.postData.date, activeFilters.date);
+            !activeFilters.Date ||
+            checkDateMatch(post.postData.date, activeFilters.Date);
+
+          // Pay Negotiable filter
+          const matchesNegotiable =
+            !activeFilters.Negotiable ||
+            checkPayNegotiableMatch(
+              post.postData.payNegotiation,
+              activeFilters.Negotiable
+            );
 
           // Pay filter
           const matchesPay =
-            !activeFilters.pay ||
-            checkPayMatch(post.postData.pay, activeFilters.pay);
+            !activeFilters.Pay ||
+            checkPayMatch(post.postData.pay, activeFilters.Pay);
 
-          return matchesSearch && matchesLocation && matchesDate && matchesPay;
+          // Add console.log for debugging
+          console.log({
+            post: post.postDoc.id,
+            locationMatch: matchesLocation,
+            dateMatch: matchesDate,
+            negotiableMatch: matchesNegotiable,
+            payMatch: matchesPay,
+            filters: activeFilters,
+            postValues: {
+              location: post.geocodedLocation,
+              payNegotiation: post.postData.payNegotiation,
+              pay: post.postData.pay,
+            },
+          });
+
+          return (
+            matchesSearch &&
+            matchesLocation &&
+            matchesDate &&
+            matchesNegotiable &&
+            matchesPay
+          );
         });
 
         displayFilteredPosts(filteredPosts);
@@ -638,26 +681,39 @@
         tomorrow.setDate(tomorrow.getDate() + 1);
 
         switch (filterValue) {
-          case "today":
+          case "Today":
             return isSameDay(postDate, today);
-          case "tomorrow":
+          case "Tomorrow":
             return isSameDay(postDate, tomorrow);
-          case "this-week":
+          case "This Week":
             return isThisWeek(postDate);
-          case "next-week":
+          case "Next Week":
             return isNextWeek(postDate);
           default:
             return true;
         }
       }
 
+      // Helper function to check pay negotiable?
+      function checkPayNegotiableMatch(postPayNegotiation, filterValue) {
+        const booleanValue = filterValue === "Yes";
+        return postPayNegotiation === booleanValue;
+      }
+
       // Helper function to check pay range matches
       function checkPayMatch(postPay, filterValue) {
-        const [min, max] = filterValue.split("-").map(Number);
-        if (filterValue === "35+") {
-          return postPay >= 35;
+        // Extract numeric values from the filter string
+        const range = filterValue.replace(/[^\d-]/g, "").split("-");
+
+        if (filterValue.includes("+")) {
+          // Handle "$35+/hr" case
+          const minValue = parseInt(range[0]);
+          return postPay >= minValue;
+        } else {
+          // Handle range case (e.g., "$15-25/hr")
+          const [min, max] = range.map(Number);
+          return postPay >= min && postPay <= max;
         }
-        return postPay >= min && postPay <= max;
       }
 
       // Helper date functions
@@ -717,7 +773,7 @@
 
             // Add click event listener directly to the option
             option.addEventListener("click", (e) => {
-              activeFilters.location = location;
+              activeFilters.Location = location;
               updateActiveFiltersUI();
               applyFilters();
               e.target.closest(".filter-menu").classList.remove("show");
@@ -840,64 +896,64 @@
       }
 
       function initializeRequestButton(currentUserId, jobId) {
-  const requestButton = document.getElementById("requestButton");
-  
-  if (currentUserId) {
-    // First check if user has already sent a request
-    const checkExistingRequest = async () => {
-      try {
-        const postRef = doc(db, "POSTS", jobId);
-        const postDoc = await getDoc(postRef);
-        
-        if (postDoc.exists()) {
-          const postData = postDoc.data();
-          // Disable button if user already sent request
-          if (postData.interestedNannies.includes(currentUserId)) {
-            requestButton.disabled = true;
-            requestButton.textContent = "Request Sent";
-            return true;
-          }
+        const requestButton = document.getElementById("requestButton");
+
+        if (currentUserId) {
+          // First check if user has already sent a request
+          const checkExistingRequest = async () => {
+            try {
+              const postRef = doc(db, "POSTS", jobId);
+              const postDoc = await getDoc(postRef);
+
+              if (postDoc.exists()) {
+                const postData = postDoc.data();
+                // Disable button if user already sent request
+                if (postData.interestedNannies.includes(currentUserId)) {
+                  requestButton.disabled = true;
+                  requestButton.textContent = "Request Sent";
+                  return true;
+                }
+              }
+              return false;
+            } catch (error) {
+              console.error("Error checking existing request:", error);
+              return false;
+            }
+          };
+
+          // Enable button and add click handler
+          const initialize = async () => {
+            const hasExistingRequest = await checkExistingRequest();
+            if (!hasExistingRequest) {
+              requestButton.disabled = false;
+
+              requestButton.addEventListener("click", async () => {
+                try {
+                  const postRef = doc(db, "POSTS", jobId);
+
+                  // Update the post document to add the nanny's ID to interestedNannies array
+                  await updateDoc(postRef, {
+                    interestedNannies: arrayUnion(currentUserId),
+                  });
+
+                  // Disable button and update text after successful request
+                  requestButton.disabled = true;
+                  requestButton.textContent = "Request Sent";
+
+                  alert("Request sent successfully!");
+                } catch (error) {
+                  console.error("Error sending request:", error);
+                  alert("Failed to send request. Please try again.");
+                }
+              });
+            }
+          };
+
+          initialize();
+        } else {
+          requestButton.disabled = true;
         }
-        return false;
-      } catch (error) {
-        console.error("Error checking existing request:", error);
-        return false;
       }
-    };
-
-    // Enable button and add click handler
-    const initialize = async () => {
-      const hasExistingRequest = await checkExistingRequest();
-      if (!hasExistingRequest) {
-        requestButton.disabled = false;
-        
-        requestButton.addEventListener("click", async () => {
-          try {
-            const postRef = doc(db, "POSTS", jobId);
-            
-            // Update the post document to add the nanny's ID to interestedNannies array
-            await updateDoc(postRef, {
-              interestedNannies: arrayUnion(currentUserId)
-            });
-
-            // Disable button and update text after successful request
-            requestButton.disabled = true;
-            requestButton.textContent = "Request Sent";
-            
-            alert("Request sent successfully!");
-          } catch (error) {
-            console.error("Error sending request:", error);
-            alert("Failed to send request. Please try again.");
-          }
-        });
-      }
-    };
-
-    initialize();
-  } else {
-    requestButton.disabled = true;
-  }
-}
 
       // Function to load all posts
       async function loadPosts() {
