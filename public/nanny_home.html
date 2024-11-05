@@ -41,9 +41,11 @@
       }
 
       .job-card {
-        cursor: pointer;
-        margin-bottom: 10px;
+        background: white;
         padding: 20px;
+        margin-bottom: 15px;
+        width: 100%;
+        cursor: pointer;
         border: 1px solid #ddd;
         border-radius: 5px;
         display: flex;
@@ -331,15 +333,18 @@
       }
 
       #detailsContainer {
-        background-color: white;
+        position: sticky;
+        top: 100px;
+        background: white;
         border: 1px solid #eee;
         border-radius: 12px;
-        padding: 20px 30px;
-        height: calc(100vh - 60px);
+        padding: 20px;
+        height: calc(100vh - 120px);
         overflow-y: auto;
         font-family: "Poppins", sans-serif;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       }
+
       .info-and-chat-wrapper {
         display: flex;
         justify-content: space-between;
@@ -388,11 +393,23 @@
       }
 
       .row {
-        margin: 0;
+        display: flex;
+        margin: 0 -15px; /* Negative margin to counteract container padding */
       }
 
       .list-group {
         padding: 0 15px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 100px auto 0 auto;
+        padding: 0 15px;
+      }
+
+      .col-md-6 {
+        padding: 0 15px; /* Add padding to columns */
+        width: 50%; /* Ensure equal width */
       }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
