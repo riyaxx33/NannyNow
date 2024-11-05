@@ -142,7 +142,7 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
-                <a class="nav-link active" href="nanny_home.html">Home</a>
+                <a class="nav-link" href="nanny_home.html">Home</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="nanny_jobs.html">My Jobs</a>
@@ -193,13 +193,31 @@
         }
       });
 
-      // Add active class to current page
+      // Improved active class detection
       document.addEventListener("DOMContentLoaded", function () {
-        const currentLocation = location.href;
-        const navLinks = document.querySelectorAll(".nav-link");
-        navLinks.forEach((link) => {
-          if (link.href === currentLocation) {
+        // Get the current page filename
+        const currentPage = window.location.pathname.split("/").pop();
+
+        // Remove 'active' class from all links
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          link.classList.remove("active");
+        });
+
+        // Find and mark the active link
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          const linkPage = link.getAttribute("href");
+          if (linkPage && currentPage && linkPage === currentPage) {
             link.classList.add("active");
+          }
+          // Special case for home page
+          if (
+            currentPage === "" ||
+            currentPage === "/" ||
+            currentPage === "index.html"
+          ) {
+            document
+              .querySelector('a[href="nanny_home.html"]')
+              .classList.add("active");
           }
         });
       });
