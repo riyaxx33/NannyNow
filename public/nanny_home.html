@@ -549,33 +549,46 @@
         });
 
         // Handle filter option selection
+        // Replace your existing filter option click handlers with this:
         filterOptions.forEach((option) => {
           option.addEventListener("click", (e) => {
             const value = e.target.dataset.value;
-            const filterType = e.target
-              .closest(".filter-menu")
-              .previousElementSibling.id.replace("Filter", "");
+            const filterMenu = e.target.closest(".filter-menu");
+            const buttonId = filterMenu.previousElementSibling.id;
 
-            // Convert filterType to match activeFilters keys
-            const filterKey =
-              filterType === "payNegotiable" ? "Negotiable" : filterType;
+            // Map the button ID to the correct filter key
+            let filterKey;
+            switch (buttonId) {
+              case "dateFilter":
+                filterKey = "Date";
+                break;
+              case "payFilter":
+                filterKey = "Pay";
+                break;
+              case "payNegotiableFilter":
+                filterKey = "Negotiable";
+                break;
+              case "locationFilter":
+                filterKey = "Location";
+                break;
+              default:
+                console.error("Unknown filter type:", buttonId);
+                return;
+            }
 
             console.log("Setting filter:", {
+              buttonId,
               filterKey,
               value,
             });
 
-            // Update active filters
             activeFilters[filterKey] = value;
 
-            // Update UI
+            console.log("Active filters after update:", activeFilters);
+
             updateActiveFiltersUI();
-
-            // Apply filters
             applyFilters();
-
-            // Hide menu
-            e.target.closest(".filter-menu").classList.remove("show");
+            filterMenu.classList.remove("show");
           });
         });
 
@@ -621,13 +634,22 @@
 
       // Apply filters to posts
       function applyFilters() {
-        console.log("Current active filters:", activeFilters);
+        console.log(
+          "Starting filter application with active filters:",
+          activeFilters
+        );
 
         const searchQuery = document
           .getElementById("jobSearch")
           .value.toLowerCase();
 
         const filteredPosts = allPosts.filter((post) => {
+          console.log("Checking post:", {
+            postId: post.postDoc.id,
+            postDate: post.postData.date,
+            postPay: post.postData.pay,
+          });
+
           const matchFilters = {
             search:
               post.parentData.firstName.toLowerCase().includes(searchQuery) ||
@@ -654,7 +676,7 @@
               checkPayMatch(post.postData.pay, activeFilters.Pay),
           };
 
-          console.log("Post filter results:", {
+          console.log("Filter results for post:", {
             postId: post.postDoc.id,
             matches: matchFilters,
           });
@@ -662,7 +684,7 @@
           return Object.values(matchFilters).every((match) => match);
         });
 
-        console.log("Filtered posts count:", filteredPosts.length);
+        console.log("Filtered posts:", filteredPosts.length);
         displayFilteredPosts(filteredPosts);
       }
 
@@ -671,27 +693,44 @@
         console.log("Checking date match:", {
           postDateString,
           filterValue,
+          postDate: new Date(postDateString),
+          today: new Date(),
         });
 
         const postDate = new Date(postDateString);
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Set to start of day
+        today.setHours(0, 0, 0, 0);
 
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
+        console.log("Date comparison:", {
+          postDate: postDate.toISOString(),
+          today: today.toISOString(),
+          tomorrow: tomorrow.toISOString(),
+        });
+
         switch (filterValue) {
           case "Today":
-            return isSameDay(postDate, today);
+            const isToday = isSameDay(postDate, today);
+            console.log("Is today?", isToday);
+            return isToday;
 
           case "Tomorrow":
-            return isSameDay(postDate, tomorrow);
+            const isTomorrow = isSameDay(postDate, tomorrow);
+            console.log("Is tomorrow?", isTomorrow);
+            return isTomorrow;
 
           case "This Week": {
             const weekEnd = new Date(today);
             weekEnd.setDate(today.getDate() + (6 - today.getDay()));
             weekEnd.setHours(23, 59, 59, 999);
-            return postDate >= today && postDate <= weekEnd;
+            const isThisWeek = postDate >= today && postDate <= weekEnd;
+            console.log("Is this week?", {
+              isThisWeek,
+              weekEnd: weekEnd.toISOString(),
+            });
+            return isThisWeek;
           }
 
           case "Next Week": {
@@ -700,7 +739,14 @@
             const nextWeekEnd = new Date(nextWeekStart);
             nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
             nextWeekEnd.setHours(23, 59, 59, 999);
-            return postDate >= nextWeekStart && postDate <= nextWeekEnd;
+            const isNextWeek =
+              postDate >= nextWeekStart && postDate <= nextWeekEnd;
+            console.log("Is next week?", {
+              isNextWeek,
+              nextWeekStart: nextWeekStart.toISOString(),
+              nextWeekEnd: nextWeekEnd.toISOString(),
+            });
+            return isNextWeek;
           }
 
           default:
@@ -722,6 +768,7 @@
         console.log("Checking pay match:", {
           postPay,
           filterValue,
+          type: typeof postPay,
         });
 
         // Remove "$" and "/hr" from the filter value
@@ -730,10 +777,19 @@
         if (range.includes("+")) {
           // Handle "$35+" case
           const minValue = parseInt(range);
+          console.log("Plus range:", {
+            minValue,
+            isMatch: postPay >= minValue,
+          });
           return postPay >= minValue;
         } else {
           // Handle range case (e.g., "15-25")
           const [min, max] = range.split("-").map(Number);
+          console.log("Normal range:", {
+            min,
+            max,
+            isMatch: postPay >= min && postPay <= max,
+          });
           return postPay >= min && postPay <= max;
         }
       }
