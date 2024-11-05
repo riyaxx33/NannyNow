@@ -17,18 +17,15 @@
         font-family: "Poppins", sans-serif;
       }
       #detailsContainer {
-        z-index: 1010; /* Below search container */
-        margin-top: 20px;
-        margin-right: 15px;
         position: sticky;
-        top: 60px;
-        background-color: white;
-        border-left: 1px solid #ccc;
-        border: 2px solid #ddd;
-        border-radius: 5px;
+        top: 100px;
+        height: calc(100vh - 120px);
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 12px;
         padding: 20px;
-        height: calc(100vh - 60px);
-        overflow-y: hidden;
+        margin-top: 0;
         font-family: "Poppins", sans-serif;
       }
 
@@ -56,7 +53,8 @@
       }
 
       .job-card:hover {
-        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
 
       .job-card img {
@@ -94,13 +92,16 @@
         z-index: 1020; /* Below navbar but above other content */
         background-color: rgba(255, 255, 255, 0.9);
         width: 100%;
+        background-color: white;
+        border-bottom: 1px solid #eee;
       }
 
       .search-bar {
         display: flex;
-        gap: 15px;
+        gap: 10px;
         align-items: center;
         font-family: "Poppins", sans-serif;
+        flex-wrap: wrap;
       }
 
       .search-input-group {
@@ -388,28 +389,67 @@
         flex-grow: 1;
       }
 
+      /* Navbar styles */
       .navbar {
-        z-index: 1030; /* Ensure navbar stays on top */
+        z-index: 1030;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.9) !important;
       }
 
+      /* Content row */
       .row {
         display: flex;
-        margin: 0 -15px; /* Negative margin to counteract container padding */
+        margin-right: -15px;
+        margin-left: -15px;
       }
 
+      /* Job cards container */
       .list-group {
-        padding: 0 15px;
+        height: calc(100vh - 200px);
+        overflow-y: auto;
+        padding-right: 10px;
       }
 
+      /* Main container styles */
       .container {
         max-width: 1200px;
-        margin: 100px auto 0 auto;
-        padding: 0 15px;
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
       }
 
+      /* First container needs top margin for navbar */
+      .container:first-of-type {
+        margin-top: 80px;
+      }
+
+      /* Column styles */
       .col-md-6 {
-        padding: 0 15px; /* Add padding to columns */
-        width: 50%; /* Ensure equal width */
+        position: relative;
+        width: 50%;
+        padding-right: 15px;
+        padding-left: 15px;
+      }
+
+      @media (max-width: 768px) {
+        .col-md-6 {
+          width: 100%;
+        }
+
+        #detailsContainer {
+          margin-top: 20px;
+          height: auto;
+          position: static;
+        }
+
+        .list-group {
+          height: auto;
+          max-height: 500px;
+        }
       }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
