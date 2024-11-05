@@ -193,32 +193,53 @@
         }
       });
 
-      // Improved active class detection
+      // Simplified active state detection with debug logging
       document.addEventListener("DOMContentLoaded", function () {
-        // Get the current page filename
-        const currentPage = window.location.pathname.split("/").pop();
+        function setActiveLink() {
+          // Get the current path
+          const currentPath = window.location.pathname;
+          console.log("Current path:", currentPath);
 
-        // Remove 'active' class from all links
-        document.querySelectorAll(".nav-link").forEach((link) => {
-          link.classList.remove("active");
-        });
+          // Get all nav links
+          const navLinks = document.querySelectorAll(".nav-link");
 
-        // Find and mark the active link
+          // Remove active class from all links
+          navLinks.forEach((link) => {
+            link.classList.remove("active");
+          });
+
+          // Set active class based on current path
+          navLinks.forEach((link) => {
+            if (link.getAttribute("href")) {
+              // Check if href exists
+              // Remove leading slash if it exists for comparison
+              const linkPath = link.getAttribute("href").replace(/^\//, "");
+              const currentPageName = currentPath.split("/").pop();
+
+              console.log("Comparing:", {
+                linkPath: linkPath,
+                currentPageName: currentPageName,
+              });
+
+              if (linkPath === currentPageName) {
+                console.log("Match found! Setting active:", linkPath);
+                link.classList.add("active");
+              }
+            }
+          });
+        }
+
+        // Set active link on page load
+        setActiveLink();
+
+        // Also set active link when clicking nav links
         document.querySelectorAll(".nav-link").forEach((link) => {
-          const linkPage = link.getAttribute("href");
-          if (linkPage && currentPage && linkPage === currentPage) {
-            link.classList.add("active");
-          }
-          // Special case for home page
-          if (
-            currentPage === "" ||
-            currentPage === "/" ||
-            currentPage === "index.html"
-          ) {
+          link.addEventListener("click", function () {
             document
-              .querySelector('a[href="nanny_home.html"]')
-              .classList.add("active");
-          }
+              .querySelectorAll(".nav-link")
+              .forEach((l) => l.classList.remove("active"));
+            this.classList.add("active");
+          });
         });
       });
     </script>
