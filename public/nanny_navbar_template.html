@@ -193,52 +193,56 @@
         }
       });
 
-      // Simplified active state detection with debug logging
       document.addEventListener("DOMContentLoaded", function () {
         function setActiveLink() {
-          // Get the current path
-          const currentPath = window.location.pathname;
-          console.log("Current path:", currentPath);
+          // Get the current path without any leading or trailing slashes
+          const currentPath = window.location.pathname.split("/").pop();
+          console.log("Current page:", currentPath);
 
           // Get all nav links
           const navLinks = document.querySelectorAll(".nav-link");
 
-          // Remove active class from all links
+          // Remove active class from all links first
+          navLinks.forEach((link) => link.classList.remove("active"));
+
+          // Set active class based on exact page match
           navLinks.forEach((link) => {
-            link.classList.remove("active");
-          });
-
-          // Set active class based on current path
-          navLinks.forEach((link) => {
-            if (link.getAttribute("href")) {
-              // Check if href exists
-              // Remove leading slash if it exists for comparison
-              const linkPath = link.getAttribute("href").replace(/^\//, "");
-              const currentPageName = currentPath.split("/").pop();
-
-              console.log("Comparing:", {
-                linkPath: linkPath,
-                currentPageName: currentPageName,
-              });
-
-              if (linkPath === currentPageName) {
-                console.log("Match found! Setting active:", linkPath);
+            const href = link.getAttribute("href");
+            if (href) {
+              // If we're on the exact page that matches the href
+              if (currentPath === href) {
+                console.log(`Match found! Setting active for: ${href}`);
+                link.classList.add("active");
+              }
+              // Special case for home page
+              else if (
+                (currentPath === "" ||
+                  currentPath === "/" ||
+                  currentPath === "index.html") &&
+                href === "nanny_home.html"
+              ) {
+                console.log("Home page detected, setting home link active");
                 link.classList.add("active");
               }
             }
           });
         }
 
-        // Set active link on page load
+        // Set active link on initial page load
         setActiveLink();
 
-        // Also set active link when clicking nav links
+        // Add click event listeners to nav links
         document.querySelectorAll(".nav-link").forEach((link) => {
           link.addEventListener("click", function () {
-            document
-              .querySelectorAll(".nav-link")
-              .forEach((l) => l.classList.remove("active"));
-            this.classList.add("active");
+            // Only handle non-dropdown links
+            if (!this.classList.contains("dropdown-toggle")) {
+              // Remove active class from all links
+              document
+                .querySelectorAll(".nav-link")
+                .forEach((l) => l.classList.remove("active"));
+              // Add active class to clicked link
+              this.classList.add("active");
+            }
           });
         });
       });
