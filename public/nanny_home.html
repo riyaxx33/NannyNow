@@ -738,9 +738,8 @@
 
           const matchFilters = {
             search:
-              post.parentData.firstName.toLowerCase().includes(searchQuery) ||
-              post.parentData.lastName.toLowerCase().includes(searchQuery) ||
-              post.postData.description.toLowerCase().includes(searchQuery),
+              searchQuery === "" ||
+              post.postDoc.id.toLowerCase().includes(searchQuery),
 
             location:
               !activeFilters.Location ||
@@ -995,10 +994,10 @@
         <div class="job-description">
           <h5>${firstName} ${lastName}</h5>
           <p>
+            Post ID: ${postDoc.id}<br>
+            Date of Job: ${new Date(postData.date).toLocaleDateString()}<br>
             Time of Job: ${postData.startTime} - ${postData.endTime}<br>
-            Expected Pay: $${postData.pay}/hr<br>
-            Pay Negotiable: ${postData.payNegotiation ? "Yes" : "No"}<br>
-            Date of Job: ${new Date(postData.date).toLocaleDateString()}
+            Expected Pay: $${postData.pay}/hr
           </p>
         </div>
       </div>
@@ -1132,6 +1131,9 @@
             const postData = postDoc.data();
             const userId = postData.userId;
 
+            // Store the post ID from Firestore
+            const postId = postDoc.id; // This is the unique Firestore document ID
+
             const parentDoc = await getDoc(doc(db, "USER", userId));
             const parentData = parentDoc.exists() ? parentDoc.data() : null;
 
@@ -1146,6 +1148,7 @@
                 postData,
                 parentData,
                 parentDetails,
+                postId,
               });
             }
           }
