@@ -1,131 +1,208 @@
-<style>
-    body {
-      font-family: "Roboto Slab", serif;
-      background-color: #fff8e7;
-    }
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
 
-    .navbar {
-      height: 80px;
-      background-color: #faf9f6 !important;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+      .navbar {
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        backdrop-filter: blur(10px);
+        padding: 15px 0;
+        transition: all 0.3s ease;
+      }
 
-    .navbar-brand img {
-      max-height: 50px;
-    }
+      .navbar.scrolled {
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
 
-    .btn {
-      border-radius: 20px;
-      padding: 8px 20px;
-    }
+      .navbar-brand {
+        font-weight: 600;
+        font-size: 1.5rem;
+      }
 
-    .btn-outline-primary {
-      color: #000;
-      border-color: #000;
-    }
+      .navbar-brand img {
+        max-height: 40px;
+        margin-right: 10px;
+      }
 
-    .btn-outline-primary:hover {
-      color: #fff;
-      background-color: #000;
-      border-color: #000;
-    }
+      .brand-text {
+        background: linear-gradient(45deg, #333, #666);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
 
-    .nav-link {
-      color: #000;
-      margin-right: 15px;
-      font-weight: 500;
-    }
+      .nav-link {
+        color: #333 !important;
+        font-weight: 500;
+        padding: 8px 16px !important;
+        margin: 0 5px;
+        position: relative;
+        transition: all 0.3s ease;
+      }
 
-    .nav-link:hover {
-      color: #fff !important;
-      background-color: #000 !important;
-      border-radius: 5px;
-      padding: 8px 15px;
-    }
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 50%;
+        background: linear-gradient(45deg, #333, #666);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+      }
 
-    .dropdown-menu {
-      border-radius: 10px;
-    }
+      .nav-link:hover::after,
+      .nav-link.active::after {
+        width: 80%;
+      }
 
-    .dropdown-item:hover {
-      background-color: #9a9999;
-      color: #333;
-    }
+      .nav-link:hover {
+        color: #000 !important;
+        transform: translateY(-2px);
+      }
 
-    .navbar-collapse {
-      flex-grow: 0; /* Prevents the menu from pushing the buttons too far right */
-    }
+      .dropdown-menu {
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        padding: 10px;
+      }
 
-    .me-auto {
-      margin-right: auto; /* Adjusts position to push items to the left */
-    }
-  </style>
-<body>
-  <header>
-    <nav class="navbar navbar-expand-sm navbar-light bg-white">
-      <div class="container">
-        <!-- Logo -->
-        <a class="navbar-brand" href="index.html"> 
-          <img src="img/logo.png" alt="Nanny logo" class="logoo" />
-          <span class="brand-text">Nanny</span>
-        </a>
+      .dropdown-item {
+        font-weight: 500;
+        padding: 8px 20px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+      }
 
-        <!-- Toggler for mobile view -->
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+      .dropdown-item:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        transform: translateX(5px);
+      }
 
-        <!-- Navbar links -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="nanny_home.html">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="nanny_jobs.html">My Jobs</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="nanny_chat.html">Chat</a>
-            </li>
-            
-            <!-- Profile dropdown -->
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Profile
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li>
-                  <a class="dropdown-item" href="nanny_profilePage.html">My Account</a>
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a class="dropdown-item" href="#" id="logoutBtn">Logout</a>
-                </li>
-              </ul>
-            </li>
-          </ul>
+      .navbar-toggler {
+        border: none;
+        padding: 0;
+      }
+
+      .navbar-toggler:focus {
+        box-shadow: none;
+      }
+
+      @media (max-width: 991.98px) {
+        .navbar-collapse {
+          background-color: rgba(255, 255, 255, 0.95);
+          padding: 20px;
+          border-radius: 12px;
+          margin-top: 10px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link {
+          padding: 12px 16px !important;
+        }
+
+        .nav-link::after {
+          bottom: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+          <a class="navbar-brand" href="index.html">
+            <img src="img/logo.png" alt="Nanny logo" />
+            <span class="brand-text">Nanny</span>
+          </a>
+
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link active" href="nanny_home.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="nanny_jobs.html">My Jobs</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="nanny_chat.html">Chat</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  id="navbarDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                >
+                  Profile
+                </a>
+                <ul
+                  class="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="navbarDropdown"
+                >
+                  <li>
+                    <a class="dropdown-item" href="nanny_profilePage.html"
+                      >My Account</a
+                    >
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <a class="dropdown-item" href="#" id="logoutBtn">Logout</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </nav>
-  </header>
-  </body>
+      </nav>
+    </header>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-  <script type="module" src="./backend/firebase-config.js"></script>
-  <script src="backend/auth.js" type="module"></script>
-  <script src="backend/logout.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Add background color on scroll
+      window.addEventListener("scroll", function () {
+        const navbar = document.querySelector(".navbar");
+        if (window.scrollY > 50) {
+          navbar.classList.add("scrolled");
+        } else {
+          navbar.classList.remove("scrolled");
+        }
+      });
+
+      // Add active class to current page
+      document.addEventListener("DOMContentLoaded", function () {
+        const currentLocation = location.href;
+        const navLinks = document.querySelectorAll(".nav-link");
+        navLinks.forEach((link) => {
+          if (link.href === currentLocation) {
+            link.classList.add("active");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
