@@ -17,6 +17,8 @@
         font-family: "Poppins", sans-serif;
       }
       #detailsContainer {
+        z-index: 1010; /* Below search container */
+        margin-top: 20px;
         position: sticky;
         top: 60px;
         background-color: white;
@@ -84,8 +86,11 @@
 
       .search-container {
         position: relative;
-        padding: 10px;
-        margin: 0px;
+        padding: 20px 0;
+        margin: 0;
+        z-index: 1020; /* Below navbar but above other content */
+        background-color: rgba(255, 255, 255, 0.9);
+        width: 100%;
       }
 
       .search-bar {
@@ -376,13 +381,17 @@
         justify-content: space-between;
         flex-grow: 1;
       }
+
+      .navbar {
+        z-index: 1030; /* Ensure navbar stays on top */
+      }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
   </head>
   <body>
     <div id="navbar"></div>
 
-    <div class="container mt-3">
+    <div class="container" style="margin-top: 100px">
       <div class="search-container">
         <div class="search-bar">
           <div class="search-input-group">
