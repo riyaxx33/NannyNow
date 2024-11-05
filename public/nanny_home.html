@@ -13,19 +13,12 @@
       rel="stylesheet"
     />
     <style>
-      #jobSearch::placeholder {
+      body {
+        margin: 0;
+        padding-top: 70px; /* Height of navbar */
         font-family: "Poppins", sans-serif;
       }
-      #detailsContainer {
-        position: sticky;
-        top: 100px;
-        height: calc(100vh - 120px);
-        overflow-y: auto;
-        background: white;
-        border: 1px solid #eee;
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 0;
+      #jobSearch::placeholder {
         font-family: "Poppins", sans-serif;
       }
 
@@ -35,6 +28,8 @@
         padding: 10px;
         border: 1px solid #ddd;
         margin-top: 15px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
       }
 
       .job-card {
@@ -344,6 +339,8 @@
         overflow-y: auto;
         font-family: "Poppins", sans-serif;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        scrollbar-width: none;
+        -ms-overflow-style: none;
       }
 
       .info-and-chat-wrapper {
@@ -424,7 +421,7 @@
 
       /* First container needs top margin for navbar */
       .container:first-of-type {
-        margin-top: 80px;
+        margin-top: 20px;
       }
 
       /* Column styles */
@@ -449,7 +446,21 @@
         .list-group {
           height: auto;
           max-height: 500px;
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
         }
+      }
+
+      .list-group::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+      }
+
+      #detailsContainer::-webkit-scrollbar {
+        display: none;
+      }
+
+      #jobDescriptionContainer::-webkit-scrollbar {
+        display: none;
       }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
