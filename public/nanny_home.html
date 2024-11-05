@@ -556,8 +556,17 @@
               .closest(".filter-menu")
               .previousElementSibling.id.replace("Filter", "");
 
+            // Convert filterType to match activeFilters keys
+            const filterKey =
+              filterType === "payNegotiable" ? "Negotiable" : filterType;
+
+            console.log("Setting filter:", {
+              filterKey,
+              value,
+            });
+
             // Update active filters
-            activeFilters[filterType] = value;
+            activeFilters[filterKey] = value;
 
             // Update UI
             updateActiveFiltersUI();
@@ -612,106 +621,119 @@
 
       // Apply filters to posts
       function applyFilters() {
+        console.log("Current active filters:", activeFilters);
+
         const searchQuery = document
           .getElementById("jobSearch")
           .value.toLowerCase();
 
         const filteredPosts = allPosts.filter((post) => {
-          // Search text filter
-          const matchesSearch =
-            post.parentData.firstName.toLowerCase().includes(searchQuery) ||
-            post.parentData.lastName.toLowerCase().includes(searchQuery) ||
-            post.postData.description.toLowerCase().includes(searchQuery);
+          const matchFilters = {
+            search:
+              post.parentData.firstName.toLowerCase().includes(searchQuery) ||
+              post.parentData.lastName.toLowerCase().includes(searchQuery) ||
+              post.postData.description.toLowerCase().includes(searchQuery),
 
-          // Location filter - now using geocoded location
-          const matchesLocation =
-            !activeFilters.Location ||
-            post.geocodedLocation === activeFilters.Location;
+            location:
+              !activeFilters.Location ||
+              post.geocodedLocation === activeFilters.Location,
 
-          // Date filter
-          const matchesDate =
-            !activeFilters.Date ||
-            checkDateMatch(post.postData.date, activeFilters.Date);
+            date:
+              !activeFilters.Date ||
+              checkDateMatch(post.postData.date, activeFilters.Date),
 
-          // Pay Negotiable filter
-          const matchesNegotiable =
-            !activeFilters.Negotiable ||
-            checkPayNegotiableMatch(
-              post.postData.payNegotiation,
-              activeFilters.Negotiable
-            );
+            negotiable:
+              !activeFilters.Negotiable ||
+              checkPayNegotiableMatch(
+                post.postData.payNegotiation,
+                activeFilters.Negotiable
+              ),
 
-          // Pay filter
-          const matchesPay =
-            !activeFilters.Pay ||
-            checkPayMatch(post.postData.pay, activeFilters.Pay);
+            pay:
+              !activeFilters.Pay ||
+              checkPayMatch(post.postData.pay, activeFilters.Pay),
+          };
 
-          // Add console.log for debugging
-          console.log({
-            post: post.postDoc.id,
-            locationMatch: matchesLocation,
-            dateMatch: matchesDate,
-            negotiableMatch: matchesNegotiable,
-            payMatch: matchesPay,
-            filters: activeFilters,
-            postValues: {
-              location: post.geocodedLocation,
-              payNegotiation: post.postData.payNegotiation,
-              pay: post.postData.pay,
-            },
+          console.log("Post filter results:", {
+            postId: post.postDoc.id,
+            matches: matchFilters,
           });
 
-          return (
-            matchesSearch &&
-            matchesLocation &&
-            matchesDate &&
-            matchesNegotiable &&
-            matchesPay
-          );
+          return Object.values(matchFilters).every((match) => match);
         });
 
+        console.log("Filtered posts count:", filteredPosts.length);
         displayFilteredPosts(filteredPosts);
       }
 
       // Helper function to check date matches
       function checkDateMatch(postDateString, filterValue) {
+        console.log("Checking date match:", {
+          postDateString,
+          filterValue,
+        });
+
         const postDate = new Date(postDateString);
         const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set to start of day
+
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
         switch (filterValue) {
           case "Today":
             return isSameDay(postDate, today);
+
           case "Tomorrow":
             return isSameDay(postDate, tomorrow);
-          case "This Week":
-            return isThisWeek(postDate);
-          case "Next Week":
-            return isNextWeek(postDate);
+
+          case "This Week": {
+            const weekEnd = new Date(today);
+            weekEnd.setDate(today.getDate() + (6 - today.getDay()));
+            weekEnd.setHours(23, 59, 59, 999);
+            return postDate >= today && postDate <= weekEnd;
+          }
+
+          case "Next Week": {
+            const nextWeekStart = new Date(today);
+            nextWeekStart.setDate(today.getDate() + (7 - today.getDay()));
+            const nextWeekEnd = new Date(nextWeekStart);
+            nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
+            nextWeekEnd.setHours(23, 59, 59, 999);
+            return postDate >= nextWeekStart && postDate <= nextWeekEnd;
+          }
+
           default:
             return true;
         }
       }
 
-      // Helper function to check pay negotiable?
       function checkPayNegotiableMatch(postPayNegotiation, filterValue) {
-        const booleanValue = filterValue === "Yes";
-        return postPayNegotiation === booleanValue;
+        console.log("Checking pay negotiable:", {
+          postPayNegotiation,
+          filterValue,
+        });
+        // Convert filterValue from "Yes"/"No" to boolean
+        return postPayNegotiation === (filterValue === "Yes");
       }
 
       // Helper function to check pay range matches
       function checkPayMatch(postPay, filterValue) {
-        // Extract numeric values from the filter string
-        const range = filterValue.replace(/[^\d-]/g, "").split("-");
+        console.log("Checking pay match:", {
+          postPay,
+          filterValue,
+        });
 
-        if (filterValue.includes("+")) {
-          // Handle "$35+/hr" case
-          const minValue = parseInt(range[0]);
+        // Remove "$" and "/hr" from the filter value
+        const range = filterValue.replace(/[\$\/hr]/g, "");
+
+        if (range.includes("+")) {
+          // Handle "$35+" case
+          const minValue = parseInt(range);
           return postPay >= minValue;
         } else {
-          // Handle range case (e.g., "$15-25/hr")
-          const [min, max] = range.map(Number);
+          // Handle range case (e.g., "15-25")
+          const [min, max] = range.split("-").map(Number);
           return postPay >= min && postPay <= max;
         }
       }
@@ -719,9 +741,9 @@
       // Helper date functions
       function isSameDay(d1, d2) {
         return (
-          d1.getDate() === d2.getDate() &&
+          d1.getFullYear() === d2.getFullYear() &&
           d1.getMonth() === d2.getMonth() &&
-          d1.getFullYear() === d2.getFullYear()
+          d1.getDate() === d2.getDate()
         );
       }
 
