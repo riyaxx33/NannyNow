@@ -1337,6 +1337,35 @@
       document.addEventListener("DOMContentLoaded", () => {
         loadPosts();
       });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Function to highlight active nav link
+        function setActiveNavLink() {
+          const currentPage =
+            window.location.pathname.split("/").pop() || "nanny_home.html";
+          const navLinks = document.querySelectorAll(".nav-link");
+
+          navLinks.forEach((link) => {
+            link.classList.remove("active");
+            const href = link.getAttribute("href");
+
+            if (
+              href &&
+              (href === currentPage ||
+                (currentPage === "" && href === "nanny_home.html") ||
+                (currentPage === "index.html" && href === "nanny_home.html"))
+            ) {
+              link.classList.add("active");
+            }
+          });
+        }
+
+        // Initial set
+        setActiveNavLink();
+
+        // Set on navigation
+        window.addEventListener("popstate", setActiveNavLink);
+      });
     </script>
 
     <script type="module">
