@@ -8,17 +8,17 @@
     <title>Nanny Post Job</title>
     <style>
       .custom-cancel-btn {
-  background-color: rgb(184, 184, 184); /* Custom background color */
-  color: white;   
-  font-family: 'Poppins', sans-serif;           /* Text color */         /* Bold text */
-  padding: 8px 16px;         /* Custom padding */
-  border-radius: 5px;        /* Rounded corners */
-  transition: background-color 0.3s ease; /* Smooth transition on hover */
-}
+        background-color: rgb(184, 184, 184);
+        color: white;   
+        font-family: 'Poppins', sans-serif;
+        padding: 8px 16px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
 
-.custom-cancel-btn:hover {
-  background-color: rgb(222, 222, 222); /* Darker color on hover */
-}
+      .custom-cancel-btn:hover {
+        background-color: rgb(222, 222, 222);
+      }
 
       .logoo {
         height: 60px;
@@ -33,7 +33,8 @@
         margin-left: 80px;
         margin-top: 20px;
       }
-      h3{
+
+      h3 {
         font-family: 'Poppins', sans-serif;
         font-size: 30px;
         margin-left: 5px;
@@ -51,14 +52,12 @@
         border-radius: 5px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       }
-      .button-container {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 10px;
-        gap: 10px;
-      }
+
       .posts-container {
         margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
       }
 
       .no-posts-message {
@@ -68,7 +67,6 @@
         color: #666;
         padding: 20px;
         font-weight: bold;
-        padding: 15px;
         border-radius: 5px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         margin-top: 20px;
@@ -77,22 +75,64 @@
         align-items: center;
         justify-content: center;
         margin-bottom: 20px;
+        grid-column: 1 / -1;
       }
 
       .post-item {
         font-family: 'Poppins', sans-serif;
         background-color: white;
-        padding: 15px;
+        padding: 20px;
         border-radius: 5px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        margin-top: 20px;
-        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
       }
 
-      .post-item h5 {
-        font-family: 'Poppins', sans-serif;
+      .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .post-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .post-title h5 {
         margin: 0;
-        padding-bottom: 10px;
+        font-size: 1.1rem;
+      }
+
+      .post-content {
+        padding: 15px 0;
+        border-top: 1px solid #dee2e6;
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 15px;
+      }
+
+      .post-detail {
+        display: flex;
+        margin-bottom: 8px;
+      }
+
+      .detail-label {
+        font-weight: 600;
+        width: 140px;
+        color: #666;
+      }
+
+      .detail-value {
+        flex: 1;
+      }
+
+      .button-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: auto;
       }
 
       .error-message {
@@ -100,9 +140,11 @@
         color: red;
         margin-top: 10px;
       }
+
       input, textarea, button, select {
         font-family: 'Poppins', sans-serif;
       }
+
       label.form-label {
         font-family: 'Poppins', sans-serif;
       }
@@ -110,27 +152,29 @@
       .form-control {
         font-family: 'Poppins', sans-serif;
       }
+
       #submit {
         font-family: 'Poppins', sans-serif;
       }
+
       .nav-tabs .nav-link {
-  font-family: 'Poppins', sans-serif;
-  color: #666;
-  border: 1px solid transparent;
-  margin-bottom: -1px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-}
+        font-family: 'Poppins', sans-serif;
+        color: #666;
+        border: 1px solid transparent;
+        margin-bottom: -1px;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+      }
 
-.nav-tabs .nav-link.active {
-  color: #495057;
-  background-color: #fff;
-  border-color: #dee2e6 #dee2e6 #fff;
-}
+      .nav-tabs .nav-link.active {
+        color: #495057;
+        background-color: #fff;
+        border-color: #dee2e6 #dee2e6 #fff;
+      }
 
-.nav-tabs .nav-link:hover:not(.active) {
-  border-color: #e9ecef #e9ecef #dee2e6;
-}
+      .nav-tabs .nav-link:hover:not(.active) {
+        border-color: #e9ecef #e9ecef #dee2e6;
+      }
 
       .badge {
         font-family: 'Poppins', sans-serif;
@@ -153,7 +197,14 @@
 
       .badge-upcoming {
         background-color: #ffc107;
-        color: #000; }
+        color: #000;
+      }
+
+      @media (max-width: 768px) {
+        .posts-container {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
 
@@ -245,22 +296,42 @@
         </div>
         
         <div v-for="post in filteredPosts" :key="post.id" class="post-item">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5>Job ID: {{ post.jobId }}</h5>
-            <div class="d-flex gap-2 align-items-center">
-              <span v-if="post.interestedNannies && post.interestedNannies.length > 0" class="badge bg-primary">
-                {{ post.interestedNannies.length }} Nanny(ies) Interested
-              </span>
+          <div class="post-header">
+            <div class="post-title">
+              <h5>Job ID: {{ post.jobId }}</h5>
               <span :class="getStatusBadgeClass(post)" class="badge">
                 {{ getStatusLabel(post) }}
               </span>
             </div>
+            <span v-if="post.interestedNannies && post.interestedNannies.length > 0" 
+                  class="badge bg-primary">
+              {{ post.interestedNannies.length }} Nanny(ies) Interested
+            </span>
           </div>
-          <p>Date: {{ post.formattedDate }}<br>
-            Pay: {{ post.pay }}<br>
-            Pay Negotiable: {{ post.payNegotiation ? 'Yes' : 'No' }}<br>
-            Time: {{ post.startTime }} - {{ post.endTime }}<br>
-            Notes: {{ post.description }}</p>
+          
+          <div class="post-content">
+            <div class="post-detail">
+              <span class="detail-label">Date:</span>
+              <span class="detail-value">{{ post.formattedDate }}</span>
+            </div>
+            <div class="post-detail">
+              <span class="detail-label">Pay:</span>
+              <span class="detail-value">{{ post.pay }}</span>
+            </div>
+            <div class="post-detail">
+              <span class="detail-label">Pay Negotiable:</span>
+              <span class="detail-value">{{ post.payNegotiation ? 'Yes' : 'No' }}</span>
+            </div>
+            <div class="post-detail">
+              <span class="detail-label">Time:</span>
+              <span class="detail-value">{{ post.startTime }} - {{ post.endTime }}</span>
+            </div>
+            <div class="post-detail">
+              <span class="detail-label">Notes:</span>
+              <span class="detail-value">{{ post.description }}</span>
+            </div>
+          </div>
+
           <div class="button-container">
             <button v-if="canEditPost(post)" @click="editPost(post)" class="btn btn-warning btn-sm">Edit</button>
             <button @click="deletePost(post.id)" class="btn btn-danger btn-sm">Delete</button>
