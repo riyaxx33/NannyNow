@@ -772,51 +772,64 @@
             );
             this.currentUserProfilePic = currentUserDetails.profilePictureUrl;
 
-            this.unsubscribe = db
+            // Create two listeners - one for sent messages and one for received messages
+            const sentMessagesUnsubscribe = db
               .collection("CHATS")
-              .orderBy("timestamp", "desc")
-              .where("from_user_id", "in", [this.currentUserId])
-              .onSnapshot(async (snapshot) => {
-                const chatMap = new Map();
+              .where("from_user_id", "==", this.currentUserId)
+              .onSnapshot(handleSnapshot);
 
-                // Get received messages as well
-                const receivedSnapshot = await db
-                  .collection("CHATS")
-                  .orderBy("timestamp", "desc")
-                  .where("to_user_id", "==", this.currentUserId)
-                  .get();
+            const receivedMessagesUnsubscribe = db
+              .collection("CHATS")
+              .where("to_user_id", "==", this.currentUserId)
+              .onSnapshot(handleSnapshot);
 
-                // Process all messages
-                const allDocs = [...snapshot.docs, ...receivedSnapshot.docs];
+            // Store both unsubscribe functions
+            this.unsubscribe = () => {
+              sentMessagesUnsubscribe();
+              receivedMessagesUnsubscribe();
+            };
 
-                for (const doc of allDocs) {
-                  const data = doc.data();
-                  const otherUserId =
-                    data.from_user_id === this.currentUserId
-                      ? data.to_user_id
-                      : data.from_user_id;
+            // Handler function for both snapshots
+            const handleSnapshot = async (snapshot) => {
+              const chatMap = new Map(
+                this.chats.map((chat) => [chat.userId, chat])
+              );
 
-                  if (
-                    !chatMap.has(otherUserId) ||
-                    chatMap.get(otherUserId).timestamp < data.timestamp
-                  ) {
-                    // Get user details from USER collection
-                    const userDetails = await this.getUserDetails(otherUserId);
+              for (const doc of snapshot.docs) {
+                const data = doc.data();
+                const otherUserId =
+                  data.from_user_id === this.currentUserId
+                    ? data.to_user_id
+                    : data.from_user_id;
 
-                    chatMap.set(otherUserId, {
-                      userId: otherUserId,
-                      firstName: userDetails.firstName,
-                      lastName: userDetails.lastName,
-                      profilePictureUrl: userDetails.profilePictureUrl,
-                      lastMessage: data.message,
-                      timestamp: data.timestamp,
-                    });
-                  }
+                const existingChat = chatMap.get(otherUserId);
+                const messageTimestamp = data.timestamp?.seconds
+                  ? data.timestamp.seconds * 1000
+                  : data.timestamp;
+
+                if (
+                  !existingChat ||
+                  existingChat.timestamp < messageTimestamp
+                ) {
+                  // Get user details from USER collection
+                  const userDetails = await this.getUserDetails(otherUserId);
+
+                  chatMap.set(otherUserId, {
+                    userId: otherUserId,
+                    firstName: userDetails.firstName,
+                    lastName: userDetails.lastName,
+                    profilePictureUrl: userDetails.profilePictureUrl,
+                    lastMessage: data.message,
+                    timestamp: messageTimestamp,
+                  });
                 }
+              }
 
-                this.chats = Array.from(chatMap.values());
-                this.originalChats = [...this.chats];
-              });
+              this.chats = Array.from(chatMap.values()).sort(
+                (a, b) => b.timestamp - a.timestamp
+              );
+              this.originalChats = [...this.chats];
+            };
           },
           async selectChat(chat) {
             this.selectedChat = chat;
