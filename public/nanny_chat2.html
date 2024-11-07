@@ -22,12 +22,14 @@
 
       body {
         font-family: "Segoe UI", sans-serif;
-        background-color: #6c5ce7;
+        background-color: white;
+        padding: 15px 0;
         height: 100vh;
       }
 
       .app-container {
-        max-width: 1200px;
+        max-width: 1400px;
+        padding: 20px 0;
         margin: 20px auto;
         height: calc(100vh - 40px);
         background-color: white;
@@ -43,7 +45,7 @@
 
       /* Sidebar styling */
       .chat-list {
-        width: 280px;
+        width: 350px;
         background-color: #f8f9fa;
         border-right: 1px solid #eee;
         display: flex;
@@ -76,7 +78,7 @@
       }
 
       .chat-preview {
-        padding: 15px;
+        padding: 12px 15px;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -137,15 +139,21 @@
         flex-grow: 1;
         padding: 20px;
         overflow-y: auto;
-        background-color: white;
+        background-color: #f0f2f5;
       }
 
       .message {
         max-width: 70%;
+        min-width: 80px;
         margin: 10px 0;
         padding: 12px 16px;
-        border-radius: 12px;
+        padding-bottom: 20px;
+        border-radius: 20px;
         position: relative;
+        display: inline-block; /* This makes the bubble wrap to content */
+        word-wrap: break-word;
+        width: fit-content; /* This makes the bubble fit the content */
+        line-height: 1.4; /* Add line height for better text spacing */
       }
 
       .message.sent {
@@ -153,12 +161,32 @@
         color: white;
         margin-left: auto;
         border-bottom-right-radius: 4px;
+        float: right;
+        clear: both;
+      }
+
+      .message.sent .timestamp {
+        color: rgba(255, 255, 255, 0.7);
       }
 
       .message.received {
-        background-color: #f0f2f5;
+        background-color: white;
         color: #1a1a1a;
         border-bottom-left-radius: 4px;
+        float: left;
+        clear: both;
+      }
+
+      .message.received .timestamp {
+        color: rgba(0, 0, 0, 0.5);
+      }
+
+      .message-container {
+        margin: 10px 0;
+        clear: both;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
       }
 
       .chat-input-container {
@@ -205,36 +233,71 @@
         outline: none;
       }
 
-      .user-status {
-        width: 8px;
-        height: 8px;
-        background-color: #4caf50;
-        border-radius: 50%;
-        position: absolute;
-        bottom: 2px;
-        right: 2px;
-      }
-
       .user-avatar {
         position: relative;
-        width: 40px;
-        height: 40px;
+        width: 48px; /* Increase size and make width/height equal */
+        height: 48px;
+        flex-shrink: 0; /* Prevent avatar from shrinking */
       }
 
       .user-avatar img {
         width: 100%;
         height: 100%;
         border-radius: 50%;
+        object-fit: cover; /* This ensures the image maintains its aspect ratio */
       }
 
       .timestamp {
         font-size: 0.75rem;
-        margin-top: 4px;
+        position: absolute;
+        bottom: 4px;
+        right: 12px;
         opacity: 0.7;
+        white-space: nowrap;
+        text-align: right;
+        min-width: 55px;
+      }
+
+      /* Update the no-chat-selected styling */
+      .no-chat-selected {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        background-color: #f8f9fa;
+      }
+
+      .no-chat-selected h2 {
+        color: #6c757d;
+        font-size: 1.5rem;
+        font-weight: 500;
+        text-align: center;
+        padding: 20px;
+        max-width: 80%;
+        line-height: 1.4;
+      }
+
+      /* Add styles for the date separator */
+      .date-separator {
+        text-align: center;
+        margin: 20px 0;
+        position: relative;
+      }
+
+      .date-label {
+        background-color: rgba(0, 0, 0, 0.2);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        display: inline-block;
       }
     </style>
   </head>
   <body>
+    <header>
+      <div id="navbar"></div>
+    </header>
     <div id="app" class="app-container">
       <div class="container">
         <!-- Sidebar -->
@@ -246,17 +309,16 @@
                 alt="Current User"
                 @error="handleImageError($event)"
               />
-              <span class="user-status"></span>
             </div>
             <h3>Messages</h3>
           </div>
 
-          <div class="sidebar-icons">
+          <!-- <div class="sidebar-icons">
             <i data-lucide="message-square"></i>
             <i data-lucide="users"></i>
             <i data-lucide="grid"></i>
             <i data-lucide="settings"></i>
-          </div>
+          </div> -->
 
           <div class="search-bar">
             <input type="text" placeholder="Search messages..." />
@@ -274,7 +336,6 @@
                 :alt="chat.firstName"
                 @error="handleImageError($event)"
               />
-              <span class="user-status"></span>
             </div>
             <div>
               <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
@@ -295,13 +356,11 @@
                     :alt="selectedChat.firstName"
                     @error="handleImageError($event)"
                   />
-                  <span class="user-status"></span>
                 </div>
                 <div>
                   <h3>
                     {{ selectedChat.firstName }} {{ selectedChat.lastName }}
                   </h3>
-                  <small>Online</small>
                 </div>
               </div>
               <div class="chat-header-right">
@@ -313,13 +372,30 @@
 
             <div class="chat-messages" ref="messageContainer">
               <div
-                v-for="message in selectedChatMessages"
-                :key="message.timestamp"
-                :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received']"
+                v-for="group in groupMessagesByDate(selectedChatMessages)"
+                :key="group.date"
               >
-                {{ message.message }}
-                <div class="timestamp">
-                  {{ formatTimestamp(message.timestamp) }}
+                <!-- Date separator -->
+                <div class="date-separator">
+                  <span class="date-label"
+                    >{{ formatDateForGroup(group.date) }}</span
+                  >
+                </div>
+
+                <!-- Messages for this date -->
+                <div
+                  v-for="message in group.messages"
+                  :key="message.timestamp"
+                  class="message-container"
+                >
+                  <div
+                    :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received']"
+                  >
+                    {{ message.message }}
+                    <div class="timestamp">
+                      {{ formatMessageTime(message.timestamp) }}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -374,6 +450,51 @@
         methods: {
           handleImageError(event) {
             event.target.src = "/api/placeholder/40/40"; // Fallback to placeholder
+          },
+
+          formatMessageTime(timestamp) {
+            if (!timestamp) return "";
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            });
+          },
+
+          formatDateForGroup(timestamp) {
+            if (!timestamp) return "";
+            const date = new Date(timestamp);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            if (date.toDateString() === today.toDateString()) {
+              return "Today";
+            } else if (date.toDateString() === yesterday.toDateString()) {
+              return "Yesterday";
+            } else {
+              return date.toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+              });
+            }
+          },
+
+          groupMessagesByDate(messages) {
+            const groups = {};
+            messages.forEach((message) => {
+              const date = new Date(message.timestamp);
+              const dateStr = date.toDateString();
+              if (!groups[dateStr]) {
+                groups[dateStr] = [];
+              }
+              groups[dateStr].push(message);
+            });
+            return Object.entries(groups).map(([date, messages]) => ({
+              date: new Date(date),
+              messages,
+            }));
           },
 
           async getUserDetails(userId) {
