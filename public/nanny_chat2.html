@@ -50,6 +50,14 @@
         border-right: 1px solid #eee;
         display: flex;
         flex-direction: column;
+        height: 100%;
+      }
+
+      /* Add a wrapper for the scrollable content */
+      .chat-list-scrollable {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
 
       .sidebar-header {
@@ -80,7 +88,7 @@
       .chat-preview {
         padding: 12px 15px;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 12px;
         cursor: pointer;
         transition: background-color 0.2s;
@@ -100,6 +108,27 @@
         height: 40px;
         border-radius: 50%;
         object-fit: cover;
+      }
+
+      .chat-preview-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .last-message {
+        color: #666;
+        font-size: 0.9em;
+        margin-top: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+      }
+
+      .chat-preview-time {
+        font-size: 0.75rem;
+        color: #666;
+        white-space: nowrap;
       }
 
       /* Main chat area styling */
@@ -414,77 +443,80 @@
             />
           </div>
 
-          <!-- Search Results -->
-          <div v-if="searchTerm.trim()" class="search-results">
-            <!-- Contacts Section -->
-            <div v-if="searchResults.contacts.length" class="search-section">
-              <div class="search-section-header">Chats</div>
-              <div
-                v-for="contact in searchResults.contacts"
-                :key="'contact-' + contact.userId"
-                class="chat-preview"
-                @click="selectChat(contact)"
-              >
-                <div class="user-avatar">
-                  <img
-                    :src="contact.profilePictureUrl"
-                    :alt="contact.firstName"
-                    @error="handleImageError($event)"
-                  />
+          <!-- Add wrapper for scrollable content -->
+          <div class="chat-list-scrollable">
+            <!-- Search Results -->
+            <div v-if="searchTerm.trim()" class="search-results">
+              <!-- Contacts Section -->
+              <div v-if="searchResults.contacts.length" class="search-section">
+                <div class="search-section-header">Chats</div>
+                <div
+                  v-for="contact in searchResults.contacts"
+                  :key="'contact-' + contact.userId"
+                  class="chat-preview"
+                  @click="selectChat(contact)"
+                >
+                  <div class="user-avatar">
+                    <img
+                      :src="contact.profilePictureUrl"
+                      :alt="contact.firstName"
+                      @error="handleImageError($event)"
+                    />
+                  </div>
+                  <div class="chat-preview-content">
+                    <h4 v-html="contact.highlightedName"></h4>
+                  </div>
                 </div>
-                <div class="chat-preview-content">
-                  <h4 v-html="contact.highlightedName"></h4>
+              </div>
+
+              <!-- Message Section -->
+              <div v-if="searchResults.messages.length" class="search-section">
+                <div class="search-section-header">Messages</div>
+                <div
+                  v-for="message in searchResults.messages"
+                  :key="'message-' + message.messageId"
+                  class="chat-preview"
+                  @click="scrollToMessage(message.messageId, message.userId)"
+                >
+                  <div class="user-avatar">
+                    <img
+                      :src="message.profilePictureUrl"
+                      :alt="message.firstName"
+                      @error="handleImageError($event)"
+                    />
+                  </div>
+                  <div class="chat-preview-content">
+                    <h4>{{ message.firstName }} {{ message.lastName }}</h4>
+                    <p
+                      class="message-preview"
+                      v-html="message.highlightedMessage"
+                    ></p>
+                    <small>{{ formatTimestamp(message.timestamp) }}</small>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Message Section -->
-            <div v-if="searchResults.messages.length" class="search-section">
-              <div class="search-section-header">Messages</div>
+            <!-- Regular Chat List -->
+            <div v-else>
               <div
-                v-for="message in searchResults.messages"
-                :key="'message-' + message.messageId"
-                class="chat-preview"
-                @click="scrollToMessage(message.messageId, message.userId)"
+                v-for="chat in sortedChats"
+                :key="chat.userId"
+                :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
+                @click="selectChat(chat)"
               >
                 <div class="user-avatar">
                   <img
-                    :src="message.profilePictureUrl"
-                    :alt="message.firstName"
+                    :src="chat.profilePictureUrl"
+                    :alt="chat.firstName"
                     @error="handleImageError($event)"
                   />
                 </div>
-                <div class="chat-preview-content">
-                  <h4>{{ message.firstName }} {{ message.lastName }}</h4>
-                  <p
-                    class="message-preview"
-                    v-html="message.highlightedMessage"
-                  ></p>
-                  <small>{{ formatTimestamp(message.timestamp) }}</small>
+                <div>
+                  <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
+                  <p class="last-message">{{ chat.lastMessage }}</p>
+                  <small>{{ formatTimestamp(chat.timestamp) }}</small>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Regular Chat List -->
-          <div v-else>
-            <div
-              v-for="chat in sortedChats"
-              :key="chat.userId"
-              :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
-              @click="selectChat(chat)"
-            >
-              <div class="user-avatar">
-                <img
-                  :src="chat.profilePictureUrl"
-                  :alt="chat.firstName"
-                  @error="handleImageError($event)"
-                />
-              </div>
-              <div>
-                <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
-                <p class="last-message">{{ chat.lastMessage }}</p>
-                <small>{{ formatTimestamp(chat.timestamp) }}</small>
               </div>
             </div>
           </div>
@@ -619,6 +651,45 @@
             event.target.src = "/api/placeholder/40/40"; // Fallback to placeholder
           },
 
+          // Chat time formatting
+          formatChatTime(timestamp) {
+            if (!timestamp) return "";
+
+            const date = new Date(timestamp);
+            const now = new Date();
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            // Check if it's today
+            if (date.toDateString() === now.toDateString()) {
+              return date.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true,
+              });
+            }
+
+            // Check if it's yesterday
+            if (date.toDateString() === yesterday.toDateString()) {
+              return "Yesterday";
+            }
+
+            // If it's this year, show date without year
+            if (date.getFullYear() === now.getFullYear()) {
+              return date.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              });
+            }
+
+            // If it's a different year, include the year
+            return date.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            });
+          },
+
           formatMessageTime(timestamp) {
             if (!timestamp) return "";
             const date = new Date(timestamp);
@@ -703,13 +774,27 @@
 
             this.unsubscribe = db
               .collection("CHATS")
-              .where("from_user_id", "==", this.currentUserId)
+              .orderBy("timestamp", "desc")
+              .where("from_user_id", "in", [this.currentUserId])
               .onSnapshot(async (snapshot) => {
                 const chatMap = new Map();
 
-                for (const doc of snapshot.docs) {
+                // Get received messages as well
+                const receivedSnapshot = await db
+                  .collection("CHATS")
+                  .orderBy("timestamp", "desc")
+                  .where("to_user_id", "==", this.currentUserId)
+                  .get();
+
+                // Process all messages
+                const allDocs = [...snapshot.docs, ...receivedSnapshot.docs];
+
+                for (const doc of allDocs) {
                   const data = doc.data();
-                  const otherUserId = data.to_user_id;
+                  const otherUserId =
+                    data.from_user_id === this.currentUserId
+                      ? data.to_user_id
+                      : data.from_user_id;
 
                   if (
                     !chatMap.has(otherUserId) ||
