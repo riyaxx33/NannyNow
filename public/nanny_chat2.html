@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Interface</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #6c5ce7;
+        height: 100vh;
+      }
+
+      .app-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        height: calc(100vh - 40px);
+        background-color: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .container {
+        display: flex;
+        height: 100%;
+      }
+
+      /* Sidebar styling */
+      .chat-list {
+        width: 280px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar-header {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .sidebar-icons {
+        display: flex;
+        padding: 15px;
+        gap: 15px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .sidebar-icons i {
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .sidebar-icons i:hover {
+        background-color: #f0f2f5;
+      }
+
+      .chat-preview {
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border-bottom: 1px solid #eee;
+      }
+
+      .chat-preview:hover {
+        background-color: #f0f2f5;
+      }
+
+      .chat-preview.active {
+        background-color: #e8eaf6;
+      }
+
+      .chat-preview img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      /* Main chat area styling */
+      .chat-details {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .chat-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: white;
+      }
+
+      .chat-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .chat-header-right {
+        display: flex;
+        gap: 20px;
+      }
+
+      .chat-header img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+
+      .chat-messages {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background-color: white;
+      }
+
+      .message {
+        max-width: 70%;
+        margin: 10px 0;
+        padding: 12px 16px;
+        border-radius: 12px;
+        position: relative;
+      }
+
+      .message.sent {
+        background-color: #6c5ce7;
+        color: white;
+        margin-left: auto;
+        border-bottom-right-radius: 4px;
+      }
+
+      .message.received {
+        background-color: #f0f2f5;
+        color: #1a1a1a;
+        border-bottom-left-radius: 4px;
+      }
+
+      .chat-input-container {
+        padding: 20px;
+        background-color: white;
+        border-top: 1px solid #eee;
+      }
+
+      .chat-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: #f0f2f5;
+        padding: 8px 15px;
+        border-radius: 24px;
+      }
+
+      .chat-input input {
+        flex-grow: 1;
+        border: none;
+        background: transparent;
+        padding: 8px;
+        outline: none;
+      }
+
+      .chat-input button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+      }
+
+      .search-bar {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .search-bar input {
+        width: 100%;
+        padding: 10px 15px;
+        border: none;
+        background-color: #f0f2f5;
+        border-radius: 20px;
+        outline: none;
+      }
+
+      .user-status {
+        width: 8px;
+        height: 8px;
+        background-color: #4caf50;
+        border-radius: 50%;
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+      }
+
+      .user-avatar {
+        position: relative;
+        width: 40px;
+        height: 40px;
+      }
+
+      .user-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+      }
+
+      .timestamp {
+        font-size: 0.75rem;
+        margin-top: 4px;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="app-container">
+      <div class="container">
+        <!-- Sidebar -->
+        <div class="chat-list">
+          <div class="sidebar-header">
+            <div class="user-avatar">
+              <img
+                :src="currentUserProfilePic"
+                alt="Current User"
+                @error="handleImageError($event)"
+              />
+              <span class="user-status"></span>
+            </div>
+            <h3>Messages</h3>
+          </div>
+
+          <div class="sidebar-icons">
+            <i data-lucide="message-square"></i>
+            <i data-lucide="users"></i>
+            <i data-lucide="grid"></i>
+            <i data-lucide="settings"></i>
+          </div>
+
+          <div class="search-bar">
+            <input type="text" placeholder="Search messages..." />
+          </div>
+
+          <div
+            v-for="chat in sortedChats"
+            :key="chat.userId"
+            :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
+            @click="selectChat(chat)"
+          >
+            <div class="user-avatar">
+              <img
+                :src="chat.profilePictureUrl"
+                :alt="chat.firstName"
+                @error="handleImageError($event)"
+              />
+              <span class="user-status"></span>
+            </div>
+            <div>
+              <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
+              <p class="last-message">{{ chat.lastMessage }}</p>
+              <small>{{ formatTimestamp(chat.timestamp) }}</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="chat-details">
+          <template v-if="selectedChat">
+            <div class="chat-header">
+              <div class="chat-header-left">
+                <div class="user-avatar">
+                  <img
+                    :src="selectedChat.profilePictureUrl"
+                    :alt="selectedChat.firstName"
+                    @error="handleImageError($event)"
+                  />
+                  <span class="user-status"></span>
+                </div>
+                <div>
+                  <h3>
+                    {{ selectedChat.firstName }} {{ selectedChat.lastName }}
+                  </h3>
+                  <small>Online</small>
+                </div>
+              </div>
+              <div class="chat-header-right">
+                <i data-lucide="video"></i>
+                <i data-lucide="phone"></i>
+                <i data-lucide="folder"></i>
+              </div>
+            </div>
+
+            <div class="chat-messages" ref="messageContainer">
+              <div
+                v-for="message in selectedChatMessages"
+                :key="message.timestamp"
+                :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received']"
+              >
+                {{ message.message }}
+                <div class="timestamp">
+                  {{ formatTimestamp(message.timestamp) }}
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-input-container">
+              <div class="chat-input">
+                <button><i data-lucide="plus"></i></button>
+                <input
+                  type="text"
+                  v-model="newMessage"
+                  @keyup.enter="sendMessage"
+                  placeholder="Type your message..."
+                />
+                <button><i data-lucide="smile"></i></button>
+                <button @click="sendMessage"><i data-lucide="send"></i></button>
+              </div>
+            </div>
+          </template>
+          <div v-else class="no-chat-selected">
+            <h2>Select a chat to start messaging</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Your existing scripts remain the same -->
+    <script type="module">
+      // Import necessary modules from Firebase
+      import { firebaseConfig } from "./backend/firebase-config.js";
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+
+      const app = Vue.createApp({
+        data() {
+          return {
+            currentUserId: null,
+            currentUserProfilePic: "/api/placeholder/40/40",
+            chats: [],
+            selectedChat: null,
+            selectedChatMessages: [],
+            newMessage: "",
+            unsubscribe: null,
+            messageUnsubscribe: null,
+          };
+        },
+        computed: {
+          sortedChats() {
+            return [...this.chats].sort((a, b) => b.timestamp - a.timestamp);
+          },
+        },
+        methods: {
+          handleImageError(event) {
+            event.target.src = "/api/placeholder/40/40"; // Fallback to placeholder
+          },
+
+          async getUserDetails(userId) {
+            try {
+              const userDoc = await db.collection("USER").doc(userId).get();
+              if (userDoc.exists) {
+                const userData = userDoc.data();
+                return {
+                  firstName: userData.firstName || "",
+                  lastName: userData.lastName || "",
+                  profilePictureUrl: userData.profilePictureUrl,
+                };
+              }
+              return {
+                firstName: "Unknown",
+                lastName: "User",
+                profilePictureUrl: "/api/placeholder/40/40",
+              };
+            } catch (error) {
+              console.error("Error fetching user details:", error);
+              return {
+                firstName: "Unknown",
+                lastName: "User",
+                profilePictureUrl: "/api/placeholder/40/40",
+              };
+            }
+          },
+          async initialize() {
+            // Get current user
+            const user = auth.currentUser;
+            if (!user) return;
+
+            this.currentUserId = user.uid;
+            // Get current user's details including profile picture
+            const currentUserDetails = await this.getUserDetails(
+              this.currentUserId
+            );
+            this.currentUserProfilePic = currentUserDetails.profilePictureUrl;
+
+            this.unsubscribe = db
+              .collection("CHATS")
+              .where("from_user_id", "==", this.currentUserId)
+              .onSnapshot(async (snapshot) => {
+                const chatMap = new Map();
+
+                for (const doc of snapshot.docs) {
+                  const data = doc.data();
+                  const otherUserId = data.to_user_id;
+
+                  if (
+                    !chatMap.has(otherUserId) ||
+                    chatMap.get(otherUserId).timestamp < data.timestamp
+                  ) {
+                    // Get user details from USER collection
+                    const userDetails = await this.getUserDetails(otherUserId);
+
+                    chatMap.set(otherUserId, {
+                      userId: otherUserId,
+                      firstName: userDetails.firstName,
+                      lastName: userDetails.lastName,
+                      profilePictureUrl: userDetails.profilePictureUrl,
+                      lastMessage: data.message,
+                      timestamp: data.timestamp,
+                    });
+                  }
+                }
+
+                this.chats = Array.from(chatMap.values());
+              });
+          },
+          async selectChat(chat) {
+            this.selectedChat = chat;
+            await this.loadChatMessages();
+          },
+          async loadChatMessages() {
+            if (!this.selectedChat) return;
+
+            // Clean up previous message listener if it exists
+            if (this.messageUnsubscribe) {
+              this.messageUnsubscribe();
+            }
+
+            // Set up real-time listener for messages
+            this.messageUnsubscribe = db
+              .collection("CHATS")
+              .where("from_user_id", "in", [
+                this.currentUserId,
+                this.selectedChat.userId,
+              ])
+              .where("to_user_id", "in", [
+                this.currentUserId,
+                this.selectedChat.userId,
+              ])
+              .orderBy("timestamp", "asc")
+              .onSnapshot((snapshot) => {
+                // Convert all timestamps to numbers for consistent comparison
+                this.selectedChatMessages = snapshot.docs
+                  .map((doc) => {
+                    const data = doc.data();
+                    const timestamp = data.timestamp?.seconds
+                      ? data.timestamp.seconds * 1000
+                      : typeof data.timestamp === "number"
+                      ? data.timestamp
+                      : Date.now();
+
+                    return {
+                      ...data,
+                      timestamp,
+                    };
+                  })
+                  .sort((a, b) => a.timestamp - b.timestamp);
+
+                // Scroll to bottom when new messages arrive
+                this.$nextTick(() => {
+                  const container = this.$refs.messageContainer;
+                  if (container) {
+                    container.scrollTop = container.scrollHeight;
+                  }
+                });
+              });
+          },
+
+          async sendMessage() {
+            if (!this.newMessage.trim() || !this.selectedChat) return;
+
+            // Add new message to database using server timestamp
+            await db.collection("CHATS").add({
+              from_user_id: this.currentUserId,
+              to_user_id: this.selectedChat.userId,
+              message: this.newMessage,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Use server timestamp
+            });
+
+            this.newMessage = "";
+            await this.loadChatMessages();
+          },
+
+          formatTimestamp(timestamp) {
+            if (!timestamp) return "Invalid Date";
+
+            // Convert to number if it's a Firestore timestamp
+            const timestampMs = timestamp?.seconds
+              ? timestamp.seconds * 1000
+              : timestamp;
+
+            return new Date(timestampMs).toLocaleString();
+          },
+        },
+        mounted() {
+          // Check if user is logged in
+          auth.onAuthStateChanged((user) => {
+            if (user) {
+              this.initialize();
+            } else {
+              // Redirect to login page or handle unauthorized access
+              console.log("User not logged in");
+            }
+          });
+        },
+        beforeUnmount() {
+          // Clean up listener
+          if (this.unsubscribe) {
+            this.unsubscribe();
+          }
+          if (this.messageUnsubscribe) {
+            this.messageUnsubscribe();
+          }
+        },
+      });
+
+      app.mount("#app");
+    </script>
+
+    <script type="module">
+      import { auth, db } from "./backend/firebase-config.js";
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+      import { logout } from "./backend/auth.js";
+
+      async function loadNavbar(user) {
+        let fileToLoad = "unloggedin_navbar_template.html";
+
+        if (user) {
+          try {
+            const userDoc = await getDoc(doc(db, "USER", user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              if (userData.role === "parent") {
+                fileToLoad = "parent_navbar_template.html";
+              } else if (userData.role === "nanny") {
+                fileToLoad = "nanny_navbar_template.html";
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching user role:", error);
+          }
+        }
+
+        try {
+          const response = await fetch(fileToLoad);
+          if (!response.ok) throw new Error("Network response was not ok");
+
+          const navbarHTML = await response.text();
+          document.getElementById("navbar").innerHTML = navbarHTML;
+
+          // Add event listener to logout link after navbar is loaded
+          const logoutLink = document.querySelector("#logoutBtn");
+          if (logoutLink) {
+            logoutLink.addEventListener("click", async (e) => {
+              e.preventDefault(); // Prevent the default link behavior
+              console.log("Logout clicked");
+              try {
+                await logout(); // The redirect is now handled in the logout function
+              } catch (error) {
+                console.error("Logout failed:", error);
+              }
+            });
+          } else {
+            console.log("Logout link not found");
+          }
+        } catch (error) {
+          console.error("Failed to load navbar:", error);
+        }
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        console.log("Auth state changed");
+        loadNavbar(user);
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // Initialize Lucide icons after the page loads
+      window.onload = function () {
+        lucide.createIcons();
+      };
+    </script>
+  </body>
+</html>
