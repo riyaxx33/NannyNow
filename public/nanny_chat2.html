@@ -492,7 +492,10 @@
             unsubscribe: null,
             messageUnsubscribe: null,
             searchTerm: "",
-            searchResults: [],
+            searchResults: {
+              contacts: [], // for name matches
+              messages: [], // for message content matches
+            },
             originalChats: [],
           };
         },
