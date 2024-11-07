@@ -266,6 +266,9 @@
 
         <p v-if="errorMessage" class="text-danger text-end">{{ errorMessage }}</p>
       </form>
+      <div v-if="errorMessage" class="alert alert-danger mt-3" role="alert">
+        {{ errorMessage }}
+      </div>
 
       <h3 class="mt-5" ref="postsSection">My Posted Jobs</h3>
 
@@ -497,7 +500,8 @@
                 return {
                   ...post,
                   formattedDate: this.formatDate(post.date),
-                  interestedNannies
+                  interestedNannies,
+                  status: post.completed ? false : post.status // Set status to false if completed
                 };
               }));
 
@@ -589,14 +593,27 @@
 
           async acceptNanny(nannyId) {
             try {
+              console.log(`Attempting to accept nanny ${nannyId} for post ${this.currentPostId}`);
+              
+              // Update the post in the database
               await updatePostData(this.currentPostId, {
                 nanny_id: nannyId,
                 completed: true
               });
+              
+              console.log(`Successfully updated post ${this.currentPostId} with nanny ${nannyId}`);
+              
+              // Close the modal
               this.closeInterestedNanniesModal();
+              
+              // Refresh the posts to reflect the changes
               await this.fetchPosts(auth.currentUser.uid);
+              
+              console.log(`Nanny ${nannyId} accepted for post ${this.currentPostId}`);
             } catch (error) {
               console.error("Error accepting nanny:", error);
+              // Set an error message to display to the user
+              this.errorMessage = `Failed to accept nanny: ${error.message}. Please try again.`;
             }
           },
         },
