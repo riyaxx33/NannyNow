@@ -1,6 +1,6 @@
 import {
   doc,
-  setDoc,
+  updateDoc,
   collection,
   getDocs,
   deleteDoc,
@@ -276,7 +276,10 @@ export async function updatePostData(postId, updatedData) {
         : undefined,
     };
 
-    await setDoc(postRef, dataToUpdate, { merge: true });
+    // Remove undefined fields to avoid errors
+    Object.keys(dataToUpdate).forEach(key => dataToUpdate[key] === undefined && delete dataToUpdate[key]);
+
+    await updateDoc(postRef, dataToUpdate);
     console.log("Post data updated successfully");
   } catch (error) {
     console.error("Error updating post data:", error);
