@@ -8,6 +8,11 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     />
+    <!-- Poppins font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-app-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-auth-compat.js"></script>
@@ -21,36 +26,46 @@
       }
 
       body {
-        font-family: "Segoe UI", sans-serif;
+        font-family: "Poppins", sans-serif;
         background-color: white;
-        padding: 15px 0;
-        height: 100vh;
+        padding-top: 50px; /* For navbar */
+        margin: 0;
+        min-height: 100vh;
       }
 
+      /* Main container styles */
       .app-container {
-        max-width: 1400px;
-        padding: 20px 0;
-        margin: 20px auto;
-        height: calc(100vh - 40px);
+        margin: 0 auto;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%; /* Take up full width */
+        max-width: 1400px; /* Maximum width to prevent stretching on very wide screens */
+        min-width: 800px; /* Minimum width to prevent squishing */
+        height: calc(100vh - 70px); /* Account for navbar and some padding */
+        margin: 12px auto; /* Center horizontally and add some vertical spacing */
         background-color: white;
         border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden; /* Keep children from spilling out */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Lighter shadow */
       }
 
-      .container {
+      .chat-container {
         display: flex;
+        min-height: 0;
         height: 100%;
+        width: 100%; /* Make container take full width */
       }
 
       /* Sidebar styling */
       .chat-list {
         width: 350px;
-        background-color: #f8f9fa;
-        border-right: 1px solid #eee;
+        background-color: white;
+        border-right: 1px solid #e9edef;
         display: flex;
         flex-direction: column;
-        height: 100%;
+        min-height: 0;
+        flex-shrink: 0;
       }
 
       /* Add a wrapper for the scrollable content */
@@ -60,40 +75,30 @@
         overflow-x: hidden;
       }
 
-      .sidebar-header {
-        padding: 20px;
-        border-bottom: 1px solid #eee;
+      /* Header styling */
+      .sidebar-header,
+      .chat-header {
+        height: 60px;
+        padding: 0 16px; /* Reduced padding */
+        background-color: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
         display: flex;
         align-items: center;
+      }
+
+      .sidebar-header {
         gap: 10px;
-        height: 60px;
-      }
-
-      .sidebar-icons {
-        display: flex;
-        padding: 15px;
-        gap: 15px;
-        border-bottom: 1px solid #eee;
-      }
-
-      .sidebar-icons i {
-        padding: 10px;
-        border-radius: 8px;
-        cursor: pointer;
-      }
-
-      .sidebar-icons i:hover {
-        background-color: #f0f2f5;
       }
 
       .chat-preview {
-        padding: 12px 15px;
+        padding: 8px 16px;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 12px;
         cursor: pointer;
         transition: background-color 0.2s;
         border-bottom: 1px solid #eee;
+        height: 72px;
       }
 
       .chat-preview:hover {
@@ -146,19 +151,16 @@
 
       /* Main chat area styling */
       .chat-details {
-        flex-grow: 1;
+        flex: 1;
         display: flex;
         flex-direction: column;
+        min-height: 0;
+        background-color: white;
+        min-width: 0;
       }
 
       .chat-header {
-        padding: 15px 20px;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        align-items: center;
         justify-content: space-between;
-        background-color: white;
-        height: 60px;
       }
 
       .chat-header-left {
@@ -179,10 +181,13 @@
       }
 
       .chat-messages {
-        flex-grow: 1;
+        flex: 1;
         padding: 20px;
         overflow-y: auto;
-        background-color: #f0f2f5;
+        background-color: #f2ebfb;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Cg fill='%23dcdcdc' fill-opacity='0.15'%3E%3Cpath d='M45 45c-4 0-8 4-8 8s4 8 8 8 8-4 8-8-4-8-8-8zm160 0c-4 0-8 4-8 8s4 8 8 8 8-4 8-8-4-8-8-8z'/%3E%3Cpath d='M75 95l10-10h20l10 10v20l-10 10H85l-10-10z'/%3E%3Cpath d='M180 80c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M220 120h20v20h-20z' transform='rotate(45 230 130)'/%3E%3Cpath d='M280 95c0-8.3 6.7-15 15-15s15 6.7 15 15-6.7 15-15 15-15-6.7-15-15z'/%3E%3Cpath d='M95 180l-15 15 15 15 15-15z'/%3E%3Cpath d='M150 190l10 10-10 10-10-10zM240 180h30v30h-30z'/%3E%3Cpath d='M50 280l20-20 20 20-20 20z'/%3E%3Cpath d='M160 250c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20z'/%3E%3Cpath d='M260 260h20v20h-20zM50 350h25v25H50z'/%3E%3Cpath d='M150 360l15-15 15 15-15 15z'/%3E%3Cpath d='M240 340c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M80 420c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20zM180 440l10-10h20l10 10v20l-10 10h-20l-10-10z'/%3E%3Cpath d='M260 420h30v30h-30zM40 500c-6.6 0-12 5.4-12 12s5.4 12 12 12 12-5.4 12-12-5.4-12-12-12z'/%3E%3Cpath d='M135 500l25 25-25 25-25-25zM260 510h20v20h-20z'/%3E%3C/g%3E%3Cg fill='%23dcdcdc' fill-opacity='0.15'%3E%3Cpath d='M435 65c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM520 45l15 15-15 15-15-15zM460 150c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M500 180h30v30h-30zM420 260l20-20 20 20-20 20z'/%3E%3Cpath d='M530 250c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20z'/%3E%3Cpath d='M450 350h25v25h-25zM520 360l15-15 15 15-15 15z'/%3E%3Cpath d='M440 420c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M520 440l10-10h20l10 10v20l-10 10h-20l-10-10z'/%3E%3Cpath d='M440 500c-6.6 0-12 5.4-12 12s5.4 12 12 12 12-5.4 12-12-5.4-12-12-12z'/%3E%3Cpath d='M535 500l25 25-25 25-25-25z'/%3E%3C/g%3E%3Cpath d='M120 120c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12zm240 240c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12z' fill='%23dcdcdc' fill-opacity='0.15'/%3E%3Cpath d='M340 340c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12zm-240 240c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12z' fill='%23dcdcdc' fill-opacity='0.15'/%3E%3Cg fill='none' stroke='%23dcdcdc' stroke-width='2' stroke-opacity='0.15'%3E%3Cpath d='M310 70l20 20m-20 0l20-20M90 290l20 20m-20 0l20-20M510 290l20 20m-20 0l20-20'/%3E%3C/g%3E%3Cpath fill='%23dcdcdc' fill-opacity='0.15' d='M310 370h20v20h-20zM110 570h20v20h-20zM510 570h20v20h-20z'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: 300px 300px;
       }
 
       .message {
@@ -239,7 +244,7 @@
       }
 
       .chat-input-container {
-        padding: 20px;
+        padding: 10px 20px;
         background-color: white;
         border-top: 1px solid #eee;
       }
@@ -250,14 +255,13 @@
         gap: 8px;
         background-color: white;
         border: 1px solid #e0e0e0;
-        padding: 8px 15px;
-        border-radius: 24px;
+        padding: 8px 12px;
+        border-radius: 8px;
       }
 
       .chat-input input {
-        flex-grow: 1;
+        flex: 1;
         border: none;
-        background: transparent;
         padding: 8px;
         outline: none;
         font-size: 15px;
@@ -294,21 +298,30 @@
 
       .search-bar {
         position: relative;
-        padding: 15px;
+        padding: 8px 16px;
         border-bottom: 1px solid #eee;
       }
 
       .search-bar input {
         width: 100%;
-        padding: 10px 15px;
-        padding-left: 40px;
+        padding: 8px 15px 8px 40px;
         border: none;
         background-color: #f0f2f5;
-        border-radius: 20px;
+        border-radius: 8px;
         outline: none;
         font-size: 14px;
+        transition: all 0.2s ease;
       }
 
+      /* Add focus state effects */
+      .search-bar input:focus {
+        background-color: white;
+        box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2); /* Subtle purple glow */
+        border-radius: 8px 8px 0 0; /* Flatten bottom corners when focused */
+        border-bottom: 2px solid #6c5ce7; /* Purple underline */
+      }
+
+      /* Search icon positioning */
       .search-bar::before {
         content: "";
         position: absolute;
@@ -321,6 +334,12 @@
         background-size: contain;
         background-repeat: no-repeat;
         opacity: 0.5;
+        pointer-events: none; /* Ensure icon doesn't interfere with input */
+      }
+
+      /* Make search bar icon color match input state */
+      .search-bar input:focus + .search-bar::before {
+        opacity: 0.7;
       }
 
       /* Search Results Styling */
@@ -427,6 +446,22 @@
         font-size: 0.85rem;
         display: inline-block;
       }
+
+      /* Media query for responsiveness */
+      @media (max-width: 1200px) {
+        .app-container {
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .app-container {
+          width: 100%;
+          height: calc(100vh - 50px);
+          margin: 0;
+          border-radius: 0;
+        }
+      }
     </style>
   </head>
   <body>
@@ -434,17 +469,10 @@
       <div id="navbar"></div>
     </header>
     <div id="app" class="app-container">
-      <div class="container">
+      <div class="chat-container">
         <!-- Sidebar -->
         <div class="chat-list">
           <div class="sidebar-header">
-            <div class="user-avatar">
-              <img
-                :src="currentUserProfilePic"
-                alt="Current User"
-                @error="handleImageError($event)"
-              />
-            </div>
             <h3>Chats</h3>
           </div>
 
