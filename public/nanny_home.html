@@ -191,18 +191,17 @@
       }
 
       #jobSearch {
-        height: 45px;
-        border-radius: 6px;
-        padding: 0 15px;
-        border: 1px solid var(--card-border);
-        width: 100%;
-        font-family: "Poppins", sans-serif;
+          height: 45px;
+          border-radius: 6px;
+          padding: 0 15px;
+          border: 1px solid var(--card-border);
+          width: 100%;
       }
 
       #jobSearch:focus {
-        border-color: var(--linkedin-blue);
-        outline: none;
-        box-shadow: 0 0 0 1px var(--linkedin-blue);
+          outline: none;
+          border-color: var(--linkedin-blue);
+          box-shadow: 0 0 0 1px var(--linkedin-blue);
       }
 
       /* Updated compact styles for parent info and children sections */
@@ -292,11 +291,26 @@
       }
 
       .profile-header img {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        object-fit: cover;
-        flex-shrink: 0;
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          object-fit: cover;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .profile-header a {
+          text-decoration: none;
+          cursor: pointer;
+      }
+
+      .profile-header a:hover img {
+          transform: scale(1.05);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .profile-info-wrapper {
+          display: flex;
+          justify-content: space-between;
+          flex-grow: 1;
       }
 
       .profile-info {
@@ -446,6 +460,8 @@
       #jobDescriptionContainer::-webkit-scrollbar {
         display: none;
       }
+
+
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
   </head>
@@ -532,39 +548,35 @@
         <!-- Job Details Section -->
         <div class="col-md-6" id="detailsContainer">
           <div class="profile-header">
-            <img
-              id="profilePicture"
-              src="/api/placeholder/80/80"
-              alt="Profile Picture"
-            />
-            <div class="profile-info-wrapper">
-              <div class="profile-info">
-                <h4 id="nannyName">Select a post to view details</h4>
-                <span id="profileSubtext" class="profile-subtext"></span>
+              <a href="#" style="text-decoration: none;">
+                  <img id="profilePicture" src="/api/placeholder/80/80" alt="Profile Picture" />
+              </a>
+              <div class="profile-info-wrapper">
+                  <div class="profile-info">
+                      <h4 id="nannyName">Select a post to view details</h4>
+                      <span id="profileSubtext" class="profile-subtext"></span>
+                  </div>
+                  <div class="chat-button-container">
+                      <button id="chatButton" class="chat-button" disabled>
+                          Chat Now
+                      </button>
+                      <button id="requestButton" class="chat-button" disabled>
+                          Send Request
+                      </button>
+                  </div>
               </div>
-              <div class="chat-button-container">
-                <button id="chatButton" class="chat-button" disabled>
-                  Chat Now
-                </button>
-                <button id="requestButton" class="chat-button" disabled>
-                  Send Request
-                </button>
-              </div>
-            </div>
           </div>
 
           <div class="parent-info" id="jobDetails">
-            <!-- Parent details will be inserted here -->
+              <!-- Parent details will be inserted here -->
           </div>
 
           <div id="jobDescriptionContainer">
-            <div id="jobDescription">
-              <!-- Job description and about me will be inserted here -->
-            </div>
+              <div id="jobDescription">
+                  <!-- Job description and about me will be inserted here -->
+              </div>
           </div>
         </div>
-      </div>
-    </div>
 
     <!-- API KEY -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5BjPBxo5PwTs6N2PAT0YCUvT66CIQuxw&libraries=places"></script>
@@ -992,10 +1004,6 @@
           jobListContainer.appendChild(jobCard);
         });
 
-        // If there are filtered posts, show details of the first one
-        if (posts.length > 0) {
-          showDetails(posts[0].postData.userId, posts[0].postDoc.id); // Accessing the first postDoc
-        }
       }
 
       // Function to calculate age from DOB
@@ -1183,68 +1191,69 @@
 
       // Function to show details when a card is clicked
       async function showDetails(userId, postId) {
-        try {
-          const parentDoc = await getDoc(doc(db, "USER", userId));
-          const parentData = parentDoc.exists() ? parentDoc.data() : null;
+    try {
+        const parentDoc = await getDoc(doc(db, "USER", userId));
+        const parentData = parentDoc.exists() ? parentDoc.data() : null;  // Fixed this line (was parentData.data())
 
-          const postDoc = await getDoc(doc(db, "POSTS", postId));
-          const postData = postDoc.exists() ? postDoc.data() : null;
+        const postDoc = await getDoc(doc(db, "POSTS", postId));
+        const postData = postDoc.exists() ? postDoc.data() : null;
 
-          const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
-          const parentDetails = parentDetailsDoc.exists()
-            ? parentDetailsDoc.data()
-            : null;
+        const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
+        const parentDetails = parentDetailsDoc.exists() ? parentDetailsDoc.data() : null;
 
-          if (parentData && postData && parentDetails) {
-            // Update profile picture and name
-            document.getElementById("profilePicture").src =
-              parentData.profilePictureUrl || "/api/placeholder/80/80";
-            document.getElementById(
-              "nannyName"
-            ).innerHTML = `${parentData.firstName} ${parentData.lastName}`;
-            const { age, gender } = calculateAge(
-              parentData.dob,
-              parentData.gender
-            );
-            document.getElementById(
-              "profileSubtext"
-            ).innerHTML = `${gender} | ${age} years old`;
+        if (parentData && postData && parentDetails) {
+        // Update profile picture and make it clickable
+        const profileImg = document.getElementById("profilePicture");
+        if (profileImg) {
+            profileImg.src = parentData.profilePictureUrl || "/api/placeholder/80/80";
+            profileImg.parentElement.href = `nanny_displayparentprofile.html?id=${userId}`;
+        }
+
+        document.getElementById(
+            "nannyName"
+        ).innerHTML = `${parentData.firstName} ${parentData.lastName}`;
+        const { age, gender } = calculateAge(
+            parentData.dob,
+            parentData.gender
+        );
+        document.getElementById(
+            "profileSubtext"
+        ).innerHTML = `${gender} | ${age} years old`;
 
             // Update parent details
             let detailsHTML = `<h5>About:</h5>
-        <p>${parentDetails.aboutMe || "No information provided"}</p>`;
+                <p>${parentDetails.aboutMe || "No information provided"}</p>`;
 
             // Add children information
             if (parentDetails.children && parentDetails.children.length > 0) {
-              detailsHTML += `
-          <div class="children-section">
-            <div class="children-title">Children:</div>
-            <div class="children-container">
-              ${parentDetails.children
-                .map(
-                  (child, index) => `
-                <div class="child-card">
-                  <div class="child-name">${child.name}</div>
-                  <div class="child-age">${child.age} years old</div>
-                </div>
-              `
-                )
-                .join("")}
-            </div>
-          </div>
-        `;
+                detailsHTML += `
+                    <div class="children-section">
+                        <div class="children-title">Children:</div>
+                        <div class="children-container">
+                            ${parentDetails.children
+                                .map(child => `
+                                    <div class="child-card">
+                                        <div class="child-name">${child.name}</div>
+                                        <div class="child-age">${child.age} years old</div>
+                                    </div>
+                                `)
+                                .join("")}
+                        </div>
+                    </div>
+                `;
             }
 
             document.getElementById("jobDetails").innerHTML = detailsHTML;
 
             // Update description section
             let descriptionHTML = `
-        <h5>Job Description:</h5>
-        <p>${postData.description}</p>
-      `;
+                <h5>Job Description:</h5>
+                <p>${postData.description}</p>
+            `;
 
-            document.getElementById("jobDescription").innerHTML =
-              descriptionHTML;
+            document.getElementById("jobDescription").innerHTML = descriptionHTML;
+
+ 
 
             // Initialize chat button
             initializeChatButton(auth.currentUser?.uid, userId);

@@ -306,7 +306,7 @@
                 {{ getStatusLabel(post) }}
               </span>
             </div>
-            <span v-if="post.interestedNannies && post.interestedNannies.length > 0" 
+            <span v-if="post.interestedNannies && post.interestedNannies.length > 0 && post.status && !post.completed" 
                   @click="openInterestedNanniesModal(post)"
                   style="text-decoration: underline; color: blue; cursor: pointer;">
               View interested Nannies({{ post.interestedNannies.length }})
@@ -401,10 +401,8 @@
           filteredPosts() {
             return this.posts.filter(post => {
               if (this.activeTab === 'active') {
-                // Show both upcoming and active jobs
                 return post.status === true;
               } else {
-                // Show both expired and completed jobs
                 return post.status === false;
               }
             });
@@ -412,10 +410,9 @@
         },
         methods: {
           formatDate(date) {
-            // Handle the YYYY-MM-DD string format directly
             if (date && typeof date === 'string') {
               const [year, month, day] = date.split('-');
-              return `${day}/${month}/${year}`; // Convert to DD/MM/YYYY for display
+              return `${day}/${month}/${year}`;
             }
             return "";
           },
@@ -545,18 +542,15 @@
           },
 
           editPost(post) {
-            // Set the editing state
             this.editingPostId = post.id;
             
-            // Populate form with post data
             this.date = post.date;
             this.pay = post.pay;
-            this.payNegotiation = String(post.payNegotiation); // Convert boolean to string for select
+            this.payNegotiation = String(post.payNegotiation);
             this.startTime = post.startTime;
             this.endTime = post.endTime;
             this.request = post.description;
 
-            // Scroll to form
             this.scrollToTop();
           },
 
@@ -570,12 +564,11 @@
           getStatusLabel(post) {
             if (!post.status && !post.completed) return 'Expired';
             if (!post.status && post.completed) return 'Completed';
-            if (post.status && !post.completed) return 'Active';
+            if (post.status && !post.completed) return 'Available';
             return 'Upcoming';
           },
 
           canEditPost(post) {
-            // Only allow editing of active posts
             return post.status === true && !post.completed;
           },
 
@@ -595,7 +588,6 @@
             try {
               console.log(`Attempting to accept nanny ${nannyId} for post ${this.currentPostId}`);
               
-              // Update the post in the database
               await updatePostData(this.currentPostId, {
                 nanny_id: nannyId,
                 completed: true
@@ -603,16 +595,13 @@
               
               console.log(`Successfully updated post ${this.currentPostId} with nanny ${nannyId}`);
               
-              // Close the modal
               this.closeInterestedNanniesModal();
               
-              // Refresh the posts to reflect the changes
               await this.fetchPosts(auth.currentUser.uid);
               
               console.log(`Nanny ${nannyId} accepted for post ${this.currentPostId}`);
             } catch (error) {
               console.error("Error accepting nanny:", error);
-              // Set an error message to display to the user
               this.errorMessage = `Failed to accept nanny: ${error.message}. Please try again.`;
             }
           },
