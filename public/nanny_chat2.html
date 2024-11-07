@@ -244,6 +244,7 @@
       }
 
       .search-bar {
+        position: relative;
         padding: 15px;
         border-bottom: 1px solid #eee;
       }
@@ -251,10 +252,26 @@
       .search-bar input {
         width: 100%;
         padding: 10px 15px;
+        padding-left: 40px;
         border: none;
         background-color: #f0f2f5;
         border-radius: 20px;
         outline: none;
+        font-size: 14px;
+      }
+
+      .search-bar::before {
+        content: "";
+        position: absolute;
+        left: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+        opacity: 0.5;
       }
 
       .user-avatar {
@@ -345,7 +362,12 @@
           </div> -->
 
           <div class="search-bar">
-            <input type="text" placeholder="Search messages..." />
+            <input
+              type="text"
+              v-model="searchTerm"
+              @input="handleSearch"
+              placeholder="Search messages..."
+            />
           </div>
 
           <div
@@ -469,17 +491,30 @@
             newMessage: "",
             unsubscribe: null,
             messageUnsubscribe: null,
+            searchTerm: "",
+            searchResults: [],
+            originalChats: [],
           };
         },
+
         computed: {
           sortedChats() {
-            return [...this.chats].sort((a, b) => b.timestamp - a.timestamp);
+            const chatsToSort = this.searchTerm
+              ? this.searchResults
+              : this.chats;
+            return [...chatsToSort].sort((a, b) => b.timestamp - a.timestamp);
           },
 
           canSendMessage() {
             return this.newMessage.trim().length > 0;
           },
         },
+
+        // Add debounce to prevent too many searches
+        created() {
+          this.handleSearch = _.debounce(this.handleSearch, 300);
+        },
+
         methods: {
           handleImageError(event) {
             event.target.src = "/api/placeholder/40/40"; // Fallback to placeholder
@@ -596,6 +631,7 @@
                 }
 
                 this.chats = Array.from(chatMap.values());
+                this.originalChats = [...this.chats];
               });
           },
           async selectChat(chat) {
@@ -674,6 +710,88 @@
               : timestamp;
 
             return new Date(timestampMs).toLocaleString();
+          },
+
+          async handleSearch() {
+            if (!this.searchTerm.trim()) {
+              this.searchResults = [];
+              return;
+            }
+
+            const searchTermLower = this.searchTerm.toLowerCase();
+            const searchPromises = [];
+            const results = new Map();
+
+            // Search through existing chats for parent names
+            this.chats.forEach((chat) => {
+              const fullName =
+                `${chat.firstName} ${chat.lastName}`.toLowerCase();
+              if (fullName.includes(searchTermLower)) {
+                results.set(chat.userId, chat);
+              }
+            });
+
+            // Search through messages
+            const messageQuery = db
+              .collection("CHATS")
+              .where("from_user_id", "in", [this.currentUserId])
+              .get();
+
+            const messageQuery2 = db
+              .collection("CHATS")
+              .where("to_user_id", "in", [this.currentUserId])
+              .get();
+
+            // Wait for both queries to complete
+            const [sentMessages, receivedMessages] = await Promise.all([
+              messageQuery,
+              messageQuery2,
+            ]);
+
+            // Process sent messages
+            for (const doc of sentMessages.docs) {
+              const messageData = doc.data();
+              if (messageData.message.toLowerCase().includes(searchTermLower)) {
+                // If message matches, get user details if not already in results
+                if (!results.has(messageData.to_user_id)) {
+                  const userDetails = await this.getUserDetails(
+                    messageData.to_user_id
+                  );
+                  results.set(messageData.to_user_id, {
+                    userId: messageData.to_user_id,
+                    firstName: userDetails.firstName,
+                    lastName: userDetails.lastName,
+                    profilePictureUrl: userDetails.profilePictureUrl,
+                    lastMessage: messageData.message,
+                    timestamp: messageData.timestamp,
+                  });
+                }
+              }
+            }
+
+            // Process received messages
+            for (const doc of receivedMessages.docs) {
+              const messageData = doc.data();
+              if (messageData.message.toLowerCase().includes(searchTermLower)) {
+                // If message matches, get user details if not already in results
+                if (!results.has(messageData.from_user_id)) {
+                  const userDetails = await this.getUserDetails(
+                    messageData.from_user_id
+                  );
+                  results.set(messageData.from_user_id, {
+                    userId: messageData.from_user_id,
+                    firstName: userDetails.firstName,
+                    lastName: userDetails.lastName,
+                    profilePictureUrl: userDetails.profilePictureUrl,
+                    lastMessage: messageData.message,
+                    timestamp: messageData.timestamp,
+                  });
+                }
+              }
+            }
+
+            // Convert results Map to array
+            this.searchResults = Array.from(results.values());
           },
         },
         mounted() {
