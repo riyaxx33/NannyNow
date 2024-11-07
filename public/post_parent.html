@@ -306,6 +306,15 @@
                 {{ getStatusLabel(post) }}
               </span>
             </div>
+            <div v-if="post.completed" class="d-flex align-items-center gap-2">
+              <div class="rounded-circle bg-gray-200 p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </div>
+              <div class="d-flex flex-column">
+                <span class="text-gray-500" style="font-size: 0.875rem;">Nanny</span>
+                <span class="text-gray-700">{{ post.nannyName }}</span>
+              </div>
+            </div>
             <span v-if="post.interestedNannies && post.interestedNannies.length > 0 && post.status && !post.completed && getStatusLabel(post) === 'Available'" 
                   @click="openInterestedNanniesModal(post)"
                   style="text-decoration: underline; color: blue; cursor: pointer;">
@@ -496,10 +505,19 @@
               const postsData = await fetchPosts(userId);
               this.posts = await Promise.all(postsData.map(async (post) => {
                 const interestedNannies = await this.fetchInterestedNannies(post.interestedNannies);
+                let nannyName = '';
+                if (post.completed && post.nanny_id) {
+                  const nannyDoc = await getDoc(doc(db, "USER", post.nanny_id));
+                  if (nannyDoc.exists()) {
+                    const nannyData = nannyDoc.data();
+                    nannyName = `${nannyData.firstName} ${nannyData.lastName}`;
+                  }
+                }
                 return {
                   ...post,
                   formattedDate: this.formatDate(post.date),
-                  interestedNannies
+                  interestedNannies,
+                  nannyName
                 };
               }));
 
@@ -608,6 +626,7 @@
               this.errorMessage = `Failed to accept nanny: ${error.message}. Please try again.`;
             }
           },
+          
         },
         mounted() {
           onAuthStateChanged(auth, async (user) => {
