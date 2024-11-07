@@ -110,19 +110,31 @@
         object-fit: cover;
       }
 
+      .chat-preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+
+      .chat-preview-header h4 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
       .chat-preview-content {
         flex: 1;
         min-width: 0;
+        margin-right: 8px;
       }
 
       .last-message {
         color: #666;
-        font-size: 0.9em;
-        margin-top: 4px;
+        font-size: 0.875em;
+        margin: 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 250px;
       }
 
       .chat-preview-time {
@@ -464,7 +476,13 @@
                     />
                   </div>
                   <div class="chat-preview-content">
-                    <h4 v-html="contact.highlightedName"></h4>
+                    <div class="chat-preview-header">
+                      <h4>{{ contact.firstName }} {{ contact.lastName }}</h4>
+                      <span class="chat-preview-time"
+                        >{{ formatChatTime(contact.timestamp) }}</span
+                      >
+                    </div>
+                    <p class="last-message">{{ contact.lastMessage }}</p>
                   </div>
                 </div>
               </div>
@@ -486,12 +504,16 @@
                     />
                   </div>
                   <div class="chat-preview-content">
-                    <h4>{{ message.firstName }} {{ message.lastName }}</h4>
+                    <div class="chat-preview-header">
+                      <h4>{{ message.firstName }} {{ message.lastName }}</h4>
+                      <span class="chat-preview-time"
+                        >{{ formatChatTime(message.timestamp) }}</span
+                      >
+                    </div>
                     <p
                       class="message-preview"
                       v-html="message.highlightedMessage"
                     ></p>
-                    <small>{{ formatTimestamp(message.timestamp) }}</small>
                   </div>
                 </div>
               </div>
@@ -512,10 +534,14 @@
                     @error="handleImageError($event)"
                   />
                 </div>
-                <div>
-                  <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
+                <div class="chat-preview-content">
+                  <div class="chat-preview-header">
+                    <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
+                    <span class="chat-preview-time"
+                      >{{ formatChatTime(chat.timestamp) }}</span
+                    >
+                  </div>
                   <p class="last-message">{{ chat.lastMessage }}</p>
-                  <small>{{ formatTimestamp(chat.timestamp) }}</small>
                 </div>
               </div>
             </div>
@@ -655,35 +681,45 @@
           formatChatTime(timestamp) {
             if (!timestamp) return "";
 
-            const date = new Date(timestamp);
+            // Convert Firebase timestamp to milliseconds if needed
+            const messageTime = timestamp?.seconds
+              ? new Date(timestamp.seconds * 1000)
+              : new Date(timestamp);
             const now = new Date();
+
+            // Set up yesterday date for comparison
             const yesterday = new Date(now);
             yesterday.setDate(yesterday.getDate() - 1);
 
-            // Check if it's today
-            if (date.toDateString() === now.toDateString()) {
-              return date.toLocaleTimeString("en-US", {
+            // Format the dates for comparison
+            const messageDate = messageTime.toDateString();
+            const todayDate = now.toDateString();
+            const yesterdayDate = yesterday.toDateString();
+
+            // Today: show time only
+            if (messageDate === todayDate) {
+              return messageTime.toLocaleTimeString("en-US", {
                 hour: "numeric",
                 minute: "2-digit",
                 hour12: true,
               });
             }
 
-            // Check if it's yesterday
-            if (date.toDateString() === yesterday.toDateString()) {
+            // Yesterday: show "Yesterday"
+            if (messageDate === yesterdayDate) {
               return "Yesterday";
             }
 
-            // If it's this year, show date without year
-            if (date.getFullYear() === now.getFullYear()) {
-              return date.toLocaleDateString("en-US", {
+            // This year: show date without year
+            if (messageTime.getFullYear() === now.getFullYear()) {
+              return messageTime.toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
               });
             }
 
-            // If it's a different year, include the year
-            return date.toLocaleDateString("en-US", {
+            // Different year: show date with year
+            return messageTime.toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
               year: "numeric",
