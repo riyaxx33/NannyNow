@@ -14,10 +14,9 @@
     />
     <style>
       body {
-        margin: 0;
-        padding-top: 70px; /* Height of navbar */
         font-family: "Poppins", sans-serif;
       }
+
       #jobSearch::placeholder {
         font-family: "Poppins", sans-serif;
       }
@@ -82,7 +81,7 @@
 
       .search-container {
         position: relative;
-        padding: 20px 0;
+        padding: 0;
         margin: 0;
         z-index: 1020; /* Below navbar but above other content */
         background-color: rgba(255, 255, 255, 0.9);
@@ -386,7 +385,7 @@
         flex-grow: 1;
       }
 
-      /* Navbar styles */
+      /* Navbar styles 
       .navbar {
         z-index: 1030;
         position: fixed;
@@ -394,6 +393,7 @@
         width: 100%;
         background-color: rgba(255, 255, 255, 0.9) !important;
       }
+      */
 
       /* Content row */
       .row {
@@ -411,7 +411,7 @@
 
       /* Main container styles */
       .container {
-        max-width: 1200px;
+        /* max-width: 1200px; */
         width: 100%;
         padding-right: 15px;
         padding-left: 15px;
@@ -466,7 +466,9 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
   </head>
   <body>
-    <div id="navbar"></div>
+    <header>
+      <div id="navbar"></div>
+    </header>
 
     <div class="container" style="margin-top: 100px; padding: 0">
       <div class="search-container">
@@ -1129,6 +1131,12 @@
 
           for (const postDoc of postsSnapshot.docs) {
             const postData = postDoc.data();
+
+            // Skip posts where status is false or completed is true
+            if (!postData.status || postData.completed) {
+              continue;
+            }
+
             const userId = postData.userId;
 
             // Store the post ID from Firestore
