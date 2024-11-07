@@ -154,6 +154,7 @@
         word-wrap: break-word;
         width: fit-content; /* This makes the bubble fit the content */
         line-height: 1.4; /* Add line height for better text spacing */
+        transition: background-color 0.3s ease;
       }
 
       .message.sent {
@@ -179,6 +180,11 @@
 
       .message.received .timestamp {
         color: rgba(0, 0, 0, 0.5);
+      }
+
+      /* Animation for highlighted message */
+      .message.highlighted {
+        animation: highlight-fade 2s ease-out;
       }
 
       .message-container {
@@ -274,6 +280,51 @@
         opacity: 0.5;
       }
 
+      /* Search Results Styling */
+      .search-section {
+        padding-bottom: 10px;
+      }
+
+      .search-section-header {
+        padding: 10px 15px;
+        font-weight: 600;
+        color: #666;
+        background-color: #f8f9fa;
+        font-size: 13px;
+        text-transform: uppercase;
+      }
+
+      /* Highlight styling */
+      mark {
+        background-color: #fff3cd;
+        padding: 0 2px;
+        border-radius: 2px;
+      }
+
+      /* Message preview in search results */
+      .message-preview {
+        color: #666;
+        font-size: 0.9em;
+        margin-top: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* Animation for highlighted message */
+      .highlighted {
+        animation: highlight-fade 2s ease-out;
+      }
+
+      @keyframes highlight-fade {
+        0% {
+          background-color: #fff3cd;
+        }
+        100% {
+          background-color: transparent;
+        }
+      }
+
       .user-avatar {
         position: relative;
         width: 48px; /* Increase size and make width/height equal */
@@ -351,42 +402,90 @@
                 @error="handleImageError($event)"
               />
             </div>
-            <h3>Messages</h3>
+            <h3>Chats</h3>
           </div>
-
-          <!-- <div class="sidebar-icons">
-            <i data-lucide="message-square"></i>
-            <i data-lucide="users"></i>
-            <i data-lucide="grid"></i>
-            <i data-lucide="settings"></i>
-          </div> -->
 
           <div class="search-bar">
             <input
               type="text"
               v-model="searchTerm"
               @input="handleSearch"
-              placeholder="Search messages..."
+              placeholder="Search..."
             />
           </div>
 
-          <div
-            v-for="chat in sortedChats"
-            :key="chat.userId"
-            :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
-            @click="selectChat(chat)"
-          >
-            <div class="user-avatar">
-              <img
-                :src="chat.profilePictureUrl"
-                :alt="chat.firstName"
-                @error="handleImageError($event)"
-              />
+          <!-- Search Results -->
+          <div v-if="searchTerm.trim()" class="search-results">
+            <!-- Contacts Section -->
+            <div v-if="searchResults.contacts.length" class="search-section">
+              <div class="search-section-header">Chats</div>
+              <div
+                v-for="contact in searchResults.contacts"
+                :key="'contact-' + contact.userId"
+                class="chat-preview"
+                @click="selectChat(contact)"
+              >
+                <div class="user-avatar">
+                  <img
+                    :src="contact.profilePictureUrl"
+                    :alt="contact.firstName"
+                    @error="handleImageError($event)"
+                  />
+                </div>
+                <div class="chat-preview-content">
+                  <h4 v-html="contact.highlightedName"></h4>
+                </div>
+              </div>
             </div>
-            <div>
-              <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
-              <p class="last-message">{{ chat.lastMessage }}</p>
-              <small>{{ formatTimestamp(chat.timestamp) }}</small>
+
+            <!-- Message Section -->
+            <div v-if="searchResults.messages.length" class="search-section">
+              <div class="search-section-header">Messages</div>
+              <div
+                v-for="message in searchResults.messages"
+                :key="'message-' + message.messageId"
+                class="chat-preview"
+                @click="scrollToMessage(message.messageId, message.userId)"
+              >
+                <div class="user-avatar">
+                  <img
+                    :src="message.profilePictureUrl"
+                    :alt="message.firstName"
+                    @error="handleImageError($event)"
+                  />
+                </div>
+                <div class="chat-preview-content">
+                  <h4>{{ message.firstName }} {{ message.lastName }}</h4>
+                  <p
+                    class="message-preview"
+                    v-html="message.highlightedMessage"
+                  ></p>
+                  <small>{{ formatTimestamp(message.timestamp) }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Regular Chat List -->
+          <div v-else>
+            <div
+              v-for="chat in sortedChats"
+              :key="chat.userId"
+              :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
+              @click="selectChat(chat)"
+            >
+              <div class="user-avatar">
+                <img
+                  :src="chat.profilePictureUrl"
+                  :alt="chat.firstName"
+                  @error="handleImageError($event)"
+                />
+              </div>
+              <div>
+                <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
+                <p class="last-message">{{ chat.lastMessage }}</p>
+                <small>{{ formatTimestamp(chat.timestamp) }}</small>
+              </div>
             </div>
           </div>
         </div>
@@ -409,11 +508,6 @@
                   </h3>
                 </div>
               </div>
-              <!-- <div class="chat-header-right">
-                <i data-lucide="video"></i>
-                <i data-lucide="phone"></i>
-                <i data-lucide="folder"></i>
-              </div> -->
             </div>
 
             <div class="chat-messages" ref="messageContainer">
@@ -435,7 +529,8 @@
                   class="message-container"
                 >
                   <div
-                    :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received']"
+                    :data-message-id="message.id"
+                    :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received', { 'highlighted' : message.id === highlightedMessage }]"
                   >
                     {{ message.message }}
                     <div class="timestamp">
@@ -497,6 +592,7 @@
               messages: [], // for message content matches
             },
             originalChats: [],
+            highlightedMessageId: null,
           };
         },
 
@@ -674,6 +770,7 @@
 
                     return {
                       ...data,
+                      id: doc.id,
                       timestamp,
                     };
                   })
@@ -722,79 +819,114 @@
             }
 
             const searchTermLower = this.searchTerm.toLowerCase();
-            const searchPromises = [];
-            const results = new Map();
+            const contacts = new Map();
+            const messages = [];
 
             // Search through existing chats for parent names
             this.chats.forEach((chat) => {
               const fullName =
                 `${chat.firstName} ${chat.lastName}`.toLowerCase();
               if (fullName.includes(searchTermLower)) {
-                results.set(chat.userId, chat);
+                contacts.set(chat.userId, {
+                  ...chat,
+                  matchType: "name",
+                  highlightedName: this.highlightText(
+                    `${chat.firstName} ${chat.lastName}`,
+                    this.searchTerm
+                  ),
+                });
               }
             });
 
             // Search through messages
-            const messageQuery = db
-              .collection("CHATS")
-              .where("from_user_id", "in", [this.currentUserId])
-              .get();
-
-            const messageQuery2 = db
-              .collection("CHATS")
-              .where("to_user_id", "in", [this.currentUserId])
-              .get();
-
-            // Wait for both queries to complete
             const [sentMessages, receivedMessages] = await Promise.all([
-              messageQuery,
-              messageQuery2,
+              db
+                .collection("CHATS")
+                .where("from_user_id", "in", [this.currentUserId])
+                .get(),
+              db
+                .collection("CHATS")
+                .where("to_user_id", "in", [this.currentUserId])
+                .get(),
             ]);
 
-            // Process sent messages
-            for (const doc of sentMessages.docs) {
-              const messageData = doc.data();
-              if (messageData.message.toLowerCase().includes(searchTermLower)) {
-                // If message matches, get user details if not already in results
-                if (!results.has(messageData.to_user_id)) {
-                  const userDetails = await this.getUserDetails(
-                    messageData.to_user_id
-                  );
-                  results.set(messageData.to_user_id, {
-                    userId: messageData.to_user_id,
+            // Process messages and group them by chat
+            for (const querySnapshot of [sentMessages, receivedMessages]) {
+              for (const doc of querySnapshot.docs) {
+                const messageData = doc.data();
+                if (
+                  messageData.message.toLowerCase().includes(searchTermLower)
+                ) {
+                  const otherUserId =
+                    messageData.from_user_id === this.currentUserId
+                      ? messageData.to_user_id
+                      : messageData.from_user_id;
+
+                  const userDetails = await this.getUserDetails(otherUserId);
+
+                  messages.push({
+                    messageId: doc.id,
+                    userId: otherUserId,
                     firstName: userDetails.firstName,
                     lastName: userDetails.lastName,
                     profilePictureUrl: userDetails.profilePictureUrl,
-                    lastMessage: messageData.message,
+                    message: messageData.message,
+                    highlightedMessage: this.highlightText(
+                      messageData.message,
+                      this.searchTerm
+                    ),
                     timestamp: messageData.timestamp,
+                    matchType: "message",
                   });
                 }
               }
             }
 
-            // Process received messages
-            for (const doc of receivedMessages.docs) {
-              const messageData = doc.data();
-              if (messageData.message.toLowerCase().includes(searchTermLower)) {
-                // If message matches, get user details if not already in results
-                if (!results.has(messageData.from_user_id)) {
-                  const userDetails = await this.getUserDetails(
-                    messageData.from_user_id
-                  );
-                  results.set(messageData.from_user_id, {
-                    userId: messageData.from_user_id,
-                    firstName: userDetails.firstName,
-                    lastName: userDetails.lastName,
-                    profilePictureUrl: userDetails.profilePictureUrl,
-                    lastMessage: messageData.message,
-                    timestamp: messageData.timestamp,
-                  });
-                }
-              }
+            this.searchResults = {
+              contacts: Array.from(contacts.values()),
+              messages: messages,
+            };
+          },
+
+          // Helper method to highlight matching text
+          highlightText(text, searchTerm) {
+            if (!searchTerm) return text;
+            const regex = new RegExp(`(${searchTerm})`, "gi");
+            return text.replace(regex, "<mark>$1</mark>");
+          },
+
+          // Method to scroll to and highlight a specific message
+          async scrollToMessage(messageId, userId) {
+            // First select the chat if needed
+            const chat = this.chats.find((c) => c.userId === userId);
+            if (
+              chat &&
+              (!this.selectedChat || this.selectedChat.userId !== userId)
+            ) {
+              await this.selectChat(chat);
             }
 
-            // Convert results Map to array
-            this.searchResults = Array.from(results.values());
+            // Wait for messages to load
+            await this.$nextTick();
+
+            // Set the highlighted message ID
+            this.highlightedMessageId = messageId;
+
+            // Find and scroll to the message
+            const messageElement = document.querySelector(
+              `[data-message-id="${messageId}"]`
+            );
+            if (messageElement) {
+              messageElement.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+
+              // Remove highlight after animation
+              setTimeout(() => {
+                this.highlightedMessageId = null;
+              }, 2000);
+            }
           },
         },
         mounted() {
