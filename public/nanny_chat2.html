@@ -231,6 +231,11 @@
         color: rgba(0, 0, 0, 0.5);
       }
 
+      /* Ensure highlighted sent messages still maintain their color */
+      .message.sent.highlighted {
+        animation: highlight-fade-sent 2s ease-out;
+      }
+
       /* Animation for highlighted message */
       .message.highlighted {
         animation: highlight-fade 2s ease-out;
@@ -380,11 +385,28 @@
       }
 
       @keyframes highlight-fade {
-        0% {
+        0%,
+        20% {
           background-color: #fff3cd;
+          transform: scale(1.02); /* Slight pop effect */
         }
         100% {
-          background-color: transparent;
+          background-color: inherit;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes highlight-fade-sent {
+        0%,
+        20% {
+          background-color: #fff3cd; /* Same light yellow for consistency */
+          color: #000; /* Temporarily change text to dark for better visibility on yellow */
+          transform: scale(1.02);
+        }
+        100% {
+          background-color: #6c5ce7; /* Return to original sent message color */
+          color: white; /* Return to original text color */
+          transform: scale(1);
         }
       }
 
@@ -1081,35 +1103,50 @@
 
           // Method to scroll to and highlight a specific message
           async scrollToMessage(messageId, userId) {
-            // First select the chat if needed
-            const chat = this.chats.find((c) => c.userId === userId);
-            if (
-              chat &&
-              (!this.selectedChat || this.selectedChat.userId !== userId)
-            ) {
-              await this.selectChat(chat);
-            }
+            try {
+              // First select the chat if needed
+              const chat = this.chats.find((c) => c.userId === userId);
+              if (
+                chat &&
+                (!this.selectedChat || this.selectedChat.userId !== userId)
+              ) {
+                await this.selectChat(chat);
 
-            // Wait for messages to load
-            await this.$nextTick();
+                // Wait for messages to load and Vue to update the DOM
+                await new Promise((resolve) => {
+                  // Use nextTick to wait for Vue to update the DOM
+                  this.$nextTick(() => {
+                    // Add a small delay to ensure messages are loaded
+                    setTimeout(resolve, 100);
+                  });
+                });
+              }
 
-            // Set the highlighted message ID
-            this.highlightedMessageId = messageId;
+              // Set the highlighted message ID
+              this.highlightedMessageId = messageId;
 
-            // Find and scroll to the message
-            const messageElement = document.querySelector(
-              `[data-message-id="${messageId}"]`
-            );
-            if (messageElement) {
-              messageElement.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
+              // Find and scroll to the message
+              const messageElement = document.querySelector(
+                `[data-message-id="${messageId}"]`
+              );
 
-              // Remove highlight after animation
-              setTimeout(() => {
-                this.highlightedMessageId = null;
-              }, 2000);
+              if (messageElement) {
+                messageElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                });
+
+                // Add highlight class
+                messageElement.classList.add("highlighted");
+
+                // Remove highlight after animation
+                setTimeout(() => {
+                  this.highlightedMessageId = null;
+                  messageElement.classList.remove("highlighted");
+                }, 2000);
+              }
+            } catch (error) {
+              console.error("Error scrolling to message:", error);
             }
           },
         },
