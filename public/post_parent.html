@@ -306,7 +306,7 @@
                 {{ getStatusLabel(post) }}
               </span>
             </div>
-            <span v-if="post.interestedNannies && post.interestedNannies.length > 0 && post.status && !post.completed" 
+            <span v-if="post.interestedNannies && post.interestedNannies.length > 0 && post.status && !post.completed && getStatusLabel(post) === 'Available'" 
                   @click="openInterestedNanniesModal(post)"
                   style="text-decoration: underline; color: blue; cursor: pointer;">
               View interested Nannies({{ post.interestedNannies.length }})
@@ -401,8 +401,10 @@
           filteredPosts() {
             return this.posts.filter(post => {
               if (this.activeTab === 'active') {
+                // Show both upcoming (status true and completed true) and available (status true and completed false) jobs
                 return post.status === true;
               } else {
+                // Show both expired (status false and completed false) and completed (status false and completed true) jobs
                 return post.status === false;
               }
             });
@@ -497,8 +499,7 @@
                 return {
                   ...post,
                   formattedDate: this.formatDate(post.date),
-                  interestedNannies,
-                  status: post.completed ? false : post.status // Set status to false if completed
+                  interestedNannies
                 };
               }));
 
@@ -555,17 +556,19 @@
           },
 
           getStatusBadgeClass(post) {
-            if (!post.status && !post.completed) return 'badge-expired';
+            if (post.status && post.completed) return 'badge-upcoming';
             if (!post.status && post.completed) return 'badge-completed';
             if (post.status && !post.completed) return 'badge-active';
-            return 'badge-upcoming';
+            if (!post.status && !post.completed) return 'badge-expired';
+            return 'badge-secondary';
           },
 
           getStatusLabel(post) {
-            if (!post.status && !post.completed) return 'Expired';
+            if (post.status && post.completed) return 'Upcoming';
             if (!post.status && post.completed) return 'Completed';
             if (post.status && !post.completed) return 'Available';
-            return 'Upcoming';
+            if (!post.status && !post.completed) return 'Expired';
+            return 'Unknown';
           },
 
           canEditPost(post) {
