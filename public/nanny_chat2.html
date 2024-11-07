@@ -772,24 +772,7 @@
             );
             this.currentUserProfilePic = currentUserDetails.profilePictureUrl;
 
-            // Create two listeners - one for sent messages and one for received messages
-            const sentMessagesUnsubscribe = db
-              .collection("CHATS")
-              .where("from_user_id", "==", this.currentUserId)
-              .onSnapshot(handleSnapshot);
-
-            const receivedMessagesUnsubscribe = db
-              .collection("CHATS")
-              .where("to_user_id", "==", this.currentUserId)
-              .onSnapshot(handleSnapshot);
-
-            // Store both unsubscribe functions
-            this.unsubscribe = () => {
-              sentMessagesUnsubscribe();
-              receivedMessagesUnsubscribe();
-            };
-
-            // Handler function for both snapshots
+            // Define the handler function first
             const handleSnapshot = async (snapshot) => {
               const chatMap = new Map(
                 this.chats.map((chat) => [chat.userId, chat])
@@ -829,6 +812,23 @@
                 (a, b) => b.timestamp - a.timestamp
               );
               this.originalChats = [...this.chats];
+            };
+
+            // Create two listeners - one for sent messages and one for received messages
+            const sentMessagesUnsubscribe = db
+              .collection("CHATS")
+              .where("from_user_id", "==", this.currentUserId)
+              .onSnapshot(handleSnapshot);
+
+            const receivedMessagesUnsubscribe = db
+              .collection("CHATS")
+              .where("to_user_id", "==", this.currentUserId)
+              .onSnapshot(handleSnapshot);
+
+            // Store both unsubscribe functions
+            this.unsubscribe = () => {
+              sentMessagesUnsubscribe();
+              receivedMessagesUnsubscribe();
             };
           },
           async selectChat(chat) {
