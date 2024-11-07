@@ -1,83 +1,60 @@
 <style>
-    body {
-      font-family: "Roboto Slab", serif;
-      background-color: #fff8e7;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
     .navbar {
-      height: 80px;
-      background-color: #faf9f6 !important;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+  height: 80px;
+  background-color: transparent !important;
+  box-shadow: none;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    .navbar-brand img {
-      max-height: 50px;
-    }
-    .btn {
-      border-radius: 20px;
-      padding: 8px 20px;
-    }
-    .btn-outline-primary {
-      color: #000;
-      border-color: #000;
-    }
-    .btn-outline-primary:hover {
-      color: #fff;
-      background-color: #000;
-      border-color: #000;
-    }
+.navbar-brand img {
+  max-height: 80px;
+  margin-left:5px;
+}
 
-    .btn-outline-primary:hover,
-    .btn-outline-primary:focus,
-    .btn-outline-primary:active,
-    .btn-outline-primary.active,
-    .show > .btn-outline-primary.dropdown-toggle {
-      color: #fff;
-      background-color: #000;
-      border-color: #000;
-    }
-    .btn-check:focus + .btn-outline-primary,
-    .btn-outline-primary:focus {
-      box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25);
-    }
+.btn {
+  border-radius: 0;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  color: inherit;
+  text-decoration: none;
+  font-size: 1.1rem;
+  margin-right:1.5rem
+}
 
-    .image-content {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        background-color: transparent;
-      }
-      .image-content img {
-        max-width: 90%;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        background-color: transparent;
-      }
+.btn:hover,
+.btn:focus,
+.btn:active {
+  background-color: transparent;
+  color: inherit;
+  box-shadow: none;
+}
 
-      .dropdown-menu {
-        border-radius: 10px;
-        overflow: hidden;
-      }
+.dropdown-menu {
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
 
-      .dropdown-item {
-        padding: 10px 20px;
-      }
+.dropdown-item {
+  padding: 10px 20px;
+}
 
-      .dropdown-item:hover,
-      .dropdown-item:focus,
-      .dropdown-item:active {
-        background-color: #f8f9fa;
-        color: #333;
-      }
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item:active {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
 </style>
 <nav class="navbar navbar-expand-sm navbar-light bg-white">
     <div class="container">
       <a class="navbar-brand" href="index.html">
-        <img src="img/nany_logo.png" alt="Nany logo" class="logoo" />
+        <img src="img/nany_logo_black.png" alt="Nany logo" class="logoo" />
       </a>
       <div class="ms-auto">
         <a href="login_page.html" class="btn btn-outline-primary me-2 login"
