@@ -13,6 +13,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-app-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-auth-compat.js"></script>
@@ -477,12 +478,7 @@
           </div>
 
           <div class="search-bar">
-            <input
-              type="text"
-              v-model="searchTerm"
-              @input="handleSearch"
-              placeholder="Search..."
-            />
+            <input type="text" v-model="searchTerm" placeholder="Search..." />
           </div>
 
           <!-- Add wrapper for scrollable content -->
@@ -679,6 +675,7 @@
               contacts: [], // for name matches
               messages: [], // for message content matches
             },
+            isSearching: false,
             originalChats: [],
             highlightedMessageId: null,
           };
@@ -686,20 +683,16 @@
 
         computed: {
           sortedChats() {
-            const chatsToSort = this.searchTerm
-              ? this.searchResults
-              : this.chats;
-            return [...chatsToSort].sort((a, b) => b.timestamp - a.timestamp);
+            // Only use search results when actually searching
+            if (this.searchTerm.trim() && this.isSearching) {
+              return [...this.searchResults.contacts];
+            }
+            return [...this.chats].sort((a, b) => b.timestamp - a.timestamp);
           },
 
           canSendMessage() {
             return this.newMessage.trim().length > 0;
           },
-        },
-
-        // Add debounce to prevent too many searches
-        created() {
-          this.handleSearch = _.debounce(this.handleSearch, 300);
         },
 
         methods: {
@@ -976,80 +969,107 @@
             return new Date(timestampMs).toLocaleString();
           },
 
-          async handleSearch() {
+          async handleSearch(event) {
             if (!this.searchTerm.trim()) {
-              this.searchResults = [];
+              this.isSearching = false;
+              this.searchResults = {
+                contacts: [],
+                messages: [],
+              };
               return;
             }
 
-            const searchTermLower = this.searchTerm.toLowerCase();
-            const contacts = new Map();
-            const messages = [];
+            this.isSearching = true;
+            await this.performSearch();
+          },
 
-            // Search through existing chats for parent names
-            this.chats.forEach((chat) => {
-              const fullName =
-                `${chat.firstName} ${chat.lastName}`.toLowerCase();
-              if (fullName.includes(searchTermLower)) {
-                contacts.set(chat.userId, {
-                  ...chat,
-                  matchType: "name",
-                  highlightedName: this.highlightText(
-                    `${chat.firstName} ${chat.lastName}`,
-                    this.searchTerm
-                  ),
-                });
-              }
-            });
+          async performSearch() {
+            try {
+              const searchTermLower = this.searchTerm.toLowerCase();
+              const contacts = new Map();
+              const messages = [];
 
-            // Search through messages
-            const [sentMessages, receivedMessages] = await Promise.all([
-              db
-                .collection("CHATS")
-                .where("from_user_id", "in", [this.currentUserId])
-                .get(),
-              db
-                .collection("CHATS")
-                .where("to_user_id", "in", [this.currentUserId])
-                .get(),
-            ]);
-
-            // Process messages and group them by chat
-            for (const querySnapshot of [sentMessages, receivedMessages]) {
-              for (const doc of querySnapshot.docs) {
-                const messageData = doc.data();
-                if (
-                  messageData.message.toLowerCase().includes(searchTermLower)
-                ) {
-                  const otherUserId =
-                    messageData.from_user_id === this.currentUserId
-                      ? messageData.to_user_id
-                      : messageData.from_user_id;
-
-                  const userDetails = await this.getUserDetails(otherUserId);
-
-                  messages.push({
-                    messageId: doc.id,
-                    userId: otherUserId,
-                    firstName: userDetails.firstName,
-                    lastName: userDetails.lastName,
-                    profilePictureUrl: userDetails.profilePictureUrl,
-                    message: messageData.message,
-                    highlightedMessage: this.highlightText(
-                      messageData.message,
+              // Search through existing chats for names
+              this.chats.forEach((chat) => {
+                const fullName =
+                  `${chat.firstName} ${chat.lastName}`.toLowerCase();
+                if (fullName.includes(searchTermLower)) {
+                  contacts.set(chat.userId, {
+                    ...chat,
+                    matchType: "name",
+                    highlightedName: this.highlightText(
+                      `${chat.firstName} ${chat.lastName}`,
                       this.searchTerm
                     ),
-                    timestamp: messageData.timestamp,
-                    matchType: "message",
                   });
                 }
-              }
-            }
+              });
 
-            this.searchResults = {
-              contacts: Array.from(contacts.values()),
-              messages: messages,
-            };
+              // Perform message search regardless of search term length
+              const [sentMessages, receivedMessages] = await Promise.all([
+                db
+                  .collection("CHATS")
+                  .where("from_user_id", "==", this.currentUserId)
+                  .get(),
+                db
+                  .collection("CHATS")
+                  .where("to_user_id", "==", this.currentUserId)
+                  .get(),
+              ]);
+
+              // Process messages
+              const processMessageSnapshot = async (querySnapshot) => {
+                for (const doc of querySnapshot.docs) {
+                  const messageData = doc.data();
+                  if (
+                    messageData.message.toLowerCase().includes(searchTermLower)
+                  ) {
+                    const otherUserId =
+                      messageData.from_user_id === this.currentUserId
+                        ? messageData.to_user_id
+                        : messageData.from_user_id;
+
+                    // Check if we already have user details cached
+                    let userDetails = contacts.get(otherUserId);
+                    if (!userDetails) {
+                      userDetails = await this.getUserDetails(otherUserId);
+                    }
+
+                    messages.push({
+                      messageId: doc.id,
+                      userId: otherUserId,
+                      firstName: userDetails.firstName,
+                      lastName: userDetails.lastName,
+                      profilePictureUrl: userDetails.profilePictureUrl,
+                      message: messageData.message,
+                      highlightedMessage: this.highlightText(
+                        messageData.message,
+                        this.searchTerm
+                      ),
+                      timestamp: messageData.timestamp,
+                      matchType: "message",
+                    });
+                  }
+                }
+              };
+
+              await Promise.all([
+                processMessageSnapshot(sentMessages),
+                processMessageSnapshot(receivedMessages),
+              ]);
+
+              // Update search results
+              this.searchResults = {
+                contacts: Array.from(contacts.values()),
+                messages: messages,
+              };
+            } catch (error) {
+              console.error("Search error:", error);
+              this.searchResults = {
+                contacts: [],
+                messages: [],
+              };
+            }
           },
 
           // Helper method to highlight matching text
@@ -1093,6 +1113,21 @@
             }
           },
         },
+
+        watch: {
+          searchTerm: _.debounce(function (newValue) {
+            if (newValue.trim()) {
+              this.handleSearch();
+            } else {
+              this.searchResults = {
+                contacts: [],
+                messages: [],
+              };
+              this.isSearching = false;
+            }
+          }, 300),
+        },
+
         mounted() {
           // Check if user is logged in
           auth.onAuthStateChanged((user) => {
