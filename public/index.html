@@ -7,21 +7,45 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
     <style>
+        .tagline, .sub-tagline {
+            color: #000;
+            transition: color 0.3s ease;
+        }
+
+        /* Add new styles for color change on scroll */
+        @media (min-width: 768px) {
+            .tagline-container.night-mode .tagline,
+            .tagline-container.night-mode .sub-tagline {
+                color: #fff;
+            }
+        }
         .action-button {
     color: #483D8B;
 }
         .tagline, .sub-tagline, .action-button {
     color: #000;
 }
-        .navbar.scrolled .btn {
-    color: #fff;
+ /* First, modify your existing navbar.move rule */
+.navbar.move {
+    background-color: transparent !important;
 }
 
-.navbar.scrolled .btn:hover,
-.navbar.scrolled .btn:focus,
-.navbar.scrolled .btn:active {
-    color: #fff;
+/* Add specific rules for the buttons when navbar has 'move' class */
+.navbar.move .btn-outline-primary {
+    color: #fff !important;
+    border-color: #fff !important;
 }
+
+.navbar.move .btn-outline-primary:hover {
+    color: #000 !important;
+    background-color: #fff !important;
+    border-color: #fff !important;
+}
+
+/* Override any other button styles that might be interfering */
+            .navbar.move .btn {
+                transition: all 0.3s ease;
+            }
         body, html {
             margin: 0;
             padding: 0;
@@ -29,27 +53,9 @@
             overflow-x: hidden;
             font-family: 'Poppins', sans-serif;
         }
-
-        /* Navbar Styles */
-        .navbar {
-            height: 100px;
-            background-color: transparent !important;
-            box-shadow: none;
-            border-bottom: none;
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
         .navbar.scrolled {
             background-color:transparent !important;
         }
-
-        .navbar-brand img {
-            max-height: 60px;
-        }
-
         .btn {
             border-radius: 20px;
             padding: 8px 20px;
@@ -58,6 +64,7 @@
         .btn-outline-primary {
             color: #000;
             border-color: #000;
+            transition: all 0.3s ease;
         }
 
         .btn-outline-primary:hover {
@@ -497,11 +504,19 @@
     const scrollProgress = Math.min(1, currentScrollPosition / maxScroll); // Clamp between 0 and 1
     const navbar = document.querySelector('.navbar');
     updateLogo();
+    const taglineContainer = document.getElementById('tagline-container');
+            
+            // Add night-mode class when scroll progress is past 80%
+            if (scrollProgress > 0.8) {
+                taglineContainer.classList.add('night-mode');
+            } else {
+                taglineContainer.classList.remove('night-mode');
+            }
     
-    if (currentScrollPosition > 200) {
-        navbar.classList.add('scrolled');
+    if (scrollProgress > 0.8) {
+        navbar.classList.add('move');
     } else {
-        navbar.classList.remove('scrolled');
+        navbar.classList.remove('move');
     }
     
     // Preserve action button text color
