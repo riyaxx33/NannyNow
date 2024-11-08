@@ -1,82 +1,20 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-    
-    function isParent() {
-      return isAuthenticated() && 
-        exists(/databases/$(database)/documents/PARENT/$(request.auth.uid));
-    }
-    
-    function isNanny() {
-      return isAuthenticated() && 
-        exists(/databases/$(database)/documents/NANNY/$(request.auth.uid));
-    }
-    
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
-    }
 
-    // User base collection - viewable by all authenticated users
-    match /USER/{userId} {
-      // Anyone logged in can view user profiles
-      allow read: if isAuthenticated();
-      // Only the user can edit their own profile
-      allow write: if isOwner(userId);
-    }
-    
-    // Parent collection - viewable by all authenticated users
-    match /PARENT/{parentId} {
-      // Both parents and nannies can view parent profiles
-      allow read: if isAuthenticated();
-      // Only the parent can edit their own profile
-      allow write: if isOwner(parentId);
-    }
-    
-    // Nanny collection - viewable by all authenticated users
-    match /NANNY/{nannyId} {
-      // Both parents and nannies can view nanny profiles
-      allow read: if isAuthenticated();
-      // Only the nanny can edit their own profile
-      allow write: if isOwner(nannyId);
-    }
-    
-    // Posts collection
-    match /POSTS/{postId} {
-      // Anyone authenticated can read posts
-      allow read: if isAuthenticated();
-      
-      // Only parents can create posts
-      allow create: if isParent() && 
-        request.resource.data.userId == request.auth.uid;
-      
-      // Only the parent who created the post can edit or delete it
-      allow update, delete: if isParent() && 
-        resource.data.userId == request.auth.uid;
-    }
-    
-    // Chats collection
-    match /CHATS/{chatId} {
-      // Only sender or recipient can read the chat
-      allow read: if isAuthenticated() && 
-        (request.auth.uid == resource.data.from_user_id || 
-         request.auth.uid == resource.data.to_user_id);
-      
-      // User can only send messages as themselves
-      allow create: if isAuthenticated() && 
-        request.resource.data.from_user_id == request.auth.uid &&
-        request.resource.data.timestamp is timestamp;
-      
-      // Messages shouldn't be updated or deleted
-      allow update, delete: if false;
-    }
-    
-    // Default deny
+    // This rule allows anyone with your Firestore database reference to view, edit,
+    // and delete all data in your Firestore database. It is useful for getting
+    // started, but it is configured to expire after 30 days because it
+    // leaves your app open to attackers. At that time, all client
+    // requests to your Firestore database will be denied.
+    //
+    // Make sure to write security rules for your app before that time, or else
+    // all client requests to your Firestore database will be denied until you Update
+    // your rules
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if request.time < timestamp.date(2024, 12, 31);
     }
   }
 }
+
