@@ -1,423 +1,1274 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Interface</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parent Chat</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <!-- Poppins font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-app-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.7.1/firebase-firestore-compat.js"></script>
-    <script type="module" src="backend/firebase-config.js"></script>
-    <script type="module" src="./backend/auth.js"></script>
-    <header>
-        <div id="navbar"></div>
-    </header>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Previous styles remain the same */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: Arial, sans-serif;
-        }
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: white;
+        padding-top: 50px; /* For navbar */
+        margin: 0;
+        min-height: 100vh;
+      }
 
-        .container {
-            display: flex;
-            height: 100%;
-            background-color: #fafafa;
-        }
+      /* Main container styles */
+      .app-container {
+        margin: 0 auto;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%; /* Take up full width */
+        max-width: 1400px; /* Maximum width to prevent stretching on very wide screens */
+        min-width: 800px; /* Minimum width to prevent squishing */
+        height: calc(100vh - 70px); /* Account for navbar and some padding */
+        margin: 12px auto; /* Center horizontally and add some vertical spacing */
+        background-color: white;
+        border-radius: 12px;
+        overflow: hidden; /* Keep children from spilling out */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Lighter shadow */
+      }
 
-        .chat-list {
+      .chat-container {
+        display: flex;
+        min-height: 0;
+        height: 100%;
+        width: 100%; /* Make container take full width */
+      }
+
+      /* Sidebar styling */
+      .chat-list {
         width: 350px;
-        border-right: 1px solid #dbdbdb;
         background-color: white;
+        border-right: 1px solid #e9edef;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        flex-shrink: 0;
+      }
+
+      /* Add a wrapper for the scrollable content */
+      .chat-list-scrollable {
+        flex: 1;
         overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        }
+        overflow-x: hidden;
+      }
 
-        .chat-preview {
-            padding: 15px;
-            border-bottom: 1px solid #dbdbdb;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .chat-preview:hover {
-            background-color: #fafafa;
-        }
-
-        .chat-preview.active {
-            background-color: #efefef;
-        }
-
-        .chat-details {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0; /* Important to allow flexbox to control height of .chat-messages */
-        }
-
-        .chat-header {
-            padding: 15px;
-            border-bottom: 1px solid #dbdbdb;
-            background-color: white;
-        }
-
-        .chat-messages {
-        flex-grow: 1;
-        padding: 20px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        }
-
-        .message {
-        max-width: 60%;
-        margin: 5px;
-        padding: 10px;
-        border-radius: 20px;
-        word-wrap: break-word;
-        }
-
-        .message.sent {
-            background-color: #0095f6;
-            color: white;
-            align-self: flex-end;
-        }
-
-        .message.received {
-            background-color: #efefef;
-            align-self: flex-start;
-        }
-
-        .chat-input {
-        padding: 20px;
-        border-top: 1px solid #dbdbdb;
+      /* Header styling */
+      .sidebar-header,
+      .chat-header {
+        height: 60px;
+        padding: 0 16px; /* Reduced padding */
         background-color: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
         display: flex;
-        }
+        align-items: center;
+      }
 
-        .chat-input input {
-        flex-grow: 1;
-        padding: 10px;
-        border: 1px solid #dbdbdb;
-        border-radius: 20px;
-        margin-right: 10px;
-        }
+      .sidebar-header {
+        gap: 10px;
+      }
 
-        .chat-input button {
-        padding: 10px 20px;
-        background-color: #0095f6;
-        color: white;
-        border: none;
-        border-radius: 20px;
+      .chat-preview {
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
         cursor: pointer;
-        }
+        transition: background-color 0.2s;
+        border-bottom: 1px solid #eee;
+        height: 72px;
+      }
 
-        .timestamp {
-        font-size: 0.8em;
-        margin-top: 5px;
-        }
+      .chat-preview:hover {
+        background-color: #fff5f5;
+      }
 
-        .message.sent .timestamp {
-            color: rgba(255, 255, 255, 0.9); /* Light color for sent messages */
-        }
+      .chat-preview.active {
+        background-color: #fff5f5;
+      }
 
-        .message.received .timestamp {
-            color: #666666; /* Darker grey for received messages */
-        }
+      .chat-preview img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
 
-        .no-chat-selected {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #8e8e8e;
+      .chat-preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+
+      .chat-preview-header h4 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .chat-preview-content {
+        flex: 1;
+        min-width: 0;
+        margin-right: 8px;
+      }
+
+      .last-message {
+        color: #666;
+        font-size: 0.875em;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .chat-preview-time {
+        font-size: 0.75rem;
+        color: #666;
+        white-space: nowrap;
+      }
+
+      /* Main chat area styling */
+      .chat-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        background-color: white;
+        min-width: 0;
+      }
+
+      .chat-header {
+        justify-content: space-between;
+      }
+
+      .chat-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .chat-header-right {
+        display: flex;
+        gap: 20px;
+      }
+
+      .chat-header img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+
+      .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background-color: #fff5f5;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Cg fill='%23dcdcdc' fill-opacity='0.15'%3E%3Cpath d='M45 45c-4 0-8 4-8 8s4 8 8 8 8-4 8-8-4-8-8-8zm160 0c-4 0-8 4-8 8s4 8 8 8 8-4 8-8-4-8-8-8z'/%3E%3Cpath d='M75 95l10-10h20l10 10v20l-10 10H85l-10-10z'/%3E%3Cpath d='M180 80c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M220 120h20v20h-20z' transform='rotate(45 230 130)'/%3E%3Cpath d='M280 95c0-8.3 6.7-15 15-15s15 6.7 15 15-6.7 15-15 15-15-6.7-15-15z'/%3E%3Cpath d='M95 180l-15 15 15 15 15-15z'/%3E%3Cpath d='M150 190l10 10-10 10-10-10zM240 180h30v30h-30z'/%3E%3Cpath d='M50 280l20-20 20 20-20 20z'/%3E%3Cpath d='M160 250c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20z'/%3E%3Cpath d='M260 260h20v20h-20zM50 350h25v25H50z'/%3E%3Cpath d='M150 360l15-15 15 15-15 15z'/%3E%3Cpath d='M240 340c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M80 420c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20zM180 440l10-10h20l10 10v20l-10 10h-20l-10-10z'/%3E%3Cpath d='M260 420h30v30h-30zM40 500c-6.6 0-12 5.4-12 12s5.4 12 12 12 12-5.4 12-12-5.4-12-12-12z'/%3E%3Cpath d='M135 500l25 25-25 25-25-25zM260 510h20v20h-20z'/%3E%3C/g%3E%3Cg fill='%23dcdcdc' fill-opacity='0.15'%3E%3Cpath d='M435 65c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM520 45l15 15-15 15-15-15zM460 150c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M500 180h30v30h-30zM420 260l20-20 20 20-20 20z'/%3E%3Cpath d='M530 250c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20z'/%3E%3Cpath d='M450 350h25v25h-25zM520 360l15-15 15 15-15 15z'/%3E%3Cpath d='M440 420c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M520 440l10-10h20l10 10v20l-10 10h-20l-10-10z'/%3E%3Cpath d='M440 500c-6.6 0-12 5.4-12 12s5.4 12 12 12 12-5.4 12-12-5.4-12-12-12z'/%3E%3Cpath d='M535 500l25 25-25 25-25-25z'/%3E%3C/g%3E%3Cpath d='M120 120c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12zm240 240c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12z' fill='%23dcdcdc' fill-opacity='0.15'/%3E%3Cpath d='M340 340c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12zm-240 240c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12z' fill='%23dcdcdc' fill-opacity='0.15'/%3E%3Cg fill='none' stroke='%23dcdcdc' stroke-width='2' stroke-opacity='0.15'%3E%3Cpath d='M310 70l20 20m-20 0l20-20M90 290l20 20m-20 0l20-20M510 290l20 20m-20 0l20-20'/%3E%3C/g%3E%3Cpath fill='%23dcdcdc' fill-opacity='0.15' d='M310 370h20v20h-20zM110 570h20v20h-20zM510 570h20v20h-20z'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: 300px 300px;
+      }
+
+      .message {
+        max-width: 70%;
+        min-width: 80px;
+        margin: 10px 0;
+        padding: 12px 16px;
+        padding-bottom: 20px;
+        border-radius: 20px;
+        position: relative;
+        display: inline-block; /* This makes the bubble wrap to content */
+        word-wrap: break-word;
+        width: fit-content; /* This makes the bubble fit the content */
+        line-height: 1.4; /* Add line height for better text spacing */
+        transition: background-color 0.3s ease;
+      }
+
+      .message.sent {
+        background-color: #ff6b6b;
+        color: white;
+        margin-left: auto;
+        border-bottom-right-radius: 4px;
+        float: right;
+        clear: both;
+      }
+
+      .message.sent .timestamp {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .message.received {
+        background-color: white;
+        color: #1a1a1a;
+        border-bottom-left-radius: 4px;
+        float: left;
+        clear: both;
+      }
+
+      .message.received .timestamp {
+        color: rgba(0, 0, 0, 0.5);
+      }
+
+      /* Ensure highlighted sent messages still maintain their color */
+      .message.sent.highlighted {
+        animation: highlight-fade-sent 2s ease-out;
+      }
+
+      /* Animation for highlighted message */
+      .message.highlighted {
+        animation: highlight-fade 2s ease-out;
+      }
+
+      .message-container {
+        margin: 10px 0;
+        clear: both;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .chat-input-container {
+        padding: 10px 20px;
+        background-color: white;
+        border-top: 1px solid #eee;
+      }
+
+      .chat-input {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        padding: 8px 12px;
+        border-radius: 8px;
+      }
+
+      .chat-input input {
+        flex: 1;
+        border: none;
+        padding: 8px;
+        outline: none;
+        font-size: 15px;
+      }
+
+      .chat-input button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+      }
+
+      .send-button {
+        background: transparent;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        color: #ff6b6b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.2s;
+      }
+
+      .send-button.disabled {
+        opacity: 0.5;
+        cursor: default;
+        color: #666;
+      }
+
+      .send-button:not(.disabled):hover {
+        opacity: 0.8;
+      }
+
+      .search-bar {
+        position: relative;
+        padding: 8px 16px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .search-bar input {
+        width: 100%;
+        padding: 8px 15px 8px 40px;
+        border: none;
+        background-color: #f0f2f5;
+        border-radius: 8px;
+        outline: none;
+        font-size: 14px;
+        transition: all 0.2s ease;
+      }
+
+      /* Add focus state effects */
+      .search-bar input:focus {
+        background-color: white;
+        box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2); /* Subtle red glow */
+        border-radius: 8px 8px 0 0; /* Flatten bottom corners when focused */
+        border-bottom: 2px solid #ff6b6b; /* Red underline */
+      }
+
+      /* Search icon positioning */
+      .search-bar::before {
+        content: "";
+        position: absolute;
+        left: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+        opacity: 0.5;
+        pointer-events: none; /* Ensure icon doesn't interfere with input */
+      }
+
+      /* Make search bar icon color match input state */
+      .search-bar input:focus + .search-bar::before {
+        opacity: 0.7;
+      }
+
+      /* Search Results Styling */
+      .search-section {
+        padding-bottom: 10px;
+      }
+
+      .search-section-header {
+        padding: 10px 15px;
+        font-weight: 600;
+        color: #666;
+        background-color: #f8f9fa;
+        font-size: 13px;
+        text-transform: uppercase;
+      }
+
+      /* Highlight styling */
+      mark {
+        background-color: #fff3cd;
+        padding: 0 2px;
+        border-radius: 2px;
+      }
+
+      /* Message preview in search results */
+      .message-preview {
+        color: #666;
+        font-size: 0.9em;
+        margin-top: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* Animation for highlighted message */
+      .highlighted {
+        animation: highlight-fade 2s ease-out;
+      }
+
+      @keyframes highlight-fade {
+        0%,
+        20% {
+          background-color: #fff3cd;
+          transform: scale(1.02); /* Slight pop effect */
         }
+        100% {
+          background-color: inherit;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes highlight-fade-sent {
+        0%,
+        20% {
+          background-color: #fff3cd; /* Same light yellow for consistency */
+          color: #000; /* Temporarily change text to dark for better visibility on yellow */
+          transform: scale(1.02);
+        }
+        100% {
+          background-color: #ff6b6b; /* Return to original sent message color */
+          color: white; /* Return to original text color */
+          transform: scale(1);
+        }
+      }
+
+      .user-avatar {
+        position: relative;
+        width: 48px; /* Increase size and make width/height equal */
+        height: 48px;
+        flex-shrink: 0; /* Prevent avatar from shrinking */
+      }
+
+      .user-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover; /* This ensures the image maintains its aspect ratio */
+      }
+
+      .timestamp {
+        font-size: 0.75rem;
+        position: absolute;
+        bottom: 4px;
+        right: 12px;
+        opacity: 0.7;
+        white-space: nowrap;
+        text-align: right;
+        min-width: 55px;
+      }
+
+      /* Update the no-chat-selected styling */
+      .no-chat-selected {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        background-color: #f8f9fa;
+      }
+
+      .no-chat-selected h2 {
+        color: #6c757d;
+        font-size: 1.5rem;
+        font-weight: 500;
+        text-align: center;
+        padding: 20px;
+        max-width: 80%;
+        line-height: 1.4;
+      }
+
+      /* Add styles for the date separator */
+      .date-separator {
+        text-align: center;
+        margin: 20px 0;
+        position: relative;
+      }
+
+      .date-label {
+        background-color: rgba(0, 0, 0, 0.2);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        display: inline-block;
+      }
+
+      /* Media query for responsiveness */
+      @media (max-width: 1200px) {
+        .app-container {
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .app-container {
+          width: 100%;
+          height: calc(100vh - 50px);
+          margin: 0;
+          border-radius: 0;
+        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <div id="navbar"></div>
+      <div id="navbar"></div>
     </header>
+    <div id="app" class="app-container">
+      <div class="chat-container">
+        <!-- Sidebar -->
+        <div class="chat-list">
+          <div class="sidebar-header">
+            <h3>Chats</h3>
+          </div>
 
-    <div id="app">
-        <div class="container">
-            <div class="chat-list">
-                Chat List
-                <div v-for="chat in sortedChats" 
-                     :key="chat.userId"
-                     :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
-                     @click="selectChat(chat)">
-                    <h3>{{ chat.firstName }} {{ chat.lastName }}</h3>
-                    <p>{{ chat.lastMessage }}</p>
-                    <div class="timestamp">{{ formatTimestamp(chat.timestamp) }}</div>
+          <div class="search-bar">
+            <input type="text" v-model="searchTerm" placeholder="Search..." />
+          </div>
+
+          <!-- Add wrapper for scrollable content -->
+          <div class="chat-list-scrollable">
+            <!-- Search Results -->
+            <div v-if="searchTerm.trim()" class="search-results">
+              <!-- Contacts Section -->
+              <div v-if="searchResults.contacts.length" class="search-section">
+                <div class="search-section-header">Chats</div>
+                <div
+                  v-for="contact in searchResults.contacts"
+                  :key="'contact-' + contact.userId"
+                  class="chat-preview"
+                  @click="selectChat(contact)"
+                >
+                  <div class="user-avatar">
+                    <img
+                      :src="contact.profilePictureUrl"
+                      :alt="contact.firstName"
+                      @error="handleImageError($event)"
+                    />
+                  </div>
+                  <div class="chat-preview-content">
+                    <div class="chat-preview-header">
+                      <h4>{{ contact.firstName }} {{ contact.lastName }}</h4>
+                      <span class="chat-preview-time"
+                        >{{ formatChatTime(contact.timestamp) }}</span
+                      >
+                    </div>
+                    <p class="last-message">{{ contact.lastMessage }}</p>
+                  </div>
                 </div>
+              </div>
+
+              <!-- Message Section -->
+              <div v-if="searchResults.messages.length" class="search-section">
+                <div class="search-section-header">Messages</div>
+                <div
+                  v-for="message in searchResults.messages"
+                  :key="'message-' + message.messageId"
+                  class="chat-preview"
+                  @click="scrollToMessage(message.messageId, message.userId)"
+                >
+                  <div class="user-avatar">
+                    <img
+                      :src="message.profilePictureUrl"
+                      :alt="message.firstName"
+                      @error="handleImageError($event)"
+                    />
+                  </div>
+                  <div class="chat-preview-content">
+                    <div class="chat-preview-header">
+                      <h4>{{ message.firstName }} {{ message.lastName }}</h4>
+                      <span class="chat-preview-time"
+                        >{{ formatChatTime(message.timestamp) }}</span
+                      >
+                    </div>
+                    <p
+                      class="message-preview"
+                      v-html="message.highlightedMessage"
+                    ></p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Chat Details -->
-            <div class="chat-details">
-                <template v-if="selectedChat">
-                    <div class="chat-header">
-                        <h2>{{ selectedChat.firstName }} {{ selectedChat.lastName }}</h2>
-                    </div>
-                    <div class="chat-messages" ref="messageContainer">
-                        <div v-for="message in selectedChatMessages" 
-                             :key="message.timestamp"
-                             :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received']">
-                            {{ message.message }}
-                            <div class="timestamp">{{ formatTimestamp(message.timestamp) }}</div>
-                        </div>
-                    </div>
-                    <div class="chat-input">
-                        <input type="text" 
-                               v-model="newMessage" 
-                               @keyup.enter="sendMessage" 
-                               placeholder="Type a message...">
-                        <button @click="sendMessage">Send</button>
-                    </div>
-                </template>
-                <div v-else class="no-chat-selected">
-                    <h2>Select a chat to start messaging</h2>
+            <!-- Regular Chat List -->
+            <div v-else>
+              <div
+                v-for="chat in sortedChats"
+                :key="chat.userId"
+                :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
+                @click="selectChat(chat)"
+              >
+                <div class="user-avatar">
+                  <img
+                    :src="chat.profilePictureUrl"
+                    :alt="chat.firstName"
+                    @error="handleImageError($event)"
+                  />
                 </div>
+                <div class="chat-preview-content">
+                  <div class="chat-preview-header">
+                    <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
+                    <span class="chat-preview-time"
+                      >{{ formatChatTime(chat.timestamp) }}</span
+                    >
+                  </div>
+                  <p class="last-message">{{ chat.lastMessage }}</p>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
+
+        <!-- Main Chat Area -->
+        <div class="chat-details">
+          <template v-if="selectedChat">
+            <div class="chat-header">
+              <div class="chat-header-left">
+                <div class="user-avatar">
+                  <img
+                    :src="selectedChat.profilePictureUrl"
+                    :alt="selectedChat.firstName"
+                    @error="handleImageError($event)"
+                  />
+                </div>
+                <div>
+                  <h3>
+                    {{ selectedChat.firstName }} {{ selectedChat.lastName }}
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-messages" ref="messageContainer">
+              <div
+                v-for="group in groupMessagesByDate(selectedChatMessages)"
+                :key="group.date"
+              >
+                <!-- Date separator -->
+                <div class="date-separator">
+                  <span class="date-label"
+                    >{{ formatDateForGroup(group.date) }}</span
+                  >
+                </div>
+
+                <!-- Messages for this date -->
+                <div
+                  v-for="message in group.messages"
+                  :key="message.timestamp"
+                  class="message-container"
+                >
+                  <div
+                    :data-message-id="message.id"
+                    :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received', { 'highlighted' : message.id === highlightedMessage }]"
+                  >
+                    {{ message.message }}
+                    <div class="timestamp">
+                      {{ formatMessageTime(message.timestamp) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-input-container">
+              <div class="chat-input">
+                <input
+                  type="text"
+                  v-model.trim="newMessage"
+                  @keyup.enter="sendMessage"
+                  placeholder="Write a message..."
+                />
+                <button
+                  class="send-button"
+                  :class="{ 'disabled': !canSendMessage }"
+                  @click="sendMessage"
+                  :disabled="!canSendMessage"
+                >
+                  <i data-lucide="send"></i>
+                </button>
+              </div>
+            </div>
+          </template>
+          <div v-else class="no-chat-selected">
+            <h2>Select a chat to start messaging</h2>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- Your existing scripts remain the same -->
     <script type="module">
-        // Import necessary modules from Firebase
-        import { firebaseConfig } from './backend/firebase-config.js';
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+      // Import necessary modules from Firebase
+      import { firebaseConfig } from "./backend/firebase-config.js";
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
 
-        const app = Vue.createApp({
-            data() {
-                return {
-                    currentUserId: null,
-                    chats: [],
-                    selectedChat: null,
-                    selectedChatMessages: [],
-                    newMessage: '',
-                    unsubscribe: null,
-                    messageUnsubscribe: null
-                }
+      const app = Vue.createApp({
+        data() {
+          return {
+            currentUserId: null,
+            currentUserProfilePic: "/api/placeholder/40/40",
+            chats: [],
+            selectedChat: null,
+            selectedChatMessages: [],
+            newMessage: "",
+            unsubscribe: null,
+            messageUnsubscribe: null,
+            searchTerm: "",
+            searchResults: {
+              contacts: [], // for name matches
+              messages: [], // for message content matches
             },
-            computed: {
-                sortedChats() {
-                    return [...this.chats].sort((a, b) => b.timestamp - a.timestamp);
-                }
-            },
-            methods: {
-                async getUserDetails(userId) {
-                    try {
-                        const userDoc = await db.collection('USER').doc(userId).get();
-                        if (userDoc.exists) {
-                            const userData = userDoc.data();
-                            return {
-                                firstName: userData.firstName || '',
-                                lastName: userData.lastName || ''
-                            };
-                        }
-                        return { firstName: 'Unknown', lastName: 'User' };
-                    } catch (error) {
-                        console.error('Error fetching user details:', error);
-                        return { firstName: 'Unknown', lastName: 'User' };
-                    }
-                },
-                async initialize() {
-                    // Get current user
-                    const user = auth.currentUser;
-                    if (!user) return;
-                    
-                    this.currentUserId = user.uid;
-                    
-                    // Get all chats for current user
-                    this.unsubscribe = db.collection('CHATS')
-                        .where('from_user_id', '==', this.currentUserId)
-                        .onSnapshot(async snapshot => {
-                            const chatMap = new Map();
-                            
-                            for (const doc of snapshot.docs) {
-                                const data = doc.data();
-                                const otherUserId = data.to_user_id;
-                                
-                                if (!chatMap.has(otherUserId) || chatMap.get(otherUserId).timestamp < data.timestamp) {
-                                    // Get user details from USER collection
-                                    const userDetails = await this.getUserDetails(otherUserId);
-                                    
-                                    chatMap.set(otherUserId, {
-                                        userId: otherUserId,
-                                        firstName: userDetails.firstName,
-                                        lastName: userDetails.lastName,
-                                        lastMessage: data.message,
-                                        timestamp: data.timestamp
-                                    });
-                                }
-                            }
-                            
-                            this.chats = Array.from(chatMap.values());
-                        });
-                },
-                async selectChat(chat) {
-                    this.selectedChat = chat;
-                    await this.loadChatMessages();
-                },
-                async loadChatMessages() {
-                    if (!this.selectedChat) return;
-                    
-                    // Clean up previous message listener if it exists
-                    if (this.messageUnsubscribe) {
-                        this.messageUnsubscribe();
-                    }
-                    
-                    // Set up real-time listener for messages
-                    this.messageUnsubscribe = db.collection('CHATS')
-                        .where('from_user_id', 'in', [this.currentUserId, this.selectedChat.userId])
-                        .where('to_user_id', 'in', [this.currentUserId, this.selectedChat.userId])
-                        .orderBy('timestamp', 'asc')
-                        .onSnapshot(snapshot => {
-                            // Convert all timestamps to numbers for consistent comparison
-                            this.selectedChatMessages = snapshot.docs.map(doc => {
-                                const data = doc.data();
-                                const timestamp = data.timestamp?.seconds 
-                                    ? data.timestamp.seconds * 1000
-                                    : typeof data.timestamp === 'number' 
-                                        ? data.timestamp 
-                                        : Date.now();
-                                
-                                return {
-                                    ...data,
-                                    timestamp
-                                };
-                            }).sort((a, b) => a.timestamp - b.timestamp);
-                            
-                            // Scroll to bottom when new messages arrive
-                            this.$nextTick(() => {
-                                const container = this.$refs.messageContainer;
-                                if (container) {
-                                    container.scrollTop = container.scrollHeight;
-                                }
-                            });
-                        });
-                    },
+            isSearching: false,
+            originalChats: [],
+            highlightedMessageId: null,
+          };
+        },
 
-                async sendMessage() {
-                    if (!this.newMessage.trim() || !this.selectedChat) return;
-                    
-                    // Add new message to database using server timestamp
-                    await db.collection('CHATS').add({
-                        from_user_id: this.currentUserId,
-                        to_user_id: this.selectedChat.userId,
-                        message: this.newMessage,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp() // Use server timestamp
-                    });
-                    
-                    this.newMessage = '';
-                    await this.loadChatMessages();
-                },
-
-                formatTimestamp(timestamp) {
-                    if (!timestamp) return 'Invalid Date';
-                    
-                    // Convert to number if it's a Firestore timestamp
-                    const timestampMs = timestamp?.seconds 
-                        ? timestamp.seconds * 1000 
-                        : timestamp;
-                    
-                    return new Date(timestampMs).toLocaleString();
-                }
-                },
-            mounted() {
-                // Check if user is logged in
-                auth.onAuthStateChanged(user => {
-                    if (user) {
-                        this.initialize();
-                    } else {
-                        // Redirect to login page or handle unauthorized access
-                        console.log('User not logged in');
-                    }
-                });
-            },
-            beforeUnmount() {
-                // Clean up listener
-                if (this.unsubscribe) {
-                this.unsubscribe();
-                }
-                if (this.messageUnsubscribe) {
-                    this.messageUnsubscribe();
-                }
+        computed: {
+          sortedChats() {
+            // Only use search results when actually searching
+            if (this.searchTerm.trim() && this.isSearching) {
+              return [...this.searchResults.contacts];
             }
-        });
+            return [...this.chats].sort((a, b) => b.timestamp - a.timestamp);
+          },
 
-        app.mount('#app');
-    </script> 
+          canSendMessage() {
+            return this.newMessage.trim().length > 0;
+          },
+        },
 
-    <script type="module">
-        import { auth, db } from "./backend/firebase-config.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-        import { logout } from './backend/auth.js';
-        
-        async function loadNavbar(user) {
-            let fileToLoad = 'unloggedin_navbar_template.html';
-    
-            if (user) {
-                try {
-                    const userDoc = await getDoc(doc(db, "USER", user.uid));
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        if (userData.role === 'parent') {
-                            fileToLoad = 'parent_navbar_template.html';
-                        } else if (userData.role === 'nanny') {
-                            fileToLoad = 'nanny_navbar_template.html';
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error fetching user role:', error);
-                }
+        methods: {
+          handleImageError(event) {
+            event.target.src = "/api/placeholder/40/40"; // Fallback to placeholder
+          },
+
+          // Chat time formatting
+          formatChatTime(timestamp) {
+            if (!timestamp) return "";
+
+            // Convert Firebase timestamp to milliseconds if needed
+            const messageTime = timestamp?.seconds
+              ? new Date(timestamp.seconds * 1000)
+              : new Date(timestamp);
+            const now = new Date();
+
+            // Set up yesterday date for comparison
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            // Format the dates for comparison
+            const messageDate = messageTime.toDateString();
+            const todayDate = now.toDateString();
+            const yesterdayDate = yesterday.toDateString();
+
+            // Today: show time only
+            if (messageDate === todayDate) {
+              return messageTime.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true,
+              });
             }
-    
+
+            // Yesterday: show "Yesterday"
+            if (messageDate === yesterdayDate) {
+              return "Yesterday";
+            }
+
+            // This year: show date without year
+            if (messageTime.getFullYear() === now.getFullYear()) {
+              return messageTime.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              });
+            }
+
+            // Different year: show date with year
+            return messageTime.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            });
+          },
+
+          formatMessageTime(timestamp) {
+            if (!timestamp) return "";
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            });
+          },
+
+          formatDateForGroup(timestamp) {
+            if (!timestamp) return "";
+            const date = new Date(timestamp);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            if (date.toDateString() === today.toDateString()) {
+              return "Today";
+            } else if (date.toDateString() === yesterday.toDateString()) {
+              return "Yesterday";
+            } else {
+              return date.toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+              });
+            }
+          },
+
+          groupMessagesByDate(messages) {
+            const groups = {};
+            messages.forEach((message) => {
+              const date = new Date(message.timestamp);
+              const dateStr = date.toDateString();
+              if (!groups[dateStr]) {
+                groups[dateStr] = [];
+              }
+              groups[dateStr].push(message);
+            });
+            return Object.entries(groups).map(([date, messages]) => ({
+              date: new Date(date),
+              messages,
+            }));
+          },
+
+          async getUserDetails(userId) {
             try {
-                const response = await fetch(fileToLoad);
-                if (!response.ok) throw new Error('Network response was not ok');
-    
-                const navbarHTML = await response.text();
-                document.getElementById('navbar').innerHTML = navbarHTML;
-    
-                // Add event listener to logout link after navbar is loaded
-                const logoutLink = document.querySelector('#logoutBtn');
-                if (logoutLink) {
-                    logoutLink.addEventListener('click', async (e) => {
-                        e.preventDefault(); // Prevent the default link behavior
-                        console.log("Logout clicked");
-                        try {
-                            await logout(); // The redirect is now handled in the logout function
-                        } catch (error) {
-                            console.error('Logout failed:', error);
-                        }
-                    });
-                } else {
-                    console.log('Logout link not found');
-                }
+              const userDoc = await db.collection("USER").doc(userId).get();
+              if (userDoc.exists) {
+                const userData = userDoc.data();
+                return {
+                  firstName: userData.firstName || "",
+                  lastName: userData.lastName || "",
+                  profilePictureUrl: userData.profilePictureUrl,
+                };
+              }
+              return {
+                firstName: "Unknown",
+                lastName: "User",
+                profilePictureUrl: "/api/placeholder/40/40",
+              };
             } catch (error) {
-                console.error('Failed to load navbar:', error);
+              console.error("Error fetching user details:", error);
+              return {
+                firstName: "Unknown",
+                lastName: "User",
+                profilePictureUrl: "/api/placeholder/40/40",
+              };
             }
+          },
+          async initialize() {
+            // Get current user
+            const user = auth.currentUser;
+            if (!user) return;
+
+            this.currentUserId = user.uid;
+            // Get current user's details including profile picture
+            const currentUserDetails = await this.getUserDetails(
+              this.currentUserId
+            );
+            this.currentUserProfilePic = currentUserDetails.profilePictureUrl;
+
+            // Define the handler function first
+            const handleSnapshot = async (snapshot) => {
+              const chatMap = new Map(
+                this.chats.map((chat) => [chat.userId, chat])
+              );
+
+              for (const doc of snapshot.docs) {
+                const data = doc.data();
+                const otherUserId =
+                  data.from_user_id === this.currentUserId
+                    ? data.to_user_id
+                    : data.from_user_id;
+
+                const existingChat = chatMap.get(otherUserId);
+                const messageTimestamp = data.timestamp?.seconds
+                  ? data.timestamp.seconds * 1000
+                  : data.timestamp;
+
+                if (
+                  !existingChat ||
+                  existingChat.timestamp < messageTimestamp
+                ) {
+                  // Get user details from USER collection
+                  const userDetails = await this.getUserDetails(otherUserId);
+
+                  chatMap.set(otherUserId, {
+                    userId: otherUserId,
+                    firstName: userDetails.firstName,
+                    lastName: userDetails.lastName,
+                    profilePictureUrl: userDetails.profilePictureUrl,
+                    lastMessage: data.message,
+                    timestamp: messageTimestamp,
+                  });
+                }
+              }
+
+              this.chats = Array.from(chatMap.values()).sort(
+                (a, b) => b.timestamp - a.timestamp
+              );
+              this.originalChats = [...this.chats];
+            };
+
+            // Create two listeners - one for sent messages and one for received messages
+            const sentMessagesUnsubscribe = db
+              .collection("CHATS")
+              .where("from_user_id", "==", this.currentUserId)
+              .onSnapshot(handleSnapshot);
+
+            const receivedMessagesUnsubscribe = db
+              .collection("CHATS")
+              .where("to_user_id", "==", this.currentUserId)
+              .onSnapshot(handleSnapshot);
+
+            // Store both unsubscribe functions
+            this.unsubscribe = () => {
+              sentMessagesUnsubscribe();
+              receivedMessagesUnsubscribe();
+            };
+          },
+          async selectChat(chat) {
+            this.selectedChat = chat;
+            await this.loadChatMessages();
+          },
+          async loadChatMessages() {
+            if (!this.selectedChat) return;
+
+            // Clean up previous message listener if it exists
+            if (this.messageUnsubscribe) {
+              this.messageUnsubscribe();
+            }
+
+            // Set up real-time listener for messages
+            this.messageUnsubscribe = db
+              .collection("CHATS")
+              .where("from_user_id", "in", [
+                this.currentUserId,
+                this.selectedChat.userId,
+              ])
+              .where("to_user_id", "in", [
+                this.currentUserId,
+                this.selectedChat.userId,
+              ])
+              .orderBy("timestamp", "asc")
+              .onSnapshot((snapshot) => {
+                // Convert all timestamps to numbers for consistent comparison
+                this.selectedChatMessages = snapshot.docs
+                  .map((doc) => {
+                    const data = doc.data();
+                    const timestamp = data.timestamp?.seconds
+                      ? data.timestamp.seconds * 1000
+                      : typeof data.timestamp === "number"
+                      ? data.timestamp
+                      : Date.now();
+
+                    return {
+                      ...data,
+                      id: doc.id,
+                      timestamp,
+                    };
+                  })
+                  .sort((a, b) => a.timestamp - b.timestamp);
+
+                // Scroll to bottom when new messages arrive
+                this.$nextTick(() => {
+                  const container = this.$refs.messageContainer;
+                  if (container) {
+                    container.scrollTop = container.scrollHeight;
+                  }
+                });
+              });
+          },
+
+          async sendMessage() {
+            if (!this.newMessage.trim() || !this.selectedChat) return;
+
+            // Add new message to database using server timestamp
+            await db.collection("CHATS").add({
+              from_user_id: this.currentUserId,
+              to_user_id: this.selectedChat.userId,
+              message: this.newMessage,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Use server timestamp
+            });
+
+            this.newMessage = "";
+            await this.loadChatMessages();
+          },
+
+          formatTimestamp(timestamp) {
+            if (!timestamp) return "Invalid Date";
+
+            // Convert to number if it's a Firestore timestamp
+            const timestampMs = timestamp?.seconds
+              ? timestamp.seconds * 1000
+              : timestamp;
+
+            return new Date(timestampMs).toLocaleString();
+          },
+
+          async handleSearch(event) {
+            if (!this.searchTerm.trim()) {
+              this.isSearching = false;
+              this.searchResults = {
+                contacts: [],
+                messages: [],
+              };
+              return;
+            }
+
+            this.isSearching = true;
+            await this.performSearch();
+          },
+
+          async performSearch() {
+            try {
+              const searchTermLower = this.searchTerm.toLowerCase();
+              const contacts = new Map();
+              const messages = [];
+
+              // Search through existing chats for names
+              this.chats.forEach((chat) => {
+                const fullName =
+                  `${chat.firstName} ${chat.lastName}`.toLowerCase();
+                if (fullName.includes(searchTermLower)) {
+                  contacts.set(chat.userId, {
+                    ...chat,
+                    matchType: "name",
+                    highlightedName: this.highlightText(
+                      `${chat.firstName} ${chat.lastName}`,
+                      this.searchTerm
+                    ),
+                  });
+                }
+              });
+
+              // Perform message search regardless of search term length
+              const [sentMessages, receivedMessages] = await Promise.all([
+                db
+                  .collection("CHATS")
+                  .where("from_user_id", "==", this.currentUserId)
+                  .get(),
+                db
+                  .collection("CHATS")
+                  .where("to_user_id", "==", this.currentUserId)
+                  .get(),
+              ]);
+
+              // Process messages
+              const processMessageSnapshot = async (querySnapshot) => {
+                for (const doc of querySnapshot.docs) {
+                  const messageData = doc.data();
+                  if (
+                    messageData.message.toLowerCase().includes(searchTermLower)
+                  ) {
+                    const otherUserId =
+                      messageData.from_user_id === this.currentUserId
+                        ? messageData.to_user_id
+                        : messageData.from_user_id;
+
+                    // Check if we already have user details cached
+                    let userDetails = contacts.get(otherUserId);
+                    if (!userDetails) {
+                      userDetails = await this.getUserDetails(otherUserId);
+                    }
+
+                    messages.push({
+                      messageId: doc.id,
+                      userId: otherUserId,
+                      firstName: userDetails.firstName,
+                      lastName: userDetails.lastName,
+                      profilePictureUrl: userDetails.profilePictureUrl,
+                      message: messageData.message,
+                      highlightedMessage: this.highlightText(
+                        messageData.message,
+                        this.searchTerm
+                      ),
+                      timestamp: messageData.timestamp,
+                      matchType: "message",
+                    });
+                  }
+                }
+              };
+
+              await Promise.all([
+                processMessageSnapshot(sentMessages),
+                processMessageSnapshot(receivedMessages),
+              ]);
+
+              // Update search results
+              this.searchResults = {
+                contacts: Array.from(contacts.values()),
+                messages: messages,
+              };
+            } catch (error) {
+              console.error("Search error:", error);
+              this.searchResults = {
+                contacts: [],
+                messages: [],
+              };
+            }
+          },
+
+          // Helper method to highlight matching text
+          highlightText(text, searchTerm) {
+            if (!searchTerm) return text;
+            const regex = new RegExp(`(${searchTerm})`, "gi");
+            return text.replace(regex, "<mark>$1</mark>");
+          },
+
+          // Method to scroll to and highlight a specific message
+          async scrollToMessage(messageId, userId) {
+            try {
+              // First select the chat if needed
+              const chat = this.chats.find((c) => c.userId === userId);
+              if (
+                chat &&
+                (!this.selectedChat || this.selectedChat.userId !== userId)
+              ) {
+                await this.selectChat(chat);
+
+                // Wait for messages to load and Vue to update the DOM
+                await new Promise((resolve) => {
+                  // Use nextTick to wait for Vue to update the DOM
+                  this.$nextTick(() => {
+                    // Add a small delay to ensure messages are loaded
+                    setTimeout(resolve, 100);
+                  });
+                });
+              }
+
+              // Set the highlighted message ID
+              this.highlightedMessageId = messageId;
+
+              // Find and scroll to the message
+              const messageElement = document.querySelector(
+                `[data-message-id="${messageId}"]`
+              );
+
+              if (messageElement) {
+                messageElement.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center",
+                });
+
+                // Add highlight class
+                messageElement.classList.add("highlighted");
+
+                // Remove highlight after animation
+                setTimeout(() => {
+                  this.highlightedMessageId = null;
+                  messageElement.classList.remove("highlighted");
+                }, 2000);
+              }
+            } catch (error) {
+              console.error("Error scrolling to message:", error);
+            }
+          },
+        },
+
+        watch: {
+          searchTerm: _.debounce(function (newValue) {
+            if (newValue.trim()) {
+              this.handleSearch();
+            } else {
+              this.searchResults = {
+                contacts: [],
+                messages: [],
+              };
+              this.isSearching = false;
+            }
+          }, 300),
+        },
+
+        mounted() {
+          // Check if user is logged in
+          auth.onAuthStateChanged((user) => {
+            if (user) {
+              this.initialize();
+            } else {
+              // Redirect to login page or handle unauthorized access
+              console.log("User not logged in");
+            }
+          });
+
+          // To create icons
+          this.$nextTick(() => {
+            lucide.createIcons();
+          });
+        },
+
+        // To handle dynamic updates
+        updated() {
+          this.$nextTick(() => {
+            lucide.createIcons();
+          });
+        },
+
+        beforeUnmount() {
+          // Clean up listener
+          if (this.unsubscribe) {
+            this.unsubscribe();
+          }
+          if (this.messageUnsubscribe) {
+            this.messageUnsubscribe();
+          }
+        },
+      });
+
+      app.mount("#app");
+    </script>
+
+    <script type="module">
+      import { auth, db } from "./backend/firebase-config.js";
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+      import { logout } from "./backend/auth.js";
+
+      async function loadNavbar(user) {
+        let fileToLoad = "unloggedin_navbar_template.html";
+
+        if (user) {
+          try {
+            const userDoc = await getDoc(doc(db, "USER", user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              if (userData.role === "parent") {
+                fileToLoad = "parent_navbar_template.html";
+              } else if (userData.role === "nanny") {
+                fileToLoad = "nanny_navbar_template.html";
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching user role:", error);
+          }
         }
-    
-        onAuthStateChanged(auth, (user) => {
-            console.log('Auth state changed');
-            loadNavbar(user);
-        });
+
+        try {
+          const response = await fetch(fileToLoad);
+          if (!response.ok) throw new Error("Network response was not ok");
+
+          const navbarHTML = await response.text();
+          document.getElementById("navbar").innerHTML = navbarHTML;
+
+          // Add event listener to logout link after navbar is loaded
+          const logoutLink = document.querySelector("#logoutBtn");
+          if (logoutLink) {
+            logoutLink.addEventListener("click", async (e) => {
+              e.preventDefault(); // Prevent the default link behavior
+              console.log("Logout clicked");
+              try {
+                await logout(); // The redirect is now handled in the logout function
+              } catch (error) {
+                console.error("Logout failed:", error);
+              }
+            });
+          } else {
+            console.log("Logout link not found");
+          }
+        } catch (error) {
+          console.error("Failed to load navbar:", error);
+        }
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        console.log("Auth state changed");
+        loadNavbar(user);
+      });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-</body>
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+    </script>
+  </body>
 </html>
