@@ -7,8 +7,10 @@
     height: 100px;
     position: fixed;
     width: 100%;
-    z-index: 10000;
-}
+    z-index: 1000;
+    background: white; /* Ensure navbar has background */
+    transition: height 0.3s ease;
+  }
 
   .navbar-brand {
     font-weight: 600;
@@ -25,7 +27,7 @@
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-  } 
+  }
 
   .nav-link {
     color: #333 !important;
@@ -105,61 +107,60 @@
     }
   }
 </style>
-    <!-- Only the navbar itself, no extra wrappers -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
-      <div class="container">
-        <a class="navbar-brand" href="nanny_home.html">
-          <img src="img/nany_logo.png" alt="Nanny logo" />
-          <span class="brand-text">Nanny</span>
-        </a>
+<!-- Only the navbar itself, no extra wrappers -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="nanny_home.html">
+      <img src="img/nany_logo.png" alt="Nanny logo" />
+      <span class="brand-text">Nanny</span>
+    </a>
 
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="nanny_home.html">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="nanny_jobs.html">My Jobs</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="nanny_chat.html">Chat</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="nanny_home.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="nanny_jobs.html">My Jobs</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="nanny_chat.html">Chat</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="navbarDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+          >
+            Profile
+          </a>
+          <ul
+            class="dropdown-menu dropdown-menu-end"
+            aria-labelledby="navbarDropdown"
+          >
+            <li>
+              <a class="dropdown-item" href="nanny_profilePage.html"
+                >My Account</a
               >
-                Profile
-              </a>
-              <ul
-                class="dropdown-menu dropdown-menu-end"
-                aria-labelledby="navbarDropdown"
-              >
-                <li>
-                  <a class="dropdown-item" href="nanny_profilePage.html"
-                    >My Account</a
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a class="dropdown-item" href="#" id="logoutBtn">Logout</a>
-                </li>
-              </ul>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item" href="#" id="logoutBtn">Logout</a>
             </li>
           </ul>
-        </div>
-      </div>
-    </nav>
- 
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
