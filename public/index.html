@@ -283,25 +283,71 @@
             fill: white;
             opacity: 0.8;
         }
-        .modal-dialog {
-    /* Remove fixed positioning */
-    position: relative;
-    top: auto;
-    left: auto;
-    transform: none;
-    margin: 1.75rem auto; /* Bootstrap's default margin */
-    width: 800px;
+        /* Find your existing .modal-header styles and update them */
+.modal-header {
+    background-color: #7952EC !important; /* Purple theme matching signup */
+    color: white !important;
+    border-bottom: none;
+}
+
+/* Update the button styles in your modal */
+.modal .btn-primary {
+    background-color: #7952EC !important;
+    border-color: #7952EC !important;
+}
+
+.modal .btn-primary:hover {
+    background-color: #6742d1 !important;
+    border-color: #6742d1 !important;
+}
+
+/* Update form control focus states */
+.modal .form-control:focus {
+    border-color: #7952EC !important;
+    box-shadow: 0 0 0 0.2rem rgba(121, 82, 236, 0.25) !important;
+}
+
+/* Update checkbox styles */
+.modal .form-check-input:checked {
+    background-color: #7952EC !important;
+    border-color: #7952EC !important;
+}
+
+/* Update link colors in modal */
+.modal a {
+    color: #7952EC !important;
+    text-decoration: none;
+}
+
+.modal a:hover {
+    text-decoration: underline;
+}
+.modal-dialog {
+    /* Remove any existing positioning */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    width: 400px; /* or whatever width you prefer */
 }
 
 .modal-content {
-    border-radius: 8px;
+    border-radius: 15px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.modal-header {
-    border-bottom: 1px solid #dee2e6;
-    padding: 1rem;
+/* Add styles for the modal backdrop */
+.modal.fade .modal-dialog {
+    transform: translate(-50%, -50%) !important;
 }
+
+/* Ensure the modal backdrop covers the whole screen */
+.modal-backdrop {
+    width: 100%;
+    height: 100%;
+}
+
 
 .modal-title {
     font-size: 1.25rem;
@@ -318,7 +364,7 @@
 }
 
 .btn-login {
-    background-color: #28a745;
+    background-color: #7952EC ;
     color: white;
     width: 100%;
     padding: 0.5rem;
@@ -328,7 +374,7 @@
 }
 
 .btn-login:hover {
-    background-color: #218838;
+    background-color: #5b4bc4;
 }
 
 .btn-close {
@@ -337,6 +383,362 @@
     font-size: 1.5rem;
     padding: 0.5rem;
     cursor: pointer;
+}
+/* Review Section Container */
+.review-section {
+  position: fixed;
+  width: 100%;
+  max-width: 1200px; /* Increased for better large screen display */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  padding: 2rem;
+}
+
+/* Review Title Styling */
+.review-title {
+  color: #2d3748;
+  text-align: center;
+  font-size: 2.75rem;
+  margin-bottom: 3rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  line-height: 1.2;
+}
+
+/* Review Card Styling */
+.review-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  margin: 0 auto;
+  max-width: 900px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Avatar Styling */
+.review-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Reviewer Name Styling */
+.review-card h5 {
+  color: #2d3748;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* Review Text Styling */
+.review-text {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #4a5568;
+  margin: 1.5rem 0;
+  font-style: italic;
+  position: relative;
+}
+
+.review-text::before,
+.review-text::after {
+  content: '"';
+  font-size: 2rem;
+  color: #7952EC;
+  font-family: Georgia, serif;
+  position: absolute;
+}
+
+.review-text::before {
+  left: -15px;
+  top: -10px;
+}
+
+.review-text::after {
+  right: -15px;
+  bottom: -10px;
+}
+
+/* Stars Styling */
+.stars {
+  color: #FFD700;
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  letter-spacing: 3px;
+}
+
+/* Review Section Container */
+.review-section {
+  position: fixed;
+  width: 100%;
+  max-width: 800px; /* Reduced max-width to match header width */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  padding: 1rem;
+}
+
+/* Review Title Styling */
+.review-title {
+  color: #2d3748;
+  text-align: center;
+  font-size: 1.75rem; /* Reduced from 2.75rem */
+  margin-bottom: 2rem; /* Reduced from 3rem */
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  line-height: 1.2;
+}
+
+/* Review Card Styling */
+.review-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px; /* Reduced from 20px */
+  padding: 2rem 1.5rem; /* Reduced padding */
+  margin: 0 auto;
+  max-width: 600px; /* Reduced from 900px */
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-3px); /* Reduced from -5px */
+}
+
+/* Avatar Styling */
+.review-avatar {
+  width: 70px; /* Reduced from 100px */
+  height: 70px; /* Reduced from 100px */
+  border-radius: 50%;
+  margin-bottom: 1rem; /* Reduced from 1.5rem */
+  border: 3px solid white; /* Reduced from 4px */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Reviewer Name Styling */
+.review-card h5 {
+  color: #2d3748;
+  font-size: 1.2rem; /* Reduced from 1.5rem */
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+/* Review Text Styling */
+.review-text {
+  font-size: 1rem; /* Reduced from 1.2rem */
+  line-height: 1.6;
+  color: #4a5568;
+  margin: 1rem 0; /* Reduced from 1.5rem */
+  font-style: italic;
+  position: relative;
+  padding: 0 1rem; /* Added padding for quotes */
+}
+
+.review-text::before,
+.review-text::after {
+  content: '"';
+  font-size: 1.5rem; /* Reduced from 2rem */
+  color: #7952EC;
+  font-family: Georgia, serif;
+  position: absolute;
+}
+
+.review-text::before {
+  left: -5px;
+  top: -8px;
+}
+
+.review-text::after {
+  right: -5px;
+  bottom: -8px;
+}
+
+/* Stars Styling */
+.stars {
+  color: #FFD700;
+  font-size: 1.2rem; /* Reduced from 1.5rem */
+  margin-top: 1rem; /* Reduced from 1.5rem */
+  letter-spacing: 2px; /* Reduced from 3px */
+}
+
+/* Review Section Container */
+.review-section {
+  position: fixed;
+  width: 100%;
+  max-width: 800px; /* Reduced max-width to match header width */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  padding: 1rem;
+}
+
+/* Review Title Styling */
+.review-title {
+  color: #2d3748;
+  text-align: center;
+  font-size: 1.75rem; /* Reduced from 2.75rem */
+  margin-bottom: 2rem; /* Reduced from 3rem */
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  line-height: 1.2;
+}
+
+/* Review Card Styling */
+.review-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px; /* Reduced from 20px */
+  padding: 2rem 1.5rem; /* Reduced padding */
+  margin: 0 auto;
+  max-width: 600px; /* Reduced from 900px */
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-3px); /* Reduced from -5px */
+}
+
+/* Avatar Styling */
+.review-avatar {
+  width: 70px; /* Reduced from 100px */
+  height: 70px; /* Reduced from 100px */
+  border-radius: 50%;
+  margin-bottom: 1rem; /* Reduced from 1.5rem */
+  border: 3px solid white; /* Reduced from 4px */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Reviewer Name Styling */
+.review-card h5 {
+  color: #2d3748;
+  font-size: 1.2rem; /* Reduced from 1.5rem */
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+/* Review Text Styling */
+.review-text {
+  font-size: 1rem; /* Reduced from 1.2rem */
+  line-height: 1.6;
+  color: #4a5568;
+  margin: 1rem 0; /* Reduced from 1.5rem */
+  font-style: italic;
+  position: relative;
+  padding: 0 1rem; /* Added padding for quotes */
+}
+
+.review-text::before,
+.review-text::after {
+  content: '"';
+  font-size: 1.5rem; /* Reduced from 2rem */
+  color: #7952EC;
+  font-family: Georgia, serif;
+  position: absolute;
+}
+
+.review-text::before {
+  left: -5px;
+  top: -8px;
+}
+
+.review-text::after {
+  right: -5px;
+  bottom: -8px;
+}
+
+/* Stars Styling */
+.stars {
+  color: #FFD700;
+  font-size: 1.2rem; /* Reduced from 1.5rem */
+  margin-top: 1rem; /* Reduced from 1.5rem */
+  letter-spacing: 2px; /* Reduced from 3px */
+}
+
+/* Carousel Controls Styling */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 8%; /* Reduced from 10% */
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  padding: 1rem; /* Reduced from 1.5rem */
+  background-size: 50%;
+}
+
+/* Carousel Indicators Styling */
+.carousel-indicators {
+  bottom: -40px; /* Reduced from -60px */
+}
+
+.carousel-indicators button {
+  width: 8px !important; /* Reduced from 12px */
+  height: 8px !important; /* Reduced from 12px */
+  border-radius: 50%;
+  margin: 0 6px !important; /* Reduced from 8px */
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  border: 2px solid white !important;
+  transition: all 0.3s ease;
+}
+
+.carousel-indicators button.active {
+  background-color: #7952EC !important;
+  transform: scale(1.2);
+}
+
+/* Carousel Item Animation */
+.carousel-item {
+  padding: 0.75rem; /* Reduced from 1rem */
+  transition: transform 0.6s ease-in-out;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .review-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .review-card {
+    padding: 1.5rem 1rem;
+  }
+  
+  .review-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  .review-avatar {
+    width: 60px;
+    height: 60px;
+  }
 }
     </style>
 </head>
@@ -367,167 +769,55 @@
             <button class="scroll-button" id="scroll-button">Scroll to find out more</button>
         </div>
     </div>
-    <div class="modal fade" id="parentSignupModal" tabindex="-1" aria-labelledby="parentSignupModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h4 class="modal-title" id="parentSignupModalLabel">Create Your Account</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div id="signupApp">
-                        <form @submit.prevent="handleSubmit">
-                            <!-- Personal Information Section -->
-                            <div class="card mb-4">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0">Personal Information</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label for="firstName" class="form-label">First Name</label>
-                                            <input type="text" class="form-control" id="firstName" v-model="firstName" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="lastName" class="form-label">Last Name</label>
-                                            <input type="text" class="form-control" id="lastName" v-model="lastName" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="dob" class="form-label">Date of Birth</label>
-                                            <input type="date" class="form-control" id="dob" v-model="dob" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="gender" class="form-label">Gender</label>
-                                            <select class="form-select" id="gender" v-model="gender" required>
-                                                <option value="">Select gender</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-    
-                            <!-- Contact Information Section -->
-                            <div class="card mb-4">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0">Contact Information</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label for="email" class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="email" v-model="email" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="phoneNumber" class="form-label">Phone Number</label>
-                                            <input type="tel" class="form-control" id="phoneNumber" v-model="phoneNumber" required>
-                                        </div>
-                                        <div class="col-12">
-                                            <label for="homeaddress" class="form-label">Home Address</label>
-                                            <input type="text" class="form-control" id="homeaddress" v-model="homeAddress" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-    
-                            <!-- Account Security Section -->
-                            <div class="card mb-4">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0">Account Security</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label for="password" class="form-label">Password</label>
-                                            <input type="password" class="form-control" id="password" v-model="password" required @input="validatePassword">
-                                            <div v-if="passwordError" class="text-danger small mt-1">{{ passwordError }}</div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                            <input type="password" class="form-control" id="confirmPassword" v-model="confirmPassword" required @input="validatePassword">
-                                            <div v-if="confirmPasswordError" class="text-danger small mt-1">{{ confirmPasswordError }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-    
-                            <!-- Profile Section -->
-                            <div class="card mb-4">
-                                <div class="card-header bg-light">
-                                    <h5 class="mb-0">Profile</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label for="profilePicture" class="form-label">Profile Picture</label>
-                                            <input type="file" class="form-control" id="profilePicture" @change="handleProfilePictureUpload" accept="image/*">
-                                        </div>
-                                        <div class="col-12">
-                                            <label for="aboutMe" class="form-label">About Me</label>
-                                            <textarea class="form-control" id="aboutMe" v-model="aboutMe" rows="4" 
-                                                placeholder="Tell us about yourself and your family..." required></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-    
-                            <!-- Children Section -->
-                            <div class="card mb-4">
-                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0">Children</h5>
-                                    <button type="button" class="btn btn-primary btn-sm" @click="addChild">
-                                        <i class="fas fa-plus me-1"></i> Add Child
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row g-4">
-                                        <div v-for="(child, index) in children" :key="index" class="col-md-6">
-                                            <div class="card h-100 border-light">
-                                                <div class="card-body">
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <h6 class="card-title mb-0">Child {{ index + 1 }}</h6>
-                                                        <button type="button" class="btn btn-outline-danger btn-sm" @click="removeChild(index)">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label :for="'childName' + index" class="form-label">Name</label>
-                                                        <input type="text" class="form-control" :id="'childName' + index" v-model="child.name" required>
-                                                    </div>
-                                                    <div class="row g-3">
-                                                        <div class="col-6">
-                                                            <label :for="'childAge' + index" class="form-label">Age</label>
-                                                            <input type="number" class="form-control" :id="'childAge' + index" v-model="child.age" required>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <label :for="'childGender' + index" class="form-label">Gender</label>
-                                                            <select class="form-select" :id="'childGender' + index" v-model="child.gender" required>
-                                                                <option value="">Select</option>
-                                                                <option value="male">Male</option>
-                                                                <option value="female">Female</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-    
-                            <!-- Submit Button -->
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-primary btn-lg px-5">
-                                    Create Account
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+    <div id="reviewSection" class="review-section">
+        <h2 class="review-title">See what our Parents and Nannies have to say</h2>
+        
+        <div id="reviewCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#reviewCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#reviewCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#reviewCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+          </div>
+          
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <div class="review-card">
+                <img src="./img/baby.jpeg" class="review-avatar" alt="Sarah M.">
+                <h5>Sarah M. - Parent</h5>
+                <p class="review-text">"Finding our perfect nanny through nany was a game-changer! The platform made it so easy to connect with qualified caregivers who truly understand our family's needs."</p>
+                <div class="stars">★★★★★</div>
+              </div>
             </div>
+            
+            <div class="carousel-item">
+              <div class="review-card">
+                <img src="./img/girl.jpeg" class="review-avatar" alt="Michaela P.">
+                <h5>Michaela P. - Nanny</h5>
+                <p class="review-text">"As a professional nanny, nany has helped me find wonderful families to work with. The platform's focus on matching compatible personalities has made all the difference."</p>
+                <div class="stars">★★★★★</div>
+              </div>
+            </div>
+            
+            <div class="carousel-item">
+              <div class="review-card">
+                <img src="./img/pet.jpeg" class="review-avatar" alt="Emily R.">
+                <h5>Emily R. - Parent</h5>
+                <p class="review-text">"The peace of mind we've gotten through nany is priceless. The verification process and detailed profiles helped us find someone we could truly trust with our children."</p>
+                <div class="stars">★★★★★</div>
+              </div>
+            </div>
+          </div>
+          
+          <button class="carousel-control-prev" type="button" data-bs-target="#reviewCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#reviewCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
         </div>
-    </div>
+      </div>
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -560,12 +850,7 @@
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
         import { login, logout, initAuth, getCurrentUser, redirectBasedOnRole } from './backend/auth.js';
         import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
-import {
-    storeParentData,
-    handleFileUpload,
-    redirectToParentHome,
-} from "./backend/firebase-op.js";
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+        import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
         async function loadNavbar(user) {
             let fileToLoad = 'unloggedin_navbar_template.html';
@@ -624,120 +909,21 @@ import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebase
                 navbar.classList.remove('scrolled');
             }
         });
-// Initialize Vue app for signup form
-const signupApp = createApp({
-    data() {
-        return {
-            email: "",
-            firstName: "",
-            lastName: "",
-            dob: "",
-            gender: "",
-            homeAddress: "",
-            phoneNumber: "",
-            children: [{ name: "", gender: "", age: null }],
-            password: "",
-            confirmPassword: "",
-            passwordError: "",
-            confirmPasswordError: "",
-            profilePicture: null,
-            aboutMe: "",
-            errorMessage: "",
-        };
-    },
-    methods: {
-        addChild() {
-            this.children.push({ name: "", gender: "", age: null });
-        },
-
-        validatePassword() {
-            const passwordRegex = /^(?=.*\d).{8,}$/;
-            if (!passwordRegex.test(this.password)) {
-                this.passwordError = "Password must be at least 8 characters long and contain a number";
-            } else {
-                this.passwordError = "";
-            }
-
-            if (this.password !== this.confirmPassword) {
-                this.confirmPasswordError = "Passwords do not match";
-            } else {
-                this.confirmPasswordError = "";
-            }
-        },
-
-        handleProfilePictureUpload(event) {
-            const file = handleFileUpload(event);
-            if (file) {
-                this.profilePicture = file;
-            }
-        },
-
-        async handleSubmit() {
-            try {
-                const userCredential = await createUserWithEmailAndPassword(
-                    auth,
-                    this.email,
-                    this.password
-                );
-                const user = userCredential.user;
-
-                await storeParentData(user, {
-                    email: this.email,
-                    firstName: this.firstName,
-                    lastName: this.lastName,
-                    dob: this.dob,
-                    gender: this.gender,
-                    homeAddress: this.homeAddress,
-                    phoneNumber: this.phoneNumber,
-                    children: this.children,
-                    profilePicture: this.profilePicture,
-                    aboutMe: this.aboutMe,
-                    isEditMode: false,
-                });
-
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('parentSignupModal'));
-                modal.hide();
-                
-                // Redirect to parent home
-                redirectToParentHome();
-            } catch (error) {
-                console.error("Signup error:", error);
-                this.errorMessage = error.message;
-            }
-        }
-    }
-});
-
-// Mount the signup app
-signupApp.mount("#signupApp");
-
 // Initialize modals
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Bootstrap modals
     const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-    const signupModal = new bootstrap.Modal(document.getElementById('parentSignupModal'));
-
     // Add event listeners for modal triggers if you have any
     const loginTriggers = document.querySelectorAll('[data-bs-target="#loginModal"]');
-    const signupTriggers = document.querySelectorAll('[data-bs-target="#parentSignupModal"]');
-
     loginTriggers.forEach(trigger => {
         trigger.addEventListener('click', () => loginModal.show());
     });
-
-    signupTriggers.forEach(trigger => {
-        trigger.addEventListener('click', () => signupModal.show());
-    });
-
     // Handle login form submission
     const loginForm = document.getElementById('loginForm');
     loginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
-
         try {
             const { user, role } = await login(email, password);
             loginModal.hide();
@@ -761,10 +947,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const scrollButton = document.getElementById('scroll-button');
 
         const colorStops = [
-            { position: 0, color: { r: 135, g: 206, b: 235 } },
-            { position: 0.5, color: { r: 255, g: 127, b: 80 } },
-            { position: 1, color: { r: 50, g: 59, b: 96 } }
-        ];
+    { position: 0, color: { r: 135, g: 206, b: 235 } },     // Morning blue
+    { position: 0.3, color: { r: 255, g: 127, b: 80 } },    // Start afternoon orange
+    { position: 0.7, color: { r: 255, g: 127, b: 80 } },    // End afternoon orange
+    { position: 1, color: { r: 50, g: 59, b: 96 } }         // Night blue
+];
 
         const cloudPaths = [
             'M25,60 A20,20 0 0,1 65,60 A20,20 0 0,1 95,60 Q95,65 85,65 Q85,70 75,70 Q65,70 65,65 Q45,70 35,65 Q25,65 25,60',
@@ -868,24 +1055,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const scrollThreshold = 200;
         let hasScrolled = false;
 
-        window.addEventListener('scroll', () => {
+window.addEventListener('scroll', () => {
     const currentScrollPosition = window.scrollY;
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollProgress = Math.min(1, currentScrollPosition / maxScroll); // Clamp between 0 and 1
+    const scrollProgress = Math.min(1, currentScrollPosition / maxScroll);
     const navbar = document.querySelector('.navbar');
     updateLogo();
     const taglineContainer = document.getElementById('tagline-container');
-            
-            // Add night-mode class when scroll progress is past 80%
-            if (scrollProgress > 0.8) {
-                taglineContainer.classList.add('night-mode');
-            } else {
-                taglineContainer.classList.remove('night-mode');
-            }
     
-    if (scrollProgress > 0.8) {
+    // Update night mode threshold
+    if (scrollProgress > 0.7) {
+        taglineContainer.classList.add('night-mode');
         navbar.classList.add('move');
     } else {
+        taglineContainer.classList.remove('night-mode');
         navbar.classList.remove('move');
     }
     
@@ -894,44 +1077,70 @@ document.addEventListener('DOMContentLoaded', () => {
     buttons.forEach(button => {
         button.style.color = '#483D8B';
     });
+
     // Update background color
     const color = getColorForScrollPosition(scrollProgress);
     document.querySelector('.container-fluid').style.backgroundColor = `rgb(${color.r}, ${color.g}, ${color.b})`;
 
-    // Transition elements based on progress
-    const sunProgress = Math.min(1, scrollProgress * 2);  // Set sun disappearance before halfway
-    document.querySelector('.sun').style.top = `${15 + (sunProgress * 85)}%`;
-    document.querySelector('.sun').style.opacity = Math.max(0, 1 - sunProgress);
+    // Adjust element transitions for afternoon phase
+    const morningToAfternoon = Math.min(1, Math.max(0, (scrollProgress - 0.2) * 5)); // Fade out entering afternoon
+    const afternoonToNight = Math.min(1, Math.max(0, (scrollProgress - 0.7) * 5));   // Fade in leaving afternoon
 
-    const moonProgress = Math.max(0, (scrollProgress - 0.5) * 2); // Moon starts appearing halfway
-    document.querySelector('.moon').style.top = `${85 - (moonProgress * 70)}%`;
-    document.querySelector('.moon').style.opacity = moonProgress;
+    // Sun transition
+    const sun = document.querySelector('.sun');
+    sun.style.top = `${15 + (morningToAfternoon * 85)}%`;
+    sun.style.opacity = Math.max(0, 1 - morningToAfternoon);
 
-    document.getElementById('stars').style.opacity = Math.max(0, (scrollProgress - 0.5) * 2);
-    document.getElementById('clouds').style.opacity = Math.max(0, 1 - scrollProgress * 2);
+    // Moon transition
+    const moon = document.querySelector('.moon');
+    moon.style.top = `${85 - (afternoonToNight * 70)}%`;
+    moon.style.opacity = afternoonToNight;
 
-    // Adjust tagline and button opacity based on scroll position
-    if (scrollProgress > 0.3 && scrollProgress < 0.6) {
-        document.getElementById('tagline-container').style.opacity = 0;
+    // Stars transition
+    const stars = document.getElementById('stars');
+    stars.style.opacity = afternoonToNight;
+
+    // Clouds transition
+    const clouds = document.getElementById('clouds');
+    clouds.style.opacity = Math.max(0, 1 - morningToAfternoon);
+
+    // Tagline container transitions
+    if (scrollProgress > 0.25 && scrollProgress < 0.65) {
+        // Hide during afternoon
+        taglineContainer.style.opacity = 0;
+    } else if (scrollProgress >= 0.65) {
+        // Fade in for night
+        taglineContainer.style.opacity = afternoonToNight;
     } else {
-        document.getElementById('tagline-container').style.opacity = 1;
+        // Show during morning
+        taglineContainer.style.opacity = Math.max(0, 1 - morningToAfternoon);
     }
 
-    // Button opacity for "night" section
-    if (scrollProgress > 0.8) {
-        document.getElementById('button-container').style.opacity = Math.min(1, (scrollProgress - 0.8) * 5);
+    // Button container transitions
+    const buttonContainer = document.getElementById('button-container');
+    if (scrollProgress > 0.7) {
+        buttonContainer.style.opacity = afternoonToNight;
     } else {
-        document.getElementById('button-container').style.opacity = 0;
+        buttonContainer.style.opacity = 0;
     }
-    // Add this code inside the window.addEventListener('scroll', ...) event listener
-if (currentScrollPosition > scrollThreshold) {
-    scrollButton.classList.add('hidden');
-    hasScrolled = true;
+
+    // Scroll button visibility
+    if (currentScrollPosition > scrollThreshold) {
+        scrollButton.classList.add('hidden');
+        hasScrolled = true;
+    } else {
+        scrollButton.classList.remove('hidden');
+    }
+    const reviewSection = document.getElementById('reviewSection');
+    if (scrollProgress > 0.3 && scrollProgress < 0.7) {
+    // Show during afternoon (fade in/out smoothly with faster transitions)
+    const fadeInProgress = Math.min(1, Math.max(0, (scrollProgress - 0.3) * 10)); // Increased from 5 to 10
+    const fadeOutProgress = Math.min(1, Math.max(0, (0.7 - scrollProgress) * 10)); // Increased from 5 to 10
+    reviewSection.style.opacity = Math.min(fadeInProgress, fadeOutProgress);
 } else {
-    scrollButton.classList.remove('hidden');
+    // Hide during morning and night
+    reviewSection.style.opacity = 0;
 }
-
-
 });
 // JavaScript to toggle button color on scroll
 
