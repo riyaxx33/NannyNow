@@ -390,34 +390,64 @@
             },
             computed: {
                 filteredPosts() {
-                // First filter for posts where current nanny is interested
-                const userPosts = this.posts.filter(post => {
-                    console.log('Post interestedNannies:', post.interestedNannies);
+                    console.log('Computing filtered posts');
+                    console.log('All posts:', this.posts);
                     console.log('Current user ID:', this.currentUserId);
-                    return post.interestedNannies && 
-                            Array.isArray(post.interestedNannies) && 
-                            post.interestedNannies.includes(this.currentUserId);
-                });
+                    console.log('Active tab:', this.activeTab);
 
-                console.log('Filtered user posts:', userPosts);
-                
-                // Then apply the tab filters
-                return userPosts.filter(post => {
-                    switch (this.activeTab) {
-                        case 'requested':
-                            return !post.completed && post.status;
-                        case 'upcoming':
-                            return post.completed && post.status;
-                        case 'completed':
-                            return post.completed && !post.status;
-                        case 'expired':
-                            return !post.completed && !post.status;
-                        default:
-                            return false;
+                    // First ensure we have valid posts and a current user ID
+                    if (!Array.isArray(this.posts) || !this.currentUserId) {
+                        console.log('No posts array or no current user ID');
+                        return [];
                     }
-                });
-            }
-        },
+
+                    // Filter posts where the current nanny is interested
+                    const userPosts = this.posts.filter(post => {
+                        // Ensure interestedNannies exists and is an array
+                        const hasValidInterestedNannies = post.interestedNannies && 
+                            Array.isArray(post.interestedNannies);
+
+                        // Check if current user is in the interestedNannies array
+                        const isUserInterested = hasValidInterestedNannies && 
+                            post.interestedNannies.some(nanny => 
+                                typeof nanny === 'string' ? 
+                                nanny === this.currentUserId : 
+                                nanny.id === this.currentUserId
+                            );
+
+                        console.log(`Post ${post.id} - Has valid interested nannies:`, hasValidInterestedNannies);
+                        console.log(`Post ${post.id} - Is user interested:`, isUserInterested);
+
+                        return isUserInterested;
+                    });
+
+                    console.log('Posts after user filter:', userPosts);
+
+                    // Then apply the tab filters
+                    const filteredByTab = userPosts.filter(post => {
+                        const result = (() => {
+                            switch (this.activeTab) {
+                                case 'requested':
+                                    return !post.completed && post.status === true;
+                                case 'upcoming':
+                                    return post.completed && post.status === true;
+                                case 'completed':
+                                    return post.completed && post.status === false;
+                                case 'expired':
+                                    return !post.completed && post.status === false;
+                                default:
+                                    return false;
+                            }
+                        })();
+                        
+                        console.log(`Post ${post.id} - Matches ${this.activeTab} tab:`, result);
+                        return result;
+                    });
+
+                    console.log('Final filtered posts:', filteredByTab);
+                    return filteredByTab;
+                }
+            },
             methods: {
                 formatDate(date) {
                 if (date && typeof date === 'string') {
