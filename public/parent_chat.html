@@ -485,6 +485,83 @@
           border-radius: 0;
         }
       }
+
+      /* Styles for the review modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.4);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 8px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .star-rating {
+        display: flex;
+        justify-content: center;
+        font-size: 24px;
+      }
+
+      .star {
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+
+      .star.active {
+        color: #ffd700;
+      }
+
+      .review-textarea {
+        width: 100%;
+        height: 100px;
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+      }
+
+      .review-submit {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .review-submit:hover {
+        background-color: #45a049;
+      }
     </style>
   </head>
   <body>
@@ -613,6 +690,13 @@
                     {{ selectedChat.firstName }} {{ selectedChat.lastName }}
                   </h3>
                 </div>
+                <button 
+                  v-if="selectedChat.role === 'nanny'"
+                  @click="openReviewModal"
+                  class="btn btn-outline-primary btn-sm ml-4"
+                >
+                  Leave Review
+                </button>
               </div>
             </div>
 
@@ -673,6 +757,36 @@
       </div>
     </div>
 
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="closeReviewModal">&times;</span>
+        <h2>How was your experience?</h2>
+        <p>Rate {{ selectedChat ? selectedChat.firstName : 'the nanny' }}</p>
+        <div class="star-rating">
+          <span 
+            v-for="star in 5" 
+            :key="star" 
+            class="star" 
+            :class="{ active: star <= rating }"
+            @click="setRating(star)"
+            @mouseover="hoverRating = star"
+            @mouseleave="hoverRating = 0"
+          >
+            &#9733;
+          </span>
+        </div>
+        <textarea 
+          v-model="reviewComment" 
+          class="review-textarea" 
+          placeholder="Share more about your experience and interactions with this nanny"
+          maxlength="400"
+        ></textarea>
+        <div class="text-right">{{ reviewComment.length }}/400</div>
+        <button @click="submitReview" class="review-submit" :disabled="!rating">Submit Review</button>
+      </div>
+    </div>
+
     <!-- Your existing scripts remain the same -->
     <script type="module">
       // Import necessary modules from Firebase
@@ -685,7 +799,7 @@
         data() {
           return {
             currentUserId: null,
-            currentUserProfilePic: "/api/placeholder/40/40",
+            currentUserProfilePic: "",
             chats: [],
             selectedChat: null,
             selectedChatMessages: [],
@@ -700,6 +814,11 @@
             isSearching: false,
             originalChats: [],
             highlightedMessageId: null,
+            // New properties for review functionality
+            showReviewModal: false,
+            rating: 0,
+            hoverRating: 0,
+            reviewComment: "",
           };
         },
 
@@ -711,7 +830,6 @@
             }
             return [...this.chats].sort((a, b) => b.timestamp - a.timestamp);
           },
-
           canSendMessage() {
             return this.newMessage.trim().length > 0;
           },
@@ -825,12 +943,14 @@
                   firstName: userData.firstName || "",
                   lastName: userData.lastName || "",
                   profilePictureUrl: userData.profilePictureUrl,
+                  role: userData.role, // Include the role
                 };
               }
               return {
                 firstName: "Unknown",
                 lastName: "User",
                 profilePictureUrl: "/api/placeholder/40/40",
+                role: "unknown",
               };
             } catch (error) {
               console.error("Error fetching user details:", error);
@@ -838,6 +958,7 @@
                 firstName: "Unknown",
                 lastName: "User",
                 profilePictureUrl: "/api/placeholder/40/40",
+                role: "unknown",
               };
             }
           },
@@ -885,6 +1006,7 @@
                     profilePictureUrl: userDetails.profilePictureUrl,
                     lastMessage: data.message,
                     timestamp: messageTimestamp,
+                    role: userDetails.role, // Include the role
                   });
                 }
               }
@@ -964,7 +1086,6 @@
                 });
               });
           },
-
           async sendMessage() {
             if (!this.newMessage.trim() || !this.selectedChat) return;
 
@@ -979,7 +1100,6 @@
             this.newMessage = "";
             await this.loadChatMessages();
           },
-
           formatTimestamp(timestamp) {
             if (!timestamp) return "Invalid Date";
 
@@ -990,7 +1110,6 @@
 
             return new Date(timestampMs).toLocaleString();
           },
-
           async handleSearch(event) {
             if (!this.searchTerm.trim()) {
               this.isSearching = false;
@@ -1004,7 +1123,6 @@
             this.isSearching = true;
             await this.performSearch();
           },
-
           async performSearch() {
             try {
               const searchTermLower = this.searchTerm.toLowerCase();
@@ -1093,14 +1211,12 @@
               };
             }
           },
-
           // Helper method to highlight matching text
           highlightText(text, searchTerm) {
             if (!searchTerm) return text;
             const regex = new RegExp(`(${searchTerm})`, "gi");
             return text.replace(regex, "<mark>$1</mark>");
           },
-
           // Method to scroll to and highlight a specific message
           async scrollToMessage(messageId, userId) {
             try {
@@ -1147,6 +1263,43 @@
               }
             } catch (error) {
               console.error("Error scrolling to message:", error);
+            }
+          },
+
+          // New methods for review functionality
+          openReviewModal() {
+            this.showReviewModal = true;
+            document.getElementById('reviewModal').style.display = 'block';
+          },
+
+          closeReviewModal() {
+            this.showReviewModal = false;
+            document.getElementById('reviewModal').style.display = 'none';
+            this.rating = 0;
+            this.reviewComment = '';
+          },
+
+          setRating(star) {
+            this.rating = star;
+          },
+
+          async submitReview() {
+            if (!this.rating) return;
+
+            try {
+              await db.collection("REVIEW").add({
+                from_userID: this.currentUserId,
+                to_userID: this.selectedChat.userId,
+                rating: this.rating,
+                comments: this.reviewComment,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+              });
+
+              this.closeReviewModal();
+              // You might want to show a success message here
+            } catch (error) {
+              console.error("Error submitting review:", error);
+              // You might want to show an error message here
             }
           },
         },
