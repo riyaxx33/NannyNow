@@ -275,22 +275,20 @@
         border-top: 1px solid #eee;
         position: sticky;
         bottom: 0;
-        display: flex;
-        justify-content: center;
+        width: 100%; /* Ensure container takes full width */
       }
 
       .chat-input {
         display: flex;
-        align-items: flex-end;
+        align-items: flex-start;
         gap: 8px;
         background-color: white;
         border: 1px solid #e0e0e0;
         padding: 8px 12px;
         border-radius: 8px;
-        min-height: 48px;
         width: 100%;
-        max-width: 800px;
-        margin: 0 auto;
+        min-height: 40px;
+        transition: min-height 0.2s ease; /* Smooth height transition */
       }
 
       /* Textarea styles */
@@ -298,35 +296,20 @@
         flex: 1;
         border: none;
         background: none;
-        padding: 8px;
+        padding: 6px;
         outline: none;
-        font-size: 15px;
+        font-size: 14px;
         min-height: 24px;
-        max-height: 120px;
+        max-height: 100px;
         resize: none;
         line-height: 1.4;
         font-family: inherit;
         margin: 0;
-        display: block;
         width: 100%;
         overflow-y: auto;
         white-space: pre-wrap;
         word-wrap: break-word;
-      }
-
-      .chat-input input {
-        flex: 1;
-        border: none;
-        padding: 8px;
-        outline: none;
-        font-size: 15px;
-        min-height: 40px;
-        max-height: 100px; /* Limit maximum height */
-        resize: none; /* Prevent manual resizing */
-        white-space: pre-wrap; /* Allow line breaks */
-        overflow-y: auto; /* Add scrollbar when needed */
-        word-wrap: break-word;
-        line-height: 1.4;
+        transition: height 0.2s ease; /* Smooth height transition */
       }
 
       .chat-input button {
@@ -339,16 +322,16 @@
       .send-button {
         background: transparent;
         border: none;
-        padding: 8px;
+        padding: 6px;
+        height: 30px;
+        width: 30px;
         cursor: pointer;
         color: #6c5ce7;
         display: flex;
         align-items: center;
         justify-content: center;
-        align-self: flex-end;
-        margin-bottom: 8px;
-        transition: opacity 0.2s;
-        margin-left: 4px;
+        flex-shrink: 0;
+        margin-top: auto; /* Align to bottom when textarea grows */
       }
 
       .send-button.disabled {
@@ -548,16 +531,20 @@
 
       /* Media query for responsiveness */
       @media (max-width: 991.98px) {
-        app-container {
+        .app-container {
           margin: 0;
           border-radius: 0;
           height: 100vh;
-          padding-top: 0;
+          padding-top: 50px;
           max-width: none;
         }
 
         .chat-container {
           position: relative;
+        }
+
+        .chat-input-container {
+          padding: 10px; /* Reduce padding on mobile */
         }
 
         .chat-list {
@@ -595,7 +582,8 @@
         }
 
         .chat-input {
-          max-width: 600px;
+          width: 100%;
+          margin: 0;
         }
 
         /* Mobile header styles */
@@ -660,10 +648,6 @@
       }
 
       @media (max-width: 767.98px) {
-        .app-container {
-          padding-top: 50px;
-        }
-
         .chat-header {
           padding: 8px;
         }
@@ -689,7 +673,8 @@
       @media (max-width: 575.98px) {
         .app-container {
           margin: 0;
-          padding-top: 0; /* Remove top padding */
+          border-radius: 0;
+          padding-top: 50px;
           height: 100vh;
         }
 
@@ -707,17 +692,16 @@
         }
 
         .chat-input-container {
-          padding: 8px 12px;
+          padding: 8px;
         }
 
         .chat-input {
           padding: 6px 10px;
-          min-height: 42px;
         }
 
         .chat-input textarea {
           font-size: 14px;
-          padding: 6px;
+          padding: 4px;
         }
       }
     </style>
@@ -1021,21 +1005,30 @@
           handleKeydown(event) {
             if (event.key === "Enter") {
               if (event.shiftKey) {
-                // Allow Shift+Enter for new line
+                // Immediately resize the textarea
+                this.$nextTick(() => {
+                  this.resizeTextarea(event.target);
+                });
                 return;
               } else {
-                // Prevent default Enter behavior and send message
                 event.preventDefault();
                 this.sendMessage();
               }
             }
+          },
 
-            // Auto-resize the textarea
-            this.$nextTick(() => {
-              const textarea = event.target;
-              textarea.style.height = "auto";
-              textarea.style.height = textarea.scrollHeight + "px";
-            });
+          resizeTextarea(textarea) {
+            // Reset height first to get the correct scrollHeight
+            textarea.style.height = "auto";
+            // Set new height based on content
+            textarea.style.height = textarea.scrollHeight + "px";
+
+            // Also adjust container if needed
+            const container = textarea.closest(".chat-input");
+            if (container) {
+              container.style.minHeight =
+                Math.max(40, textarea.scrollHeight + 16) + "px";
+            }
           },
 
           handleImageError(event) {
@@ -1496,8 +1489,7 @@
             this.$nextTick(() => {
               const textarea = this.$el.querySelector(".chat-input textarea");
               if (textarea) {
-                textarea.style.height = "auto";
-                textarea.style.height = textarea.scrollHeight + "px";
+                this.resizeTextarea(textarea);
               }
             });
           },
