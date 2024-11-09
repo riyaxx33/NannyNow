@@ -1170,10 +1170,28 @@
         },
 
         mounted() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const parentId = urlParams.get('parentId');
+          const autoSelect = urlParams.get('autoSelect');
           // Check if user is logged in
           auth.onAuthStateChanged((user) => {
             if (user) {
               this.initialize();
+                    // After initialization, check if we need to auto-select a chat
+                    if (parentId && autoSelect === 'true') {
+                      // Set up a watcher for the chats array
+                      const checkForChat = setInterval(() => {
+                        const targetChat = this.chats.find(chat => chat.userId === parentId);
+                        
+                        if (targetChat) {
+                          clearInterval(checkForChat);
+                          this.selectChat(targetChat);
+                        }
+                      }, 100); // Check every 100ms
+
+                      // Clear interval after 5 seconds to prevent infinite checking
+                      setTimeout(() => clearInterval(checkForChat), 5000);
+                    }
             } else {
               // Redirect to login page or handle unauthorized access
               console.log("User not logged in");
