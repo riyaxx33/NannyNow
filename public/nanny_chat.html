@@ -57,6 +57,7 @@
 
       /* Sidebar styling */
       .chat-list {
+        width: 350px;
         background-color: white;
         border-right: 1px solid #e9edef;
         display: flex;
@@ -72,7 +73,14 @@
       }
 
       .sidebar-header {
+        padding: 16px 16px 8px 16px;
         gap: 10px;
+      }
+
+      .sidebar-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
       }
 
       /* Mobile sidebar toggle */
@@ -526,12 +534,14 @@
         }
 
         .chat-list {
+          width: 100%;
           position: absolute;
           left: 0;
           top: 0;
+          height: 100%;
           bottom: 0;
           width: 280px;
-          z-index: 10;
+          z-index: 20;
           transform: translateX(-100%);
           transition: transform 0.3s ease;
         }
@@ -562,6 +572,35 @@
 
         .chat-details {
           width: 100%;
+        }
+
+        /* Mobile chat header with back button */
+        .chat-header-mobile {
+          display: flex;
+          align-items: center;
+          padding: 8px 16px;
+          background: white;
+          border-bottom: 1px solid #e9edef;
+        }
+
+        .back-button {
+          background: none;
+          border: none;
+          padding: 8px;
+          margin-right: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          color: #666;
+        }
+
+        .back-button:hover {
+          color: #6c5ce7;
+        }
+
+        /* Hide desktop header when in mobile view */
+        .chat-header:not(.mobile-view) {
+          display: none;
         }
       }
 
@@ -735,7 +774,33 @@
           <!-- Main Chat Area -->
           <div class="chat-details">
             <template v-if="selectedChat">
-              <div class="chat-header">
+              <!-- Mobile header (shows only on mobile) -->
+              <div class="chat-header mobile-view" v-if="isMobileView">
+                <button class="back-button" @click="showChatList">
+                  <i data-lucide="arrow-left"></i>
+                </button>
+                <div class="chat-header-left">
+                  <div class="user-avatar">
+                    <a
+                      :href="`nanny_displayparentprofile.html?id=${selectedChat.userId}`"
+                    >
+                      <img
+                        :src="selectedChat.profilePictureUrl"
+                        :alt="selectedChat.firstName"
+                        @error="handleImageError($event)"
+                      />
+                    </a>
+                  </div>
+                  <div>
+                    <h3>
+                      {{ selectedChat.firstName }} {{ selectedChat.lastName }}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Desktop header -->
+              <div class="chat-header" v-else>
                 <div class="chat-header-left">
                   <div class="user-avatar">
                     <!-- Updated href with correct URL -->
@@ -844,7 +909,8 @@
             isSearching: false,
             originalChats: [],
             highlightedMessageId: null,
-            isSidebarOpen: false,
+            isMobileView: window.innerWidth < 992,
+            isSidebarOpen: true,
           };
         },
 
@@ -865,6 +931,20 @@
         methods: {
           toggleSidebar() {
             this.isSidebarOpen = !this.isSidebarOpen;
+          },
+
+          showChatList() {
+            if (this.isMobileView) {
+              this.isSidebarOpen = true;
+              this.selectedChat = null; // Clear selected chat when going back to list
+            }
+          },
+
+          handleResize() {
+            this.isMobileView = window.innerWidth < 992;
+            if (!this.isMobileView) {
+              this.isSidebarOpen = true;
+            }
           },
 
           handleImageError(event) {
@@ -1064,7 +1144,7 @@
           async selectChat(chat) {
             this.selectedChat = chat;
             await this.loadChatMessages();
-            if (window.innerWidth < 992) {
+            if (this.isMobileView) {
               this.isSidebarOpen = false;
             }
           },
@@ -1318,6 +1398,10 @@
         },
 
         mounted() {
+          // Resize listener
+          window.addEventListener("resize", this.handleResize);
+          this.handleResize(); // Initial check
+
           const urlParams = new URLSearchParams(window.location.search);
           const parentId = urlParams.get("parentId");
           const autoSelect = urlParams.get("autoSelect");
@@ -1362,6 +1446,9 @@
         },
 
         beforeUnmount() {
+          // Remove resize listener
+          window.removeEventListener("resize", this.handleResize);
+
           // Clean up listener
           if (this.unsubscribe) {
             this.unsubscribe();
