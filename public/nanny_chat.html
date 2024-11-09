@@ -219,8 +219,10 @@
         position: relative;
         display: inline-block; /* This makes the bubble wrap to content */
         word-wrap: break-word;
+        white-space: pre-wrap; /* Preserve line breaks but wrap text */
         width: fit-content; /* This makes the bubble fit the content */
         line-height: 1.4; /* Add line height for better text spacing */
+        overflow: hidden; /* Prevent content overflow */
         transition: background-color 0.3s ease;
       }
 
@@ -448,9 +450,12 @@
         bottom: 4px;
         right: 12px;
         opacity: 0.7;
+        padding-left: 8px;
+        margin-top: 4px;
         white-space: nowrap;
         text-align: right;
         min-width: 55px;
+        background: inherit;
       }
 
       /* Update the no-chat-selected styling */
@@ -519,8 +524,13 @@
         }
 
         .message {
-          max-width: 85%;
+          max-width: 80%;
+          font-size: 0.95em; /* slighly smaller font on mobile */
           padding-bottom: 24px;
+        }
+
+        .chat-messages {
+          padding: 12px;
         }
 
         .timestamp {
@@ -640,8 +650,8 @@
         }
 
         .message {
-          max-width: 90%;
-          padding: 8px 12px;
+          max-width: 85%;
+          padding: 10px 14px 18px;
         }
 
         .chat-preview {
