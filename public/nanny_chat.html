@@ -40,33 +40,28 @@
         position: relative;
         display: flex;
         flex-direction: column;
-        width: 100%; /* Take up full width */
-        max-width: 1400px; /* Maximum width to prevent stretching on very wide screens */
-        min-width: 800px; /* Minimum width to prevent squishing */
-        height: calc(100vh - 100px); /* Account for navbar and some padding */
-        margin: 12px auto; /* Center horizontally and add some vertical spacing */
+        width: 100%;
+        max-width: 1400px;
+        height: calc(100vh - 100px);
         background-color: white;
         border-radius: 12px;
-        overflow: hidden; /* Keep children from spilling out */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Lighter shadow */
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
       }
 
       .chat-container {
         display: flex;
-        min-height: 0;
         height: 100%;
         width: 100%; /* Make container take full width */
       }
 
       /* Sidebar styling */
       .chat-list {
-        width: 350px;
         background-color: white;
         border-right: 1px solid #e9edef;
         display: flex;
         flex-direction: column;
-        min-height: 0;
-        flex-shrink: 0;
+        transition: all 0.3s ease;
       }
 
       /* Add a wrapper for the scrollable content */
@@ -78,6 +73,38 @@
 
       .sidebar-header {
         gap: 10px;
+      }
+
+      /* Mobile sidebar toggle */
+      .sidebar-toggle {
+        display: none; /* Hidden by default on desktop */
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #6c5ce7;
+        color: white;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Dark overlay for mobile sidebar */
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 5;
+      }
+
+      .sidebar-overlay.show {
+        display: block;
       }
 
       .chat-preview {
@@ -156,26 +183,26 @@
         border-bottom: 1px solid rgba(0, 0, 0, 0.2);
         display: flex;
         align-items: center;
-        position: relative;  /* Add this */
+        position: relative; /* Add this */
         justify-content: space-between;
-        z-index: 1;  /* Add this - make sure it's lower than navbar z-index */
+        z-index: 1; /* Add this - make sure it's lower than navbar z-index */
       }
 
       .chat-header .user-avatar {
-        position: relative;  /* Add this */
-        z-index: 1;  /* Add this */
+        position: relative; /* Add this */
+        z-index: 1; /* Add this */
       }
 
       .chat-header .user-avatar a {
-        display: block;  /* Add this */
-        width: 100%;    /* Add this */
-        height: 100%;   /* Add this */
+        display: block; /* Add this */
+        width: 100%; /* Add this */
+        height: 100%; /* Add this */
       }
 
       .chat-header .user-avatar img {
-        width: 100%;    /* Add this if not already set */
-        height: 100%;   /* Add this if not already set */
-        object-fit: cover;  /* Add this if not already set */
+        width: 100%; /* Add this if not already set */
+        height: 100%; /* Add this if not already set */
+        object-fit: cover; /* Add this if not already set */
       }
 
       .chat-header-left {
@@ -485,18 +512,93 @@
       }
 
       /* Media query for responsiveness */
-      @media (max-width: 1200px) {
-        .app-container {
+      @media (max-width: 991.98px) {
+        app-container {
+          margin: 0;
+          border-radius: 0;
+          height: 100vh;
+          padding-top: 60px;
+          max-width: none;
+        }
+
+        .chat-container {
+          position: relative;
+        }
+
+        .chat-list {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 280px;
+          z-index: 10;
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
+        }
+
+        .chat-list.show {
+          transform: translateX(0);
+        }
+
+        .sidebar-toggle {
+          display: block;
+        }
+
+        /* Dark overlay for mobile sidebar */
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 5;
+        }
+
+        .sidebar-overlay.show {
+          display: block;
+        }
+
+        .chat-details {
           width: 100%;
         }
       }
 
-      @media (max-width: 900px) {
+      @media (max-width: 767.98px) {
         .app-container {
+          padding-top: 50px;
+        }
+
+        .chat-header {
+          padding: 8px;
+        }
+
+        .message {
+          max-width: 85%;
+        }
+
+        .chat-input {
+          padding: 8px;
+        }
+
+        .chat-input input {
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 575.98px) {
+        .chat-list {
           width: 100%;
-          height: calc(100vh - 50px);
-          margin: 0;
-          border-radius: 0;
+        }
+
+        .message {
+          max-width: 90%;
+          padding: 8px 12px;
+        }
+
+        .chat-preview {
+          padding: 8px;
         }
       }
     </style>
@@ -505,187 +607,211 @@
     <header>
       <div id="navbar"></div>
     </header>
-    <div id="app" class="app-container">
-      <div class="chat-container">
-        <!-- Sidebar -->
-        <div class="chat-list">
-          <div class="sidebar-header">
-            <h3>Chats</h3>
-          </div>
 
-          <div class="search-bar">
-            <input type="text" v-model="searchTerm" placeholder="Search..." />
-          </div>
+    <!-- Sidebar toggle button for mobile -->
+    <button class="sidebar-toggle" @click="toggleSidebar">
+      <i data-lucide="menu"></i>
+    </button>
 
-          <!-- Add wrapper for scrollable content -->
-          <div class="chat-list-scrollable">
-            <!-- Search Results -->
-            <div v-if="searchTerm.trim()" class="search-results">
-              <!-- Contacts Section -->
-              <div v-if="searchResults.contacts.length" class="search-section">
-                <div class="search-section-header">Chats</div>
+    <!-- Dark overlay for mobile sidebar -->
+    <div
+      class="sidebar-overlay"
+      :class="{ show: isSidebarOpen }"
+      @click="toggleSidebar"
+    ></div>
+
+    <div class="container-fluid p-0">
+      <div id="app" class="app-container">
+        <div class="chat-container">
+          <!-- Sidebar -->
+          <div class="chat-list" :class="{ show: isSidebarOpen }">
+            <div class="sidebar-header">
+              <h3>Chats</h3>
+            </div>
+
+            <div class="search-bar">
+              <input type="text" v-model="searchTerm" placeholder="Search..." />
+            </div>
+
+            <!-- Add wrapper for scrollable content -->
+            <div class="chat-list-scrollable">
+              <!-- Search Results -->
+              <div v-if="searchTerm.trim()" class="search-results">
+                <!-- Contacts Section -->
                 <div
-                  v-for="contact in searchResults.contacts"
-                  :key="'contact-' + contact.userId"
-                  class="chat-preview"
-                  @click="selectChat(contact)"
+                  v-if="searchResults.contacts.length"
+                  class="search-section"
                 >
-                  <div class="user-avatar">
-                    <img
-                      :src="contact.profilePictureUrl"
-                      :alt="contact.firstName"
-                      @error="handleImageError($event)"
-                    />
-                  </div>
-                  <div class="chat-preview-content">
-                    <div class="chat-preview-header">
-                      <h4>{{ contact.firstName }} {{ contact.lastName }}</h4>
-                      <span class="chat-preview-time"
-                        >{{ formatChatTime(contact.timestamp) }}</span
-                      >
+                  <div class="search-section-header">Chats</div>
+                  <div
+                    v-for="contact in searchResults.contacts"
+                    :key="'contact-' + contact.userId"
+                    class="chat-preview"
+                    @click="selectChat(contact)"
+                  >
+                    <div class="user-avatar">
+                      <img
+                        :src="contact.profilePictureUrl"
+                        :alt="contact.firstName"
+                        @error="handleImageError($event)"
+                      />
                     </div>
-                    <p class="last-message">{{ contact.lastMessage }}</p>
+                    <div class="chat-preview-content">
+                      <div class="chat-preview-header">
+                        <h4>{{ contact.firstName }} {{ contact.lastName }}</h4>
+                        <span class="chat-preview-time"
+                          >{{ formatChatTime(contact.timestamp) }}</span
+                        >
+                      </div>
+                      <p class="last-message">{{ contact.lastMessage }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Message Section -->
+                <div
+                  v-if="searchResults.messages.length"
+                  class="search-section"
+                >
+                  <div class="search-section-header">Messages</div>
+                  <div
+                    v-for="message in searchResults.messages"
+                    :key="'message-' + message.messageId"
+                    class="chat-preview"
+                    @click="scrollToMessage(message.messageId, message.userId)"
+                  >
+                    <div class="user-avatar">
+                      <img
+                        :src="message.profilePictureUrl"
+                        :alt="message.firstName"
+                        @error="handleImageError($event)"
+                      />
+                    </div>
+                    <div class="chat-preview-content">
+                      <div class="chat-preview-header">
+                        <h4>{{ message.firstName }} {{ message.lastName }}</h4>
+                        <span class="chat-preview-time"
+                          >{{ formatChatTime(message.timestamp) }}</span
+                        >
+                      </div>
+                      <p
+                        class="message-preview"
+                        v-html="message.highlightedMessage"
+                      ></p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Message Section -->
-              <div v-if="searchResults.messages.length" class="search-section">
-                <div class="search-section-header">Messages</div>
+              <!-- Regular Chat List -->
+              <div v-else>
                 <div
-                  v-for="message in searchResults.messages"
-                  :key="'message-' + message.messageId"
-                  class="chat-preview"
-                  @click="scrollToMessage(message.messageId, message.userId)"
+                  v-for="chat in sortedChats"
+                  :key="chat.userId"
+                  :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
+                  @click="selectChat(chat)"
                 >
                   <div class="user-avatar">
                     <img
-                      :src="message.profilePictureUrl"
-                      :alt="message.firstName"
+                      :src="chat.profilePictureUrl"
+                      :alt="chat.firstName"
                       @error="handleImageError($event)"
                     />
                   </div>
                   <div class="chat-preview-content">
                     <div class="chat-preview-header">
-                      <h4>{{ message.firstName }} {{ message.lastName }}</h4>
+                      <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
                       <span class="chat-preview-time"
-                        >{{ formatChatTime(message.timestamp) }}</span
+                        >{{ formatChatTime(chat.timestamp) }}</span
                       >
                     </div>
-                    <p
-                      class="message-preview"
-                      v-html="message.highlightedMessage"
-                    ></p>
+                    <p class="last-message">{{ chat.lastMessage }}</p>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Regular Chat List -->
-            <div v-else>
-              <div
-                v-for="chat in sortedChats"
-                :key="chat.userId"
-                :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
-                @click="selectChat(chat)"
-              >
-                <div class="user-avatar">
-                  <img
-                    :src="chat.profilePictureUrl"
-                    :alt="chat.firstName"
-                    @error="handleImageError($event)"
-                  />
+          <!-- Main Chat Area -->
+          <div class="chat-details">
+            <template v-if="selectedChat">
+              <div class="chat-header">
+                <div class="chat-header-left">
+                  <div class="user-avatar">
+                    <!-- Updated href with correct URL -->
+                    <a
+                      :href="`nanny_displayparentprofile.html?id=${selectedChat.userId}`"
+                      style="text-decoration: none"
+                    >
+                      <img
+                        :src="selectedChat.profilePictureUrl"
+                        :alt="selectedChat.firstName"
+                        @error="handleImageError($event)"
+                        style="cursor: pointer"
+                      />
+                    </a>
+                  </div>
+                  <div>
+                    <h3>
+                      {{ selectedChat.firstName }} {{ selectedChat.lastName }}
+                    </h3>
+                  </div>
                 </div>
-                <div class="chat-preview-content">
-                  <div class="chat-preview-header">
-                    <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
-                    <span class="chat-preview-time"
-                      >{{ formatChatTime(chat.timestamp) }}</span
+              </div>
+
+              <div class="chat-messages" ref="messageContainer">
+                <div
+                  v-for="group in groupMessagesByDate(selectedChatMessages)"
+                  :key="group.date"
+                >
+                  <!-- Date separator -->
+                  <div class="date-separator">
+                    <span class="date-label"
+                      >{{ formatDateForGroup(group.date) }}</span
                     >
                   </div>
-                  <p class="last-message">{{ chat.lastMessage }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Main Chat Area -->
-        <div class="chat-details">
-          <template v-if="selectedChat">
-            <div class="chat-header">
-              <div class="chat-header-left">
-                <div class="user-avatar">
-                  <!-- Updated href with correct URL -->
-                  <a :href="`nanny_displayparentprofile.html?id=${selectedChat.userId}`" style="text-decoration: none;">
-                    <img
-                      :src="selectedChat.profilePictureUrl"
-                      :alt="selectedChat.firstName"
-                      @error="handleImageError($event)"
-                      style="cursor: pointer;"
-                    />
-                  </a>
-                </div>
-                <div>
-                  <h3>
-                    {{ selectedChat.firstName }} {{ selectedChat.lastName }}
-                  </h3>
-                </div>
-              </div>
-            </div>
-
-            <div class="chat-messages" ref="messageContainer">
-              <div
-                v-for="group in groupMessagesByDate(selectedChatMessages)"
-                :key="group.date"
-              >
-                <!-- Date separator -->
-                <div class="date-separator">
-                  <span class="date-label"
-                    >{{ formatDateForGroup(group.date) }}</span
-                  >
-                </div>
-
-                <!-- Messages for this date -->
-                <div
-                  v-for="message in group.messages"
-                  :key="message.timestamp"
-                  class="message-container"
-                >
+                  <!-- Messages for this date -->
                   <div
-                    :data-message-id="message.id"
-                    :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received', { 'highlighted' : message.id === highlightedMessage }]"
+                    v-for="message in group.messages"
+                    :key="message.timestamp"
+                    class="message-container"
                   >
-                    {{ message.message }}
-                    <div class="timestamp">
-                      {{ formatMessageTime(message.timestamp) }}
+                    <div
+                      :data-message-id="message.id"
+                      :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received', { 'highlighted' : message.id === highlightedMessage }]"
+                    >
+                      {{ message.message }}
+                      <div class="timestamp">
+                        {{ formatMessageTime(message.timestamp) }}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div class="chat-input-container">
-              <div class="chat-input">
-                <input
-                  type="text"
-                  v-model.trim="newMessage"
-                  @keyup.enter="sendMessage"
-                  placeholder="Write a message..."
-                />
-                <button
-                  class="send-button"
-                  :class="{ 'disabled': !canSendMessage }"
-                  @click="sendMessage"
-                  :disabled="!canSendMessage"
-                >
-                  <i data-lucide="send"></i>
-                </button>
+              <div class="chat-input-container">
+                <div class="chat-input">
+                  <input
+                    type="text"
+                    v-model.trim="newMessage"
+                    @keyup.enter="sendMessage"
+                    placeholder="Write a message..."
+                  />
+                  <button
+                    class="send-button"
+                    :class="{ 'disabled': !canSendMessage }"
+                    @click="sendMessage"
+                    :disabled="!canSendMessage"
+                  >
+                    <i data-lucide="send"></i>
+                  </button>
+                </div>
               </div>
+            </template>
+            <div v-else class="no-chat-selected">
+              <h2>Select a chat to start messaging</h2>
             </div>
-          </template>
-          <div v-else class="no-chat-selected">
-            <h2>Select a chat to start messaging</h2>
           </div>
         </div>
       </div>
@@ -718,6 +844,7 @@
             isSearching: false,
             originalChats: [],
             highlightedMessageId: null,
+            isSidebarOpen: false,
           };
         },
 
@@ -736,6 +863,10 @@
         },
 
         methods: {
+          toggleSidebar() {
+            this.isSidebarOpen = !this.isSidebarOpen;
+          },
+
           handleImageError(event) {
             event.target.src = "/api/placeholder/40/40"; // Fallback to placeholder
           },
@@ -933,6 +1064,9 @@
           async selectChat(chat) {
             this.selectedChat = chat;
             await this.loadChatMessages();
+            if (window.innerWidth < 992) {
+              this.isSidebarOpen = false;
+            }
           },
           async loadChatMessages() {
             if (!this.selectedChat) return;
@@ -1185,27 +1319,29 @@
 
         mounted() {
           const urlParams = new URLSearchParams(window.location.search);
-          const parentId = urlParams.get('parentId');
-          const autoSelect = urlParams.get('autoSelect');
+          const parentId = urlParams.get("parentId");
+          const autoSelect = urlParams.get("autoSelect");
           // Check if user is logged in
           auth.onAuthStateChanged((user) => {
             if (user) {
               this.initialize();
-                    // After initialization, check if we need to auto-select a chat
-                    if (parentId && autoSelect === 'true') {
-                      // Set up a watcher for the chats array
-                      const checkForChat = setInterval(() => {
-                        const targetChat = this.chats.find(chat => chat.userId === parentId);
-                        
-                        if (targetChat) {
-                          clearInterval(checkForChat);
-                          this.selectChat(targetChat);
-                        }
-                      }, 100); // Check every 100ms
+              // After initialization, check if we need to auto-select a chat
+              if (parentId && autoSelect === "true") {
+                // Set up a watcher for the chats array
+                const checkForChat = setInterval(() => {
+                  const targetChat = this.chats.find(
+                    (chat) => chat.userId === parentId
+                  );
 
-                      // Clear interval after 5 seconds to prevent infinite checking
-                      setTimeout(() => clearInterval(checkForChat), 5000);
-                    }
+                  if (targetChat) {
+                    clearInterval(checkForChat);
+                    this.selectChat(targetChat);
+                  }
+                }, 100); // Check every 100ms
+
+                // Clear interval after 5 seconds to prevent infinite checking
+                setTimeout(() => clearInterval(checkForChat), 5000);
+              }
             } else {
               // Redirect to login page or handle unauthorized access
               console.log("User not logged in");
