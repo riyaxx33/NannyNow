@@ -274,20 +274,6 @@
                             {{ getStatusLabel(post) }}
                         </span>
                     </div>
-                    <div v-if="post.completed" class="d-flex align-items-center gap-2">
-                        <div class="rounded-circle bg-gray-200 p-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        </div>
-                        <div class="d-flex flex-column">
-                            <span class="text-gray-500" style="font-size: 0.875rem;">Nanny</span>
-                            <span class="text-gray-700">{{ post.nannyName }}</span>
-                        </div>
-                    </div>
-                    <span v-if="post.interestedNannies && post.interestedNannies.length > 0 && post.status && !post.completed && getStatusLabel(post) === 'Available'" 
-                          @click="openInterestedNanniesModal(post)"
-                          style="text-decoration: underline; color: blue; cursor: pointer;">
-                        View interested Nannies({{ post.interestedNannies.length }})
-                    </span>
                 </div>
                 
                 <div class="post-content">
@@ -314,36 +300,9 @@
                 </div>
 
                 <div class="button-container">
-                    <button v-if="canEditPost(post)" @click="editPost(post)" class="btn btn-warning btn-sm" style="background-color: transparent; border: none;">
-                        <img src="img/edit_icon.jpg" alt="Edit" style="width: 30px; height: 30px;">
-                    </button>
                     <button @click="deletePost(post.id)" class="btn btn-danger btn-sm" style="background-color: transparent; border: none;">
                         <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eOwQST7r1tOqlQLEFjJyi2lazqcJEg.png" alt="Delete" style="width: 30px; height: 30px;">
                     </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Interested Nannies Modal -->
-        <div v-if="showInterestedNanniesModal" class="modal" tabindex="-1" style="display: block; background-color: rgba(0,0,0,0.5);">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Interested Nannies</h5>
-                        <button type="button" class="btn-close" @click="closeInterestedNanniesModal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div v-for="nanny in interestedNannies" :key="nanny.id" class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="d-flex align-items-center">
-                                <img :src="nanny.profilePictureUrl" alt="Nanny Profile" class="rounded-circle me-2" style="width: 50px; height: 50px; object-fit: cover;">
-                                <div>
-                                    <h6 class="mb-0">{{ nanny.firstName }} {{ nanny.lastName }}</h6>
-                                    <small class="text-muted">{{ nanny.yrsExperience }} years experience</small>
-                                </div>
-                            </div>
-                            <button @click="acceptNanny(nanny.id)" class="btn btn-success btn-sm">Accept</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -378,14 +337,11 @@
         const app = createApp({
             data() {
                 return {
-                activeTab: 'requested',
-                posts: [],
-                showInterestedNanniesModal: false,
-                interestedNannies: [],
-                currentPostId: null,
-                showDeleteConfirmation: false,
-                postToDelete: null,
-                currentUserId: null,
+                    activeTab: 'requested',
+                    posts: [],
+                    showDeleteConfirmation: false,
+                    postToDelete: null,
+                    currentUserId: null,
                 };
             },
             computed: {
@@ -395,19 +351,15 @@
                     console.log('Current user ID:', this.currentUserId);
                     console.log('Active tab:', this.activeTab);
 
-                    // First ensure we have valid posts and a current user ID
                     if (!Array.isArray(this.posts) || !this.currentUserId) {
                         console.log('No posts array or no current user ID');
                         return [];
                     }
 
-                    // Filter posts where the current nanny is interested
                     const userPosts = this.posts.filter(post => {
-                        // Ensure interestedNannies exists and is an array
                         const hasValidInterestedNannies = post.interestedNannies && 
                             Array.isArray(post.interestedNannies);
 
-                        // Check if current user is in the interestedNannies array
                         const isUserInterested = hasValidInterestedNannies && 
                             post.interestedNannies.some(nanny => 
                                 typeof nanny === 'string' ? 
@@ -423,7 +375,6 @@
 
                     console.log('Posts after user filter:', userPosts);
 
-                    // Then apply the tab filters
                     const filteredByTab = userPosts.filter(post => {
                         const result = (() => {
                             switch (this.activeTab) {
@@ -450,194 +401,127 @@
             },
             methods: {
                 formatDate(date) {
-                if (date && typeof date === 'string') {
-                    const [year, month, day] = date.split('-');
-                    return `${day}/${month}/${year}`;
-                }
-                return "";
+                    if (date && typeof date === 'string') {
+                        const [year, month, day] = date.split('-');
+                        return `${day}/${month}/${year}`;
+                    }
+                    return "";
                 },
-        
+                
                 async fetchPosts() {
-                try {
-                    await updateExpiredPosts();
-                    
-                    // Fetch all posts from the POSTS collection
-                    const postsCollection = collection(db, "POSTS");
-                    const querySnapshot = await getDocs(postsCollection);
-                    
-                    // Map the documents to our posts array
-                    const postsData = querySnapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
+                    try {
+                        await updateExpiredPosts();
+                        
+                        const postsCollection = collection(db, "POSTS");
+                        const querySnapshot = await getDocs(postsCollection);
+                        
+                        const postsData = querySnapshot.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data()
+                        }));
 
-                    console.log('Fetched posts:', postsData);
+                        console.log('Fetched posts:', postsData);
 
-                    this.posts = await Promise.all(postsData.map(async (post) => {
-                        const interestedNannies = await this.fetchInterestedNannies(post.interestedNannies);
-                        let nannyName = '';
-                        if (post.completed && post.nanny_id) {
-                            const nannyDoc = await getDoc(doc(db, "USER", post.nanny_id));
-                            if (nannyDoc.exists()) {
-                                const nannyData = nannyDoc.data();
-                                nannyName = `${nannyData.firstName} ${nannyData.lastName}`;
-                            }
-                        }
-                        return {
+                        this.posts = postsData.map(post => ({
                             ...post,
-                            formattedDate: this.formatDate(post.date),
-                            interestedNannies,
-                            nannyName
-                        };
-                    }));
+                            formattedDate: this.formatDate(post.date)
+                        }));
 
-                    console.log('Processed posts:', this.posts);
+                        console.log('Processed posts:', this.posts);
 
-                    // Sort posts by date (newest first)
-                    this.posts.sort((a, b) => {
-                        const dateA = new Date(a.date);
-                        const dateB = new Date(b.date);
-                        return dateB - dateA;
-                    });
+                        this.posts.sort((a, b) => {
+                            const dateA = new Date(a.date);
+                            const dateB = new Date(b.date);
+                            return dateB - dateA;
+                        });
                     } catch (error) {
                         console.error("Error fetching posts:", error);
                     }
                 },
         
-                async fetchInterestedNannies(nannyIds) {
-                if (!nannyIds || nannyIds.length === 0) return [];
-                try {
-                    const nannies = await Promise.all(nannyIds.map(id => getDoc(doc(db, "USER", id))));
-                    return nannies.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                    }));
-                } catch (error) {
-                    console.error("Error fetching interested nannies:", error);
-                    return [];
-                }
-                },
-        
                 deletePost(postId) {
-                this.showDeleteConfirmation = true;
-                this.postToDelete = postId;
+                    this.showDeleteConfirmation = true;
+                    this.postToDelete = postId;
                 },
         
                 async confirmDelete() {
-                if (this.postToDelete) {
-                    try {
-                    await deletePostData(this.postToDelete);
-                    await this.fetchPosts(auth.currentUser.uid);
-                    console.log("Post deleted successfully.");
-                    } catch (error) {
-                    console.error("Error deleting post:", error);
-                    } finally {
-                    this.showDeleteConfirmation = false;
-                    this.postToDelete = null;
+                    if (this.postToDelete) {
+                        try {
+                            await deletePostData(this.postToDelete);
+                            await this.fetchPosts();
+                            console.log("Post deleted successfully.");
+                        } catch (error) {
+                            console.error("Error deleting post:", error);
+                        } finally {
+                            this.showDeleteConfirmation = false;
+                            this.postToDelete = null;
+                        }
                     }
-                }
                 },
         
                 cancelDelete() {
-                this.showDeleteConfirmation = false;
-                this.postToDelete = null;
+                    this.showDeleteConfirmation = false;
+                    this.postToDelete = null;
                 },
         
                 getStatusBadgeClass(post) {
-                if (post.status && post.completed) return 'badge-upcoming';
-                if (!post.status && post.completed) return 'badge-completed';
-                if (post.status && !post.completed) return 'badge-active';
-                if (!post.status && !post.completed) return 'badge-expired';
-                return 'badge-secondary';
+                    if (post.status && post.completed) return 'badge-upcoming';
+                    if (!post.status && post.completed) return 'badge-completed';
+                    if (post.status && !post.completed) return 'badge-active';
+                    if (!post.status && !post.completed) return 'badge-expired';
+                    return 'badge-secondary';
                 },
         
                 getStatusLabel(post) {
-                if (post.status && post.completed) return 'Upcoming';
-                if (!post.status && post.completed) return 'Completed';
-                if (post.status && !post.completed) return 'Requested';
-                if (!post.status && !post.completed) return 'Expired';
-                return 'Unknown';
-                },
-        
-                canEditPost(post) {
-                return post.status === true && !post.completed;
-                },
-        
-                openInterestedNanniesModal(post) {
-                this.currentPostId = post.id;
-                this.interestedNannies = post.interestedNannies || [];
-                this.showInterestedNanniesModal = true;
-                },
-        
-                closeInterestedNanniesModal() {
-                this.showInterestedNanniesModal = false;
-                this.interestedNannies = [];
-                this.currentPostId = null;
-                },
-        
-                async acceptNanny(nannyId) {
-                try {
-                    console.log(`Attempting to accept nanny ${nannyId} for post ${this.currentPostId}`);
-                    
-                    await updatePostData(this.currentPostId, {
-                    nanny_id: nannyId,
-                    completed: true
-                    });
-                    
-                    console.log(`Successfully updated post ${this.currentPostId} with nanny ${nannyId}`);
-                    
-                    this.closeInterestedNanniesModal();
-                    
-                    await this.fetchPosts(auth.currentUser.uid);
-                    
-                    console.log(`Nanny ${nannyId} accepted for post ${this.currentPostId}`);
-                } catch (error) {
-                    console.error("Error accepting nanny:", error);
-                }
+                    if (post.status && post.completed) return 'Upcoming';
+                    if (!post.status && post.completed) return 'Completed';
+                    if (post.status && !post.completed) return 'Requested';
+                    if (!post.status && !post.completed) return 'Expired';
+                    return 'Unknown';
                 },
             },
             mounted() {
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    try {
-                        this.currentUserId = user.uid;
-                        console.log('Current user ID set:', this.currentUserId);
-                        await this.fetchPosts();
-                    } catch (error) {
-                        console.error("Error in mounted:", error);
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        try {
+                            this.currentUserId = user.uid;
+                            console.log('Current user ID set:', this.currentUserId);
+                            await this.fetchPosts();
+                        } catch (error) {
+                            console.error("Error in mounted:", error);
+                        }
+                    } else {
+                        console.error("No user is logged in.");
                     }
-                } else {
-                    console.error("No user is logged in.");
-                }
-            });
+                });
             }
-            });
+        });
         
-            app.mount("#app");
-        </script>
+        app.mount("#app");
+    </script>
+    
+    <script type="module">
+        import { auth, db } from "./backend/firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+        import { logout } from './backend/auth.js';
         
-        <script type="module">
-            import { auth, db } from "./backend/firebase-config.js";
-            import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-            import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-            import { logout } from './backend/auth.js';
-            
-            async function loadNavbar(user) {
+        async function loadNavbar(user) {
             let fileToLoad = 'unloggedin_navbar_template.html';
         
             if (user) {
                 try {
-                const userDoc = await getDoc(doc(db, "USER", user.uid));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    if (userData.role === 'parent') {
-                    fileToLoad = 'parent_navbar_template.html';
-                    } else if (userData.role === 'nanny') {
-                    fileToLoad = 'nanny_navbar_template.html';
+                    const userDoc = await getDoc(doc(db, "USER", user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        if (userData.role === 'parent') {
+                            fileToLoad = 'parent_navbar_template.html';
+                        } else if (userData.role === 'nanny') {
+                            fileToLoad = 'nanny_navbar_template.html';
+                        }
                     }
-                }
                 } catch (error) {
-                console.error('Error fetching user role:', error);
+                    console.error('Error fetching user role:', error);
                 }
             }
         
@@ -650,26 +534,26 @@
         
                 const logoutLink = document.querySelector('#logoutBtn');
                 if (logoutLink) {
-                logoutLink.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    console.log("Logout clicked");
-                    try {
-                    await logout();
-                    } catch (error) {
-                    console.error('Logout failed:', error);
-                    }
-                });
+                    logoutLink.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        console.log("Logout clicked");
+                        try {
+                            await logout();
+                        } catch (error) {
+                            console.error('Logout failed:', error);
+                        }
+                    });
                 }
             } catch (error) {
                 console.error('Failed to load navbar:', error);
             }
-            }
+        }
         
-            onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, (user) => {
             console.log('Auth state changed');
             loadNavbar(user);
-            });
-        </script>
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
