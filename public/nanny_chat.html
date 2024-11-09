@@ -273,11 +273,13 @@
         padding: 10px 20px;
         background-color: white;
         border-top: 1px solid #eee;
+        position: sticky;
+        bottom: 0;
       }
 
       .chat-input {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 8px;
         background-color: white;
         border: 1px solid #e0e0e0;
@@ -291,6 +293,13 @@
         padding: 8px;
         outline: none;
         font-size: 15px;
+        min-height: 40px;
+        max-height: 100px; /* Limit maximum height */
+        resize: none; /* Prevent manual resizing */
+        white-space: pre-wrap; /* Allow line breaks */
+        overflow-y: auto; /* Add scrollbar when needed */
+        word-wrap: break-word;
+        line-height: 1.4;
       }
 
       .chat-input button {
@@ -309,6 +318,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        align-self: flex-end;
+        margin-bottom: 8px;
         transition: opacity 0.2s;
       }
 
@@ -524,7 +535,7 @@
         }
 
         .message {
-          max-width: 80%;
+          max-width: 75%;
           font-size: 0.95em; /* slighly smaller font on mobile */
           padding-bottom: 24px;
         }
@@ -632,7 +643,7 @@
         }
 
         .message {
-          max-width: 85%;
+          max-width: 60%;
         }
 
         .chat-input {
@@ -645,12 +656,18 @@
       }
 
       @media (max-width: 575.98px) {
+        .app-container {
+          margin: 0;
+          padding-top: 0; /* Remove top padding */
+          height: 100vh;
+        }
+
         .chat-list {
           width: 100%;
         }
 
         .message {
-          max-width: 85%;
+          max-width: 50%;
           padding: 10px 14px 18px;
         }
 
@@ -863,12 +880,13 @@
 
               <div class="chat-input-container">
                 <div class="chat-input">
-                  <input
-                    type="text"
+                  <textarea
                     v-model.trim="newMessage"
-                    @keyup.enter="sendMessage"
+                    @keydown="handleKeydown"
                     placeholder="Write a message..."
-                  />
+                    rows="1"
+                    ref="messageInput"
+                  ></textarea>
                   <button
                     class="send-button"
                     :class="{ 'disabled': !canSendMessage }"
@@ -947,6 +965,32 @@
             if (!this.isMobileView) {
               this.isSidebarOpen = true;
             }
+          },
+
+          autoResizeTextarea(event) {
+            const textarea = event.target;
+            textarea.style.height = "auto";
+            textarea.style.height = textarea.scrollHeight + "px";
+          },
+
+          handleKeydown(event) {
+            if (event.key === "Enter") {
+              if (event.shiftKey) {
+                // Allow Shift+Enter for new line
+                return;
+              } else {
+                // Prevent default Enter behavior and send message
+                event.preventDefault();
+                this.sendMessage();
+              }
+            }
+
+            // Auto-resize the textarea
+            this.$nextTick(() => {
+              const textarea = event.target;
+              textarea.style.height = "auto";
+              textarea.style.height = textarea.scrollHeight + "px";
+            });
           },
 
           handleImageError(event) {
@@ -1210,6 +1254,11 @@
               timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Use server timestamp
             });
 
+            // Reset textarea height after sending
+            if (this.$refs.messageInput) {
+              this.$refs.messageInput.style.height = "auto";
+            }
+
             this.newMessage = "";
             await this.loadChatMessages();
           },
@@ -1397,6 +1446,16 @@
               this.isSearching = false;
             }
           }, 300),
+
+          newMessage(val) {
+            this.$nextTick(() => {
+              const textarea = this.$el.querySelector(".chat-input textarea");
+              if (textarea) {
+                textarea.style.height = "auto";
+                textarea.style.height = textarea.scrollHeight + "px";
+              }
+            });
+          },
         },
 
         mounted() {
