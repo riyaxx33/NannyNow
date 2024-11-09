@@ -1029,7 +1029,7 @@
       }
 
       // Function to initialize chat button
-      function initializeChatButton(currentUserId, parentId) {
+      function initializeChatButton(currentUserId, parentId, postDocId) {
         const chatButton = document.getElementById("chatButton");
 
         if (currentUserId) {
@@ -1041,12 +1041,15 @@
                 to_user_id: parentId,
                 from_user_id: auth.currentUser.uid,
                 timestamp: new Date(),
-                message:
-                  "Hi, I'm interested in your job posting and would like to discuss details.",
+                post_doc_id: postDocId,
+                message: `Hi, I'm interested in your job posting Post ID: '${postDocId}' and would like to discuss details.`,
               };
 
               await addDoc(collection(db, "CHATS"), chatData);
-              alert("Message sent successfully!");
+              
+              // Instead of alert, redirect to chat page with the parent ID
+              window.location.href = `nanny_chat.html?parentId=${parentId}&autoSelect=true`;
+              
             } catch (error) {
               console.error("Error sending message:", error);
               alert("Failed to send message. Please try again.");
@@ -1056,7 +1059,6 @@
           chatButton.disabled = true;
         }
       }
-
       function initializeRequestButton(currentUserId, jobId) {
         const requestButton = document.getElementById("requestButton");
 
@@ -1261,7 +1263,8 @@
  
 
             // Initialize chat button
-            initializeChatButton(auth.currentUser?.uid, userId);
+            // Inside showDetails function where you initialize the chat button
+            initializeChatButton(auth.currentUser?.uid, userId, postDoc.id);
             initializeRequestButton(auth.currentUser?.uid, postData.jobId);
 
             // Google Maps API
