@@ -49,7 +49,7 @@
         body, html {
             margin: 0;
             padding: 0;
-            height: 300vh;
+            height: 500vh;
             overflow-x: hidden;
             font-family: 'Poppins', sans-serif;
         }
@@ -290,7 +290,7 @@
     left: auto;
     transform: none;
     margin: 1.75rem auto; /* Bootstrap's default margin */
-    width: 400px;
+    width: 800px;
 }
 
 .modal-content {
@@ -367,6 +367,167 @@
             <button class="scroll-button" id="scroll-button">Scroll to find out more</button>
         </div>
     </div>
+    <div class="modal fade" id="parentSignupModal" tabindex="-1" aria-labelledby="parentSignupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h4 class="modal-title" id="parentSignupModalLabel">Create Your Account</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="signupApp">
+                        <form @submit.prevent="handleSubmit">
+                            <!-- Personal Information Section -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Personal Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="firstName" class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="firstName" v-model="firstName" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="lastName" class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="lastName" v-model="lastName" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="dob" class="form-label">Date of Birth</label>
+                                            <input type="date" class="form-control" id="dob" v-model="dob" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="gender" class="form-label">Gender</label>
+                                            <select class="form-select" id="gender" v-model="gender" required>
+                                                <option value="">Select gender</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <!-- Contact Information Section -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Contact Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="email" v-model="email" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="phoneNumber" v-model="phoneNumber" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="homeaddress" class="form-label">Home Address</label>
+                                            <input type="text" class="form-control" id="homeaddress" v-model="homeAddress" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <!-- Account Security Section -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Account Security</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="password" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="password" v-model="password" required @input="validatePassword">
+                                            <div v-if="passwordError" class="text-danger small mt-1">{{ passwordError }}</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                            <input type="password" class="form-control" id="confirmPassword" v-model="confirmPassword" required @input="validatePassword">
+                                            <div v-if="confirmPasswordError" class="text-danger small mt-1">{{ confirmPasswordError }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <!-- Profile Section -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Profile</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="profilePicture" class="form-label">Profile Picture</label>
+                                            <input type="file" class="form-control" id="profilePicture" @change="handleProfilePictureUpload" accept="image/*">
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="aboutMe" class="form-label">About Me</label>
+                                            <textarea class="form-control" id="aboutMe" v-model="aboutMe" rows="4" 
+                                                placeholder="Tell us about yourself and your family..." required></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <!-- Children Section -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Children</h5>
+                                    <button type="button" class="btn btn-primary btn-sm" @click="addChild">
+                                        <i class="fas fa-plus me-1"></i> Add Child
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-4">
+                                        <div v-for="(child, index) in children" :key="index" class="col-md-6">
+                                            <div class="card h-100 border-light">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                        <h6 class="card-title mb-0">Child {{ index + 1 }}</h6>
+                                                        <button type="button" class="btn btn-outline-danger btn-sm" @click="removeChild(index)">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label :for="'childName' + index" class="form-label">Name</label>
+                                                        <input type="text" class="form-control" :id="'childName' + index" v-model="child.name" required>
+                                                    </div>
+                                                    <div class="row g-3">
+                                                        <div class="col-6">
+                                                            <label :for="'childAge' + index" class="form-label">Age</label>
+                                                            <input type="number" class="form-control" :id="'childAge' + index" v-model="child.age" required>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label :for="'childGender' + index" class="form-label">Gender</label>
+                                                            <select class="form-select" :id="'childGender' + index" v-model="child.gender" required>
+                                                                <option value="">Select</option>
+                                                                <option value="male">Male</option>
+                                                                <option value="female">Female</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <!-- Submit Button -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    Create Account
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -398,7 +559,13 @@
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
         import { login, logout, initAuth, getCurrentUser, redirectBasedOnRole } from './backend/auth.js';
-
+        import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+import {
+    storeParentData,
+    handleFileUpload,
+    redirectToParentHome,
+} from "./backend/firebase-op.js";
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
         async function loadNavbar(user) {
             let fileToLoad = 'unloggedin_navbar_template.html';
@@ -457,27 +624,130 @@
                 navbar.classList.remove('scrolled');
             }
         });
-        const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+// Initialize Vue app for signup form
+const signupApp = createApp({
+    data() {
+        return {
+            email: "",
+            firstName: "",
+            lastName: "",
+            dob: "",
+            gender: "",
+            homeAddress: "",
+            phoneNumber: "",
+            children: [{ name: "", gender: "", age: null }],
+            password: "",
+            confirmPassword: "",
+            passwordError: "",
+            confirmPasswordError: "",
+            profilePicture: null,
+            aboutMe: "",
+            errorMessage: "",
+        };
+    },
+    methods: {
+        addChild() {
+            this.children.push({ name: "", gender: "", age: null });
+        },
 
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                const { user, role } = await login(email, password);
-                console.log('Logged in user:', user);
-
-                // Close the modal and redirect based on the user's role
-                const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
-                modal.hide();
-                redirectBasedOnRole(role);
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('Login failed. Please check your email and password.');
+        validatePassword() {
+            const passwordRegex = /^(?=.*\d).{8,}$/;
+            if (!passwordRegex.test(this.password)) {
+                this.passwordError = "Password must be at least 8 characters long and contain a number";
+            } else {
+                this.passwordError = "";
             }
-        });
-    </script>
+
+            if (this.password !== this.confirmPassword) {
+                this.confirmPasswordError = "Passwords do not match";
+            } else {
+                this.confirmPasswordError = "";
+            }
+        },
+
+        handleProfilePictureUpload(event) {
+            const file = handleFileUpload(event);
+            if (file) {
+                this.profilePicture = file;
+            }
+        },
+
+        async handleSubmit() {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(
+                    auth,
+                    this.email,
+                    this.password
+                );
+                const user = userCredential.user;
+
+                await storeParentData(user, {
+                    email: this.email,
+                    firstName: this.firstName,
+                    lastName: this.lastName,
+                    dob: this.dob,
+                    gender: this.gender,
+                    homeAddress: this.homeAddress,
+                    phoneNumber: this.phoneNumber,
+                    children: this.children,
+                    profilePicture: this.profilePicture,
+                    aboutMe: this.aboutMe,
+                    isEditMode: false,
+                });
+
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('parentSignupModal'));
+                modal.hide();
+                
+                // Redirect to parent home
+                redirectToParentHome();
+            } catch (error) {
+                console.error("Signup error:", error);
+                this.errorMessage = error.message;
+            }
+        }
+    }
+});
+
+// Mount the signup app
+signupApp.mount("#signupApp");
+
+// Initialize modals
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Bootstrap modals
+    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+    const signupModal = new bootstrap.Modal(document.getElementById('parentSignupModal'));
+
+    // Add event listeners for modal triggers if you have any
+    const loginTriggers = document.querySelectorAll('[data-bs-target="#loginModal"]');
+    const signupTriggers = document.querySelectorAll('[data-bs-target="#parentSignupModal"]');
+
+    loginTriggers.forEach(trigger => {
+        trigger.addEventListener('click', () => loginModal.show());
+    });
+
+    signupTriggers.forEach(trigger => {
+        trigger.addEventListener('click', () => signupModal.show());
+    });
+
+    // Handle login form submission
+    const loginForm = document.getElementById('loginForm');
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        try {
+            const { user, role } = await login(email, password);
+            loginModal.hide();
+            redirectBasedOnRole(role);
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Login failed. Please check your email and password.');
+        }
+    });
+});
     </script>
 
     <script>
