@@ -43,6 +43,7 @@
         width: 100%;
         max-width: 1400px;
         height: calc(100vh - 100px);
+        padding-top: 100px;
         background-color: white;
         border-radius: 12px;
         overflow: hidden;
@@ -531,11 +532,29 @@
 
       /* Media query for responsiveness */
       @media (max-width: 991.98px) {
+        /* Make navbar shorter on mobile */
+        .navbar {
+          height: 70px;
+        }
+
+        /* Adjust navbar collapse on mobile */
+        .navbar-collapse {
+          position: absolute;
+          top: 70px; /* Match navbar height */
+          left: 0;
+          right: 0;
+          background-color: white;
+          padding: 20px;
+          border-radius: 0 0 12px 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          z-index: 1000;
+        }
+
         .app-container {
           margin: 0;
           border-radius: 0;
           height: 100vh;
-          padding-top: 50px;
+          padding-top: 70px;
           max-width: none;
         }
 
@@ -551,9 +570,8 @@
           width: 100%;
           position: fixed;
           left: 0;
-          top: 0;
-          bottom: 0;
-          height: 100%;
+          top: 70px;
+          height: calc(100vh - 70px); /* Subtract navbar height */
           z-index: 20;
           transform: translateX(-100%);
           transition: transform 0.3s ease;
@@ -579,6 +597,8 @@
 
         .chat-details {
           width: 100%;
+          height: calc(100vh - 70px); /* Subtract navbar height */
+          margin-top: 0;
         }
 
         .chat-input {
@@ -674,7 +694,7 @@
         .app-container {
           margin: 0;
           border-radius: 0;
-          padding-top: 50px;
+          padding-top: 70px;
           height: 100vh;
         }
 
