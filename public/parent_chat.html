@@ -679,6 +679,9 @@
             <div class="chat-header">
               <div class="chat-header-left">
                 <div class="user-avatar">
+                  <a
+                      :href="`parent_displaynannyprofile.html?id=${selectedChat.userId}`"
+                    >
                   <img
                     :src="selectedChat.profilePictureUrl"
                     :alt="selectedChat.firstName"
