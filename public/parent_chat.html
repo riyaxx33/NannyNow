@@ -487,80 +487,167 @@
       }
 
       /* Styles for the review modal */
-      .modal {
-        display: none;
+      /* Review Modal Styles */
+      .review-modal {
         position: fixed;
-        z-index: 1000;
-        left: 0;
         top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0,0,0,0.4);
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn 0.2s ease-out;
       }
 
-      .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
+      .review-modal-content {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        width: 90%;
         max-width: 500px;
-        border-radius: 8px;
+        position: relative;
+        animation: slideIn 0.3s ease-out;
       }
 
-      .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
+      .review-modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
         cursor: pointer;
+        padding: 0.5rem;
+        color: #666;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      .close:hover,
-      .close:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
+      .review-modal-close:hover {
+        color: #333;
       }
 
-      .star-rating {
+      .review-modal-header {
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      .review-modal-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+      }
+
+      .review-modal-header p {
+        color: #666;
+        font-size: 1rem;
+      }
+
+      .review-star-rating {
         display: flex;
         justify-content: center;
-        font-size: 24px;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
       }
 
-      .star {
-        color: #ddd;
+      .review-star-button {
+        background: none;
+        border: none;
         cursor: pointer;
-        transition: color 0.2s;
+        padding: 0.25rem;
+        transition: transform 0.2s;
       }
 
-      .star.active {
+      .review-star-button:hover {
+        transform: scale(1.1);
+      }
+
+      .review-star-button i {
+        width: 2rem;
+        height: 2rem;
+        color: #ddd;
+        transition: color 0.2s, fill 0.2s;
+      }
+
+      .review-star-button i.filled {
         color: #ffd700;
+        fill: #ffd700;
+      }
+
+      .review-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
       }
 
       .review-textarea {
         width: 100%;
-        height: 100px;
-        margin-top: 10px;
-        padding: 10px;
+        height: 120px;
+        padding: 0.75rem;
         border: 1px solid #ddd;
-        border-radius: 4px;
-        resize: vertical;
+        border-radius: 8px;
+        resize: none;
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: border-color 0.2s;
       }
 
-      .review-submit {
-        margin-top: 10px;
-        padding: 10px 20px;
-        background-color: #4CAF50;
+      .review-textarea:focus {
+        outline: none;
+        border-color: #ff6b6b;
+      }
+
+      .review-char-count {
+        text-align: right;
+        color: #666;
+        font-size: 0.875rem;
+      }
+
+      .review-submit-btn {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background-color: #ff6b6b;
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 8px;
+        font-weight: 500;
         cursor: pointer;
+        transition: background-color 0.2s;
       }
 
-      .review-submit:hover {
-        background-color: #45a049;
+      .review-submit-btn:hover:not(:disabled) {
+        background-color: #ff5252;
+      }
+
+      .review-submit-btn:disabled {
+        background-color: #ddd;
+        cursor: not-allowed;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
     </style>
   </head>
@@ -684,14 +771,13 @@
                     :alt="selectedChat.firstName"
                     @error="handleImageError($event)"
                   />
-                  </a>
                 </div>
                 <div>
                   <h3>
                     {{ selectedChat.firstName }} {{ selectedChat.lastName }}
                   </h3>
                 </div>
-                <button 
+                <button
                   v-if="selectedChat.role === 'nanny'"
                   @click="openReviewModal"
                   class="btn btn-outline-primary btn-sm ml-4"
@@ -759,32 +845,54 @@
     </div>
 
     <!-- Review Modal -->
-    <div id="reviewModal" class="modal">
-      <div class="modal-content">
-        <span class="close" @click="closeReviewModal">&times;</span>
-        <h2>How was your experience?</h2>
-        <p>Rate {{ selectedChat ? selectedChat.firstName : 'the nanny' }}</p>
-        <div class="star-rating">
-          <span 
-            v-for="star in 5" 
-            :key="star" 
-            class="star" 
-            :class="{ active: star <= rating }"
-            @click="setRating(star)"
+    <div
+      v-if="showReviewModal"
+      class="review-modal"
+      @click.self="closeReviewModal"
+    >
+      <div class="review-modal-content">
+        <button class="review-modal-close" @click="closeReviewModal">
+          <i data-lucide="x"></i>
+        </button>
+
+        <div class="review-modal-header">
+          <h2>Rate Your Experience</h2>
+          <p>How was your experience with {{ selectedChat?.firstName }}?</p>
+        </div>
+
+        <div class="review-star-rating">
+          <button
+            v-for="star in 5"
+            :key="star"
+            class="review-star-button"
             @mouseover="hoverRating = star"
             @mouseleave="hoverRating = 0"
+            @click="setRating(star)"
           >
-            &#9733;
-          </span>
+            <i
+              data-lucide="star"
+              :class="{ 'filled': star <= (hoverRating || rating) }"
+            ></i>
+          </button>
         </div>
-        <textarea 
-          v-model="reviewComment" 
-          class="review-textarea" 
-          placeholder="Share more about your experience and interactions with this nanny"
-          maxlength="400"
-        ></textarea>
-        <div class="text-right">{{ reviewComment.length }}/400</div>
-        <button @click="submitReview" class="review-submit" :disabled="!rating">Submit Review</button>
+
+        <div class="review-form">
+          <textarea
+            v-model="reviewComment"
+            class="review-textarea"
+            placeholder="Share your experience with this nanny..."
+            maxlength="400"
+          ></textarea>
+          <div class="review-char-count">{{ reviewComment.length }}/400</div>
+
+          <button
+            @click="submitReview"
+            class="review-submit-btn"
+            :disabled="!rating"
+          >
+            Submit Review
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1270,14 +1378,20 @@
           // New methods for review functionality
           openReviewModal() {
             this.showReviewModal = true;
-            document.getElementById('reviewModal').style.display = 'block';
+            this.rating = 0;
+            this.hoverRating = 0;
+            this.reviewComment = "";
+            // Force Lucide icons to render after modal opens
+            this.$nextTick(() => {
+              lucide.createIcons();
+            });
           },
 
           closeReviewModal() {
             this.showReviewModal = false;
-            document.getElementById('reviewModal').style.display = 'none';
             this.rating = 0;
-            this.reviewComment = '';
+            this.hoverRating = 0;
+            this.reviewComment = "";
           },
 
           setRating(star) {
@@ -1288,6 +1402,12 @@
             if (!this.rating) return;
 
             try {
+              // Show loading state
+              const submitButton = document.querySelector(".review-submit-btn");
+              const originalText = submitButton.textContent;
+              submitButton.textContent = "Submitting...";
+              submitButton.disabled = true;
+
               await db.collection("REVIEW").add({
                 from_userID: this.currentUserId,
                 to_userID: this.selectedChat.userId,
@@ -1296,11 +1416,17 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
               });
 
+              // Show success message
+              alert("Review submitted successfully!");
               this.closeReviewModal();
-              // You might want to show a success message here
             } catch (error) {
               console.error("Error submitting review:", error);
-              // You might want to show an error message here
+              alert("Failed to submit review. Please try again.");
+            } finally {
+              // Reset button state
+              const submitButton = document.querySelector(".review-submit-btn");
+              submitButton.textContent = "Submit Review";
+              submitButton.disabled = false;
             }
           },
         },
