@@ -1036,7 +1036,7 @@
               <div class="job-description">
                 <h5>${firstName} ${lastName}</h5>
                 <p>
-                  Post ID: ${postDoc.id}<br>
+                  Job ID: ${postDoc.id}<br>
                   Date of Job: ${new Date(postData.date).toLocaleDateString()}<br>
                   Time of Job: ${postData.startTime} - ${postData.endTime}<br>
                   Expected Pay: $${postData.pay}/hr
@@ -1080,7 +1080,7 @@
                 from_user_id: auth.currentUser.uid,
                 timestamp: new Date(),
                 post_doc_id: postDocId,
-                message: `Hi, I'm interested in your job posting Post ID: '${postDocId}' and would like to discuss details.`,
+                message: `Hi, I'm interested in your job posting Job ID: '${postDocId}' and would like to discuss details.`,
               };
 
               await addDoc(collection(db, "CHATS"), chatData);
@@ -1271,7 +1271,7 @@
               <p>${parentDetails.aboutMe || "No information provided"}</p>
               <h5>Job Details:</h5>
               <p>
-                Post ID: ${postId}<br>
+                Job ID: ${postId}<br>
                 Date: ${new Date(postData.date).toLocaleDateString()}<br>
                 Time: ${postData.startTime} - ${postData.endTime}<br>
                 Expected Pay: $${postData.pay}/hr
