@@ -16,11 +16,12 @@
     />
     <script src="https://unpkg.com/vue@3/dist/vue.esm-browser.js"></script>
 
+    
     <style>
       :root {
-        --linkedin-blue: #0a66c2;
-        --linkedin-light-blue: #70b5f9;
-        --linkedin-background: #f3f2ef;
+        --accent-color: #6c5ce7;
+        --accent-light: rgba(108, 92, 231, 0.1);
+        --background-white: #ffffff;
         --card-border: #e0e0e0;
       }
 
@@ -29,15 +30,15 @@
       }
 
       body {
-        background-color: var(--linkedin-background);
+        background-color: var(--background-white);
         font-family: "Poppins", sans-serif;
         padding-top: 100px;
       }
 
       /* Profile Background */
       .profile-background {
-        height: 200px;
-        background-color: var(--linkedin-light-blue);
+        height: 100px;
+        background-color: var(--accent-light);
         border-radius: 8px 8px 0 0;
         position: relative;
       }
@@ -49,12 +50,13 @@
         border: 1px solid var(--card-border);
         margin-bottom: 20px;
         padding: 24px;
+        box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
       }
 
       /* Avatar */
       .avatar-container {
         position: relative;
-        margin-top: -72px;
+        margin-top: -40px;
         padding-left: 24px;
       }
 
@@ -64,11 +66,11 @@
         border: 4px solid white;
         border-radius: 50%;
         object-fit: cover;
+        box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
       }
-
       /* Profile Info */
       .profile-info {
-        padding-top: 24px;
+        padding-top: 12px; /* Reduced from 24px */
       }
 
       .profile-name {
@@ -99,37 +101,50 @@
         gap: 16px;
       }
 
-      /* Section Styling */
       .section-title {
         font-size: 20px;
         font-weight: 600;
-        color: rgba(0, 0, 0, 0.9);
+        color: var(--accent-color);
         margin-bottom: 16px;
       }
 
-      /* Buttons */
       .btn-primary,
       .btn-edit {
-        background-color: var(--linkedin-blue);
-        border-color: var(--linkedin-blue);
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
         color: white;
       }
 
+      .btn-primary:hover,
+      .btn-edit:hover {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+        opacity: 0.9;
+      }
+
       .btn-outline-primary {
-        color: var(--linkedin-blue);
-        border-color: var(--linkedin-blue);
+        color: var(--accent-color);
+        border-color: var(--accent-color);
       }
 
       .btn-outline-primary:hover {
-        background-color: rgba(112, 181, 249, 0.2);
-        border-color: var(--linkedin-blue);
-        color: var(--linkedin-blue);
+        background-color: var(--accent-light);
+        border-color: var(--accent-color);
+        color: var(--accent-color);
       }
 
-      /* Responsive Breakpoints */
+      /* Star Rating Colors */
+      .star-filled {
+        color: var(--accent-color) !important;
+      }
+
+      .star-empty {
+        color: #D1D5DB !important;
+      }
+
       @media (min-width: 768px) {
         .profile-info {
-          padding-top: 80px;
+          padding-top: 24px; /* Reduced from 80px */
         }
 
         .w-md-auto {
@@ -155,6 +170,10 @@
           flex-direction: column;
           align-items: flex-start;
           gap: 8px;
+        }
+
+        .profile-info {
+          padding-top: 8px; /* Further reduced for mobile */
         }
       }
     </style>
