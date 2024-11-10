@@ -84,7 +84,7 @@
         position: relative;
         padding: 0;
         margin: 0;
-        z-index: 1020; /* Below navbar but above other content */
+        z-index: 1020;
         background-color: rgba(255, 255, 255, 0.9);
         width: 100%;
         background-color: white;
@@ -99,7 +99,6 @@
         flex-wrap: wrap;
       }
       .search-input-group{
-        border: 1px solid #dee2e6;
         border: 1px solid #dee2e6;
         border-radius: 6px;
       }
@@ -165,7 +164,7 @@
 
       .filter-option.active {
         background-color: #e9ecef;
-        color: #007bff;
+        color: #6c5ce7;
       }
 
       .active-filters {
@@ -180,7 +179,7 @@
         align-items: center;
         padding: 4px 12px;
         background-color: #e7f3ff;
-        color: #007bff;
+        color: #6c5ce7;
         border-radius: 20px;
         font-size: 0.9em;
       }
@@ -188,7 +187,7 @@
       .active-filter button {
         background: none;
         border: none;
-        color: #007bff;
+        color: #6c5ce7;
         margin-left: 8px;
         padding: 0;
         cursor: pointer;
@@ -205,11 +204,10 @@
 
       #jobSearch:focus {
           outline: none;
-          border-color: var(--linkedin-blue);
-          box-shadow: 0 0 0 1px var(--linkedin-blue);
+          border-color: #6c5ce7;
+          box-shadow: 0 0 0 1px #6c5ce7;
       }
 
-      /* Updated compact styles for parent info and children sections */
       .parent-info {
         margin-bottom: 8px;
       }
@@ -217,6 +215,7 @@
       .parent-info h5 {
         font-size: 1rem;
         margin-bottom: 6px;
+        color: #6c5ce7;
       }
 
       .parent-info p {
@@ -225,10 +224,10 @@
         line-height: 1.4;
       }
 
-      /* Job Description styles to match other sections */
       #jobDescription h5 {
         font-size: 1rem;
         margin-bottom: 6px;
+        color: #6c5ce7;
       }
 
       #jobDescription p {
@@ -253,7 +252,7 @@
         font-size: 1rem;
         font-weight: 500;
         margin-bottom: 8px;
-        color: #212529;
+        color: #6c5ce7;
       }
 
       .children-container {
@@ -274,7 +273,7 @@
       .child-name {
         font-size: 0.9rem;
         font-weight: 500;
-        color: #212529;
+        color: #6c5ce7;
         margin-bottom: 2px;
         white-space: nowrap;
         overflow: hidden;
@@ -327,7 +326,7 @@
         font-size: 2.2rem;
         font-weight: 600;
         margin-bottom: 4px;
-        color: #333;
+        color: #6c5ce7;
       }
 
       .profile-subtext {
@@ -337,7 +336,7 @@
       }
 
       .chat-button:hover {
-        background-color: #e0e0e0;
+        background-color: #5a4bd1;
       }
 
       .chat-button:disabled {
@@ -371,12 +370,12 @@
 
       .parent-info {
         flex: 1;
-        margin-bottom: 0; /* Override existing margin */
+        margin-bottom: 0;
       }
 
       .chat-button-container {
         flex-shrink: 0;
-        margin: 0; /* Override existing margin */
+        margin: 0;
       }
 
       .chat-button {
@@ -391,10 +390,10 @@
       .chat-button {
         width: 100%;
         padding: 8px 16px;
-        background-color: #f3f4f6;
-        border: 1px solid #e5e7eb;
+        background-color: #6c5ce7;
+        border: 1px solid #5a4bd1;
         border-radius: 6px;
-        color: #4b5563;
+        color: #ffffff;
         font-size: 14px;
       }
 
@@ -404,21 +403,18 @@
         flex-grow: 1;
       }
 
-      /* Content row */
       .row {
         display: flex;
         margin-right: -15px;
         margin-left: -15px;
       }
 
-      /* Job cards container */
       .list-group {
         height: calc(100vh - 200px);
         overflow-y: auto;
         padding-right: 10px;
       }
 
-      /* Main container styles */
       .container {
         width: 100%;
         padding-right: 15px;
@@ -427,7 +423,6 @@
         margin-left: auto;
       }
 
-      /* Column styles */
       .col-md-6 {
         position: relative;
         width: 50%;
@@ -435,25 +430,56 @@
         padding-left: 15px;
       }
 
-      @media (max-width: 768px) {
+      @media (max-width: 576px) {
         .col-md-6 {
           width: 100%;
         }
 
+        body.details-visible .search-container {
+          display: none;
+        }
+
         #detailsContainer {
-          margin-top: 20px;
-          height: auto;
-          position: static;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 1000;
+          height: 100vh;
+          margin-top: 0;
+          display: none;
+        }
+
+        #detailsContainer.show {
+          display: block;
+        }
+
+        #detailsContainer.show ~ .search-container,
+        #detailsContainer.show ~ .container .search-container {
+          display: none;
         }
 
         .list-group {
-          height: auto;
-          max-height: 500px;
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE and Edge */
+          height: calc(100vh - 100px);
+          max-height: none;
+        }
+
+        #backToPostBtn {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          z-index: 1001;
+          display: none;
+        }
+
+        #backToPostBtn.show {
+          display: block;
         }
       }
 
+      .list-group::-webkit-scrollbar,
+      #detailsContainer::-webkit-scrollbar,
       .list-group::-webkit-scrollbar {
         display: none; /* Chrome, Safari, Opera */
       }
@@ -466,6 +492,14 @@
         display: none;
       }
 
+      #backToPostBtn {
+        background-color: #6c5ce7;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
 
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
@@ -582,6 +616,12 @@
               </div>
           </div>
         </div>
+      </div>
+      <button id="backToPostBtn" class="btn" >Back to Post</button>
+      <!-- style="display: none;" -->
+    </div>
+        
+
 
     <!-- API KEY -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5BjPBxo5PwTs6N2PAT0YCUvT66CIQuxw&libraries=places"></script>
@@ -983,32 +1023,30 @@
         jobListContainer.innerHTML = "";
 
         posts.forEach(({ postData, parentData, postDoc }) => {
-          const profileImage =
-            parentData.profilePictureUrl || "/api/placeholder/60/60";
+          const profileImage = parentData.profilePictureUrl || "/api/placeholder/60/60";
           const { firstName, lastName } = parentData;
 
           const jobCard = document.createElement("div");
           jobCard.className = "list-group-item job-card";
-          jobCard.onclick = () => showDetails(postData.userId, postDoc.id); // Ensure postDoc.id is accessible
+          jobCard.onclick = () => showDetails(postData.userId, postDoc.id);
 
           jobCard.innerHTML = `
-      <div class="job-card-content">
-        <img src="${profileImage}" alt="Profile" />
-        <div class="job-description">
-          <h5>${firstName} ${lastName}</h5>
-          <p>
-            Post ID: ${postDoc.id}<br>
-            Date of Job: ${new Date(postData.date).toLocaleDateString()}<br>
-            Time of Job: ${postData.startTime} - ${postData.endTime}<br>
-            Expected Pay: $${postData.pay}/hr
-          </p>
-        </div>
-      </div>
-    `;
+            <div class="job-card-content">
+              <img src="${profileImage}" alt="Profile" />
+              <div class="job-description">
+                <h5>${firstName} ${lastName}</h5>
+                <p>
+                  Post ID: ${postDoc.id}<br>
+                  Date of Job: ${new Date(postData.date).toLocaleDateString()}<br>
+                  Time of Job: ${postData.startTime} - ${postData.endTime}<br>
+                  Expected Pay: $${postData.pay}/hr
+                </p>
+              </div>
+            </div>
+          `;
 
           jobListContainer.appendChild(jobCard);
         });
-
       }
 
       // Function to calculate age from DOB
@@ -1198,38 +1236,47 @@
 
       // Function to show details when a card is clicked
       async function showDetails(userId, postId) {
-    try {
-        const parentDoc = await getDoc(doc(db, "USER", userId));
-        const parentData = parentDoc.exists() ? parentDoc.data() : null;  // Fixed this line (was parentData.data())
+            try {
+                const parentDoc = await getDoc(doc(db, "USER", userId));
+                const parentData = parentDoc.exists() ? parentDoc.data() : null;  // Fixed this line (was parentData.data())
 
-        const postDoc = await getDoc(doc(db, "POSTS", postId));
-        const postData = postDoc.exists() ? postDoc.data() : null;
+                const postDoc = await getDoc(doc(db, "POSTS", postId));
+                const postData = postDoc.exists() ? postDoc.data() : null;
 
-        const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
-        const parentDetails = parentDetailsDoc.exists() ? parentDetailsDoc.data() : null;
+                const parentDetailsDoc = await getDoc(doc(db, "PARENT", userId));
+                const parentDetails = parentDetailsDoc.exists() ? parentDetailsDoc.data() : null;
 
-        if (parentData && postData && parentDetails) {
-        // Update profile picture and make it clickable
-        const profileImg = document.getElementById("profilePicture");
-        if (profileImg) {
-            profileImg.src = parentData.profilePictureUrl || "/api/placeholder/80/80";
-            profileImg.parentElement.href = `nanny_displayparentprofile.html?id=${userId}`;
-        }
+                if (parentData && postData && parentDetails) {
+                // Update profile picture and make it clickable
+                const profileImg = document.getElementById("profilePicture");
+                if (profileImg) {
+                    profileImg.src = parentData.profilePictureUrl || "/api/placeholder/80/80";
+                    profileImg.parentElement.href = `nanny_displayparentprofile.html?id=${userId}`;
+                }
 
-        document.getElementById(
-            "nannyName"
-        ).innerHTML = `${parentData.firstName} ${parentData.lastName}`;
-        const { age, gender } = calculateAge(
-            parentData.dob,
-            parentData.gender
-        );
-        document.getElementById(
-            "profileSubtext"
-        ).innerHTML = `${gender} | ${age} years old`;
+                document.getElementById(
+                    "nannyName"
+                ).innerHTML = `${parentData.firstName} ${parentData.lastName}`;
+                const { age, gender } = calculateAge(
+                    parentData.dob,
+                    parentData.gender
+                );
+                document.getElementById(
+                    "profileSubtext"
+                ).innerHTML = `${gender} | ${age} years old`;
 
             // Update parent details
-            let detailsHTML = `<h5>About:</h5>
-                <p>${parentDetails.aboutMe || "No information provided"}</p>`;
+            let detailsHTML = `
+              <h5>About:</h5>
+              <p>${parentDetails.aboutMe || "No information provided"}</p>
+              <h5>Job Details:</h5>
+              <p>
+                Post ID: ${postId}<br>
+                Date: ${new Date(postData.date).toLocaleDateString()}<br>
+                Time: ${postData.startTime} - ${postData.endTime}<br>
+                Expected Pay: $${postData.pay}/hr
+              </p>
+            `;
 
             // Add children information
             if (parentDetails.children && parentDetails.children.length > 0) {
@@ -1270,12 +1317,23 @@
             // Google Maps API
             const address = parentDetails.homeAddress;
             geocodeAddress(address);
+
+            if (window.innerWidth <= 576) {
+            document.body.classList.add('details-visible');
+            document.getElementById("detailsContainer").classList.add("show");
+            document.getElementById("backToPostBtn").classList.add("show");
+          }
           }
         } catch (error) {
           console.error("Error showing details:", error);
         }
       }
 
+      document.getElementById("backToPostBtn").addEventListener("click", () => {
+        document.body.classList.remove('details-visible');
+        document.getElementById("detailsContainer").classList.remove("show");
+        document.getElementById("backToPostBtn").classList.remove("show");
+      });
       // Geocoding API
       function geocodeAddress(address) {
         const geocoder = new google.maps.Geocoder();
