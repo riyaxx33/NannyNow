@@ -13,99 +13,136 @@
       rel="stylesheet"
     />
     <style>
-      body {
-        margin: 0;
+      body, input, button, .filter-dropdown, .job-card, #detailsContainer {
         font-family: "Poppins", sans-serif;
       }
-
+      body {
+        padding-top: 70px;
+      }
+      
+      /* Make the right details container fixed */
       #detailsContainer {
         position: sticky;
-        top: 100px;
-        background: white;
-        border: 1px solid #eee;
-        border-radius: 12px;
+        background-color: white;
+        top: 60px; /* Matches the navbar height to keep it aligned */
+        border-left: 1px solid #ccc;
+        border: 2px solid #ddd;
+        border-radius: 5px;
         padding: 20px;
-        height: calc(100vh - 120px);
-        overflow-y: auto;
-        font-family: "Poppins", sans-serif;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        scrollbar-width: none;
-        -ms-overflow-style: none;
+        height: calc(
+          100vh - 60px
+        ); /* Ensures it takes full height minus the navbar */
+        overflow-y: auto; /* Allow vertical scroll within the container if content exceeds */
       }
 
+      /* Styling the container that holds the job description */
       #jobDescriptionContainer {
-        height: calc(100% - 70px);
-        overflow-y: auto;
+        height: 300px; /* Set a fixed height for the description section */
+        overflow-y: auto; /* Enables vertical scrolling */
         padding: 10px;
-        border: 1px solid #ddd;
+        border: 1px solid #ddd; /* Optional: Add a border around the scrollable area */
         margin-top: 15px;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
       }
-
       .nanny-profile-pic {
-        width: 80px;
-        height: 80px;
-        margin-right: 15px;
-        border-radius: 50%;
-        object-fit: cover;
+          width: 80px;
+          height: 80px;
+          margin-right: 15px;
+          border-radius: 50%;
+          object-fit: cover;
       }
-
+      /* Job card styling */
       .job-card {
-        background: white;
-        padding: 20px;
-        margin-bottom: 15px;
-        width: 100%;
         cursor: pointer;
-        border: 1px solid #ddd;
+        margin-bottom: 10px;
+        padding: 20px;
+        border: 1px solid #6c5ce7;
         border-radius: 5px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        transition: background-color 0.3s ease;
-        height: auto;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        font-family: "Poppins", sans-serif;
       }
-
       .job-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px rgba(108, 92, 231, 0.1);
       }
-
       .job-card-content {
         display: flex;
         align-items: center;
         width: 100%;
-        font-family: "Poppins", sans-serif;
       }
 
       .job-description {
         flex-grow: 1;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .chat-button-container {
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .chat-button {
+        padding: 10px 20px;
+        font-size: 1.1em;
+        background-color: #6c5ce7;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-family: "Poppins", sans-serif;
+        font-weight: 500;
+      }
+
+      .chat-button:hover {
+        background-color: #5849c4;
+      }
+
+      .chat-button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
       }
 
       .search-container {
         position: relative;
-        padding: 0;
-        margin: 0;
-        z-index: 1020;
-        background-color: rgba(255, 255, 255, 0.9);
-        width: 100%;
-        background-color: white;
-        border-bottom: 1px solid #eee;
+        padding: 10px;
+        margin: 0px;
       }
 
       .search-bar {
         display: flex;
-        gap: 10px;
+        gap: 15px;
         align-items: center;
         font-family: "Poppins", sans-serif;
-        flex-wrap: wrap;
+        height: 30px;
+      }
+
+      .search-input-group{
+        border: 1px solid #6c5ce7;
+        border-radius: 6px;
+        height: 45px;
       }
 
       .search-input-group {
         flex-grow: 1;
         position: relative;
-        border: 1px solid #dee2e6;
+      }
+
+      .search-input-group i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c5ce7;
+      }
+
+      .search-input {
+        padding-left: 40px;
         border-radius: 6px;
+        border: 1px solid #6c5ce7;
+        height: 45px;
       }
 
       .filter-dropdown {
@@ -118,21 +155,25 @@
         width: 100%;
         height: 45px;
         background-color: white;
-        border: 1px solid #dee2e6;
+        border: 1px solid #6c5ce7;
         border-radius: 6px;
         padding: 0 15px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        color: #495057;
+        color: #6c5ce7;
         font-weight: 500;
         transition: all 0.2s ease;
         cursor: pointer;
       }
 
       .filter-button:hover {
-        border-color: #adb5bd;
-        background-color: #f8f9fa;
+        border-color: #5849c4;
+        background-color: #f0edff;
+      }
+
+      .filter-button i {
+        color: #6c5ce7;
       }
 
       .filter-menu {
@@ -140,11 +181,12 @@
         top: calc(100% + 5px);
         left: 0;
         right: 0;
+        margin-top: 5px;
         background-color: white;
         border-radius: 6px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 1000;
-        border: 1px solid #dee2e6;
+        border: 1px solid #6c5ce7;
         display: none;
       }
 
@@ -167,156 +209,129 @@
         color: #6c5ce7;
       }
 
+      .filter-option:first-child {
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+      }
+
+      .filter-option:last-child {
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+
       .active-filters {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 10px;
+        gap: 10px;
+        margin-top: 15px;
       }
 
       .active-filter {
         display: inline-flex;
         align-items: center;
         padding: 4px 12px;
-        background-color: #e7f3ff;
+        background-color: #e7e4ff;
         color: #6c5ce7;
         border-radius: 20px;
         font-size: 0.9em;
       }
 
-      .active-filter button {
+      .active-filter i {
+        margin-left: 5px;
+        cursor: pointer;
+      }
+
+      .filter-tag {
+        display: inline-flex;
+        align-items: center;
+        background-color: #e7e4ff;
+        color: #6c5ce7;
+        padding: 6px 12px;
+        border-radius: 20px;
+        margin-right: 8px;
+        margin-top: 8px;
+        font-size: 0.9em;
+      }
+
+      .filter-tag span {
+        margin-right: 8px;
+      }
+
+      .remove-filter {
+        cursor: pointer;
         background: none;
         border: none;
         color: #6c5ce7;
-        margin-left: 8px;
-        padding: 0;
-        cursor: pointer;
-        font-size: 14px;
+        padding: 0 4px;
+        font-weight: bold;
       }
 
-      #jobSearch {
-        height: 45px;
-        border-radius: 6px;
-        padding: 0 15px;
-        border: 1px solid var(--card-border);
-        width: 100%;
+      .remove-filter:hover {
+        color: #5849c4;
       }
-
-      #jobSearch:focus {
-        outline: none;
-        border-color: #6c5ce7;
-        box-shadow: 0 0 0 1px #6c5ce7;
-      }
-
-      .chat-button {
-        width: 100%;
-        padding: 8px 16px;
-        background-color: #6c5ce7;
-        border: 1px solid #5a4bd1;
-        border-radius: 6px;
-        color: #ffffff;
-        font-size: 14px;
-      }
-
-      .chat-button:hover {
-        background-color: #5a4bd1;
-      }
-
-      .chat-button:disabled {
-        background-color: #f0f0f0;
-        color: #999;
-        cursor: not-allowed;
-      }
-
-      .profile-header {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 30px;
-        padding: 20px 0;
-        width: 100%;
-        gap: 20px;
-      }
-
-      .profile-header img {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .profile-header a {
-        text-decoration: none;
-        cursor: pointer;
-      }
-
-      .profile-header a:hover img {
-        transform: scale(1.05);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      }
-
-      .profile-info h4 {
-        font-size: 2.2rem;
-        font-weight: 600;
-        margin-bottom: 4px;
+      .details{
         color: #6c5ce7;
       }
-
-      .profile-subtext {
-        color: #666;
-        font-size: 1.1rem;
-        margin-top: 2px;
+      .col-md-6 {
+        transition: all 0.3s ease;
       }
 
-      @media (max-width: 576px) {
-            #detailsContainer {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                z-index: 1000;
-                height: 100vh;
-                margin-top: 0;
-                display: none;
-                overflow-y: auto;
-            }
 
-            #detailsContainer.show {
-                display: block;
-            }
-
-            body.details-visible .search-container,
-            body.details-visible .list-group {
-                display: none;
-            }
-
-            #backToListBtn {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 1001;
-                display: none;
-            }
-
-            #backToListBtn.show {
-                display: block;
-            }
+      /* Responsive styles for smaller screens */
+      @media (max-width: 768px) {
+        .col-md-6#nanny_list {
+          display: block;
         }
-      .list-group::-webkit-scrollbar,
-      #detailsContainer::-webkit-scrollbar,
-      #jobDescriptionContainer::-webkit-scrollbar {
-        display: none;
+        
+        .col-md-6#nanny_list.hide {
+          display: none;
+        }
+        
+        .col-md-6#detailsContainer {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: white;
+          z-index: 1000;
+          overflow-y: auto;
+          padding: 20px;
+        }
+        
+        .col-md-6#detailsContainer.show {
+          display: block;
+        }
+        
+        .back-to-nanny {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: #007bff;
+          color: white !important;
+          padding: 10px 20px;
+          border-radius: 5px;
+          text-decoration: none;
+          z-index: 1001;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .back-to-nanny:hover {
+          background: #0056b3;
+          text-decoration: none;
+        }
       }
 
-      #backToPostBtn {
-        background-color: #6c5ce7;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      @media (min-width: 769px) {
+        .back-to-nanny {
+          display: none;
+        }
       }
+
     </style>
   </head>
   <body>
@@ -428,7 +443,7 @@
       <div class="container mt-3">
         <div class="row">
           <!-- Nanny Cards Section -->
-          <div class="col-md-6">
+          <div class="col-md-6" id="nanny_list">
             <div class="list-group">
               <div
                 v-for="nanny in filteredNannies"
@@ -452,56 +467,54 @@
             </div>
           </div>
 
-                  <!-- Nanny Details Section -->
-        <!-- Nanny Details Section -->
-        <div class="col-md-6" id="detailsContainer">
-
-          <div v-if="selectedNanny">
-            <div class="d-flex align-items-start gap-4 mb-4">
-              <a 
-                :href="`parent_displaynannyprofile.html?id=${selectedNanny.id}`"
-                style="text-decoration: none;"
-              >
-                <img
-                  :src="selectedNanny.profilePictureUrl || '/api/placeholder/100/100'"
-                  :alt="selectedNanny.firstName + ' ' + selectedNanny.lastName"
-                  class="rounded-circle"
-                  style="width: 100px; height: 100px; object-fit: cover; border:none; cursor: pointer;"
-                />
-              </a>
-              
-              <div>
-                <h2 class="text-4xl font-bold mb-2">{{ selectedNanny.firstName }} {{ selectedNanny.lastName }}</h2>
-                <div class="text-xl text-gray-600">
-                  <span class="details">{{ selectedNanny.gender.charAt(0).toUpperCase() + selectedNanny.gender.slice(1) }} | {{ calculateAge(selectedNanny.dob) }} years old</span>
-                </div>
-                <div class="chat-button-container">
-                  <button 
-                    class="chat-button"
-                    @click="sendMessage"
-                    :disabled="!currentUserId || !selectedNanny">
-                    Chat Now
-                  </button>
+          <!-- Nanny Details Section -->
+          <div class="col-md-6" id="detailsContainer" :class="{ 'show': selectedNanny }">
+            <div v-if="selectedNanny">
+              <div class="d-flex align-items-start gap-4 mb-4">
+                <a 
+                  :href="`parent_displaynannyprofile.html?id=${selectedNanny.id}`"
+                  style="text-decoration: none;"
+                >
+                  <img
+                    :src="selectedNanny.profilePictureUrl || '/api/placeholder/100/100'"
+                    :alt="selectedNanny.firstName + ' ' + selectedNanny.lastName"
+                    class="rounded-circle"
+                    style="width: 100px; height: 100px; object-fit: cover; border:none; cursor: pointer;"
+                  />
+                </a>
+                
+                <div>
+                  <h2 class="text-4xl font-bold mb-2">{{ selectedNanny.firstName }} {{ selectedNanny.lastName }}</h2>
+                  <div class="text-xl text-gray-600">
+                    <span class="details">{{ selectedNanny.gender.charAt(0).toUpperCase() + selectedNanny.gender.slice(1) }} | {{ calculateAge(selectedNanny.dob) }} years old</span>
+                  </div>
+                  <div class="chat-button-container">
+                    <button 
+                      class="chat-button"
+                      @click="sendMessage"
+                      :disabled="!currentUserId || !selectedNanny">
+                      Chat Now
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div class="mt-2">
-              <p>Experience: {{ selectedNanny.yrsExperience || 'N/A' }} years<br>
-                About Me: {{ selectedNanny.description }}</p>
-            </div>
               
-            
+              <div class="mt-2">
+                <p>Experience: {{ selectedNanny.yrsExperience || 'N/A' }} years<br>
+                  About Me: {{ selectedNanny.description }}</p>
+              </div>
+            </div>
+            <div v-else>
+              <p>Select a nanny to view details</p>
+            </div>
           </div>
-          <div v-else>
-            <p>Select a nanny to view details</p>
-          </div>
-        </div>
-
-
         </div>
       </div>
     </div>
+
+    <a class="back-to-nanny" v-if="selectedNanny" @click.prevent="closeDetails">
+      <i class="fas fa-arrow-left"></i> Back to List
+    </a>
 
     <script type="module">
       import {
@@ -525,17 +538,17 @@
       } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
       createApp({
-  setup() {
-    const nannies = ref([]);
-    const selectedNanny = ref(null);
-    const searchQuery = ref("");
-    const currentUserId = ref(null);
-    const experienceFilter = ref("");
-    const genderFilter = ref("");
-    const showFilterMenu = ref({
-      experience: false,
-      gender: false,
-    });
+        setup() {
+          const nannies = ref([]);
+          const selectedNanny = ref(null);
+          const searchQuery = ref("");
+          const currentUserId = ref(null);
+          const experienceFilter = ref("");
+          const genderFilter = ref("");
+          const showFilterMenu = ref({
+            experience: false,
+            gender: false,
+          });
 
           const experienceOptions = [
             { value: "0-2", label: "0-2 years" },
@@ -547,18 +560,15 @@
           const genderOptions = ["Male", "Female"];
 
           const calculateAge = (dob) => {
-      if (!dob) return 'N/A';
-      return Math.floor((new Date() - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000));
-    };
+            if (!dob) return 'N/A';
+            return Math.floor((new Date() - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000));
+          };
 
           const toggleFilterMenu = (filterType) => {
-            // Close other filter menus
             Object.keys(showFilterMenu.value).forEach((key) => {
               if (key !== filterType) showFilterMenu.value[key] = false;
             });
-            // Toggle the selected filter menu
-            showFilterMenu.value[filterType] =
-              !showFilterMenu.value[filterType];
+            showFilterMenu.value[filterType] = !showFilterMenu.value[filterType];
           };
 
           const setExperienceFilter = (value) => {
@@ -580,8 +590,7 @@
           };
 
           const handleClickOutside = (event) => {
-            const filterDropdowns =
-              document.querySelectorAll(".filter-dropdown");
+            const filterDropdowns = document.querySelectorAll(".filter-dropdown");
             filterDropdowns.forEach((dropdown) => {
               if (!dropdown.contains(event.target)) {
                 Object.keys(showFilterMenu.value).forEach((key) => {
@@ -610,36 +619,33 @@
           };
 
           const matchesGenderFilter = (nanny, filter) => {
-    if (!filter) return true;
-    return nanny.gender.charAt(0).toUpperCase() + nanny.gender.slice(1) === filter;
-};
+            if (!filter) return true;
+            return nanny.gender.charAt(0).toUpperCase() + nanny.gender.slice(1) === filter;
+          };
 
           const fetchNannies = async () => {
-  try {
-    const userCollectionRef = collection(db, "USER");
-    const q = query(userCollectionRef, where("role", "==", "nanny"));
-    const userSnapshot = await getDocs(q);
+            try {
+              const userCollectionRef = collection(db, "USER");
+              const q = query(userCollectionRef, where("role", "==", "nanny"));
+              const userSnapshot = await getDocs(q);
 
-    const nannyData = await Promise.all(
-      userSnapshot.docs.map(async (userDoc) => {
-        const userData = userDoc.data();
-        const nannyDocRef = doc(db, "NANNY", userDoc.id);
-        const nannySnapshot = await getDoc(nannyDocRef);
-        const nannyDetails = nannySnapshot.exists() ? nannySnapshot.data() : {};
+              const nannyData = await Promise.all(
+                userSnapshot.docs.map(async (userDoc) => {
+                  const userData = userDoc.data();
+                  const nannyDocRef = doc(db, "NANNY", userDoc.id);
+                  const nannySnapshot = await getDoc(nannyDocRef);
+                  const nannyDetails = nannySnapshot.exists() ? nannySnapshot.data() : {};
 
-        // Combine userData and nannyDetails, including profilePictureURL from userData
-        return { ...userData, ...nannyDetails, id: userDoc.id };
-      })
-    );
+                  return { ...userData, ...nannyDetails, id: userDoc.id };
+                })
+              );
 
-    nannies.value = nannyData;
-
-
-    console.log("Fetched nannies:", nannyData);
-  } catch (error) {
-    console.error("Error fetching nanny data:", error);
-  }
-};
+              nannies.value = nannyData;
+              console.log("Fetched nannies:", nannyData);
+            } catch (error) {
+              console.error("Error fetching nanny data:", error);
+            }
+          };
 
           const sendMessage = async () => {
             if (!currentUserId.value || !selectedNanny.value) {
@@ -648,20 +654,16 @@
             }
 
             try {
-              // Create a chat document reference
               const chatData = {
                 to_user_id: selectedNanny.value.id,
                 from_user_id: currentUserId.value,
-                timestamp: serverTimestamp(), // Firebase server timestamp
+                timestamp: serverTimestamp(),
                 message: `Hi, I would like to hire you and discuss details.`,
-                // Add these additional fields for better date handling
                 localTimestamp: new Date().toISOString(),
                 status: "sent",
               };
 
-            // Redirect to chat page instead of showing alert
-            window.location.href = `parent_chat.html?nannyId=${selectedNanny.value.id}&autoSelect=true`;
-
+              window.location.href = `parent_chat.html?nannyId=${selectedNanny.value.id}&autoSelect=true`;
             } catch (error) {
               console.error("Error sending message:", error);
               alert("Failed to send message. Please try again.");
@@ -690,28 +692,46 @@
           });
 
           const showDetails = (nanny) => {
-                    this.selectedNanny = nanny;
-                    if (window.innerWidth <= 576) {
-                        document.body.classList.add('details-visible');
-                        document.getElementById("detailsContainer").classList.add("show");
-                        document.getElementById("backToListBtn").classList.add("show");
-                    }
-                };
-          const hideDetails = () => {
-                    if (window.innerWidth <= 576) {
-                        document.body.classList.remove('details-visible');
-                        document.getElementById("detailsContainer").classList.remove("show");
-                        document.getElementById("backToListBtn").classList.remove("show");
-                    }
-                };
+            selectedNanny.value = nanny;
+            if (window.innerWidth <= 768) {
+              const listElement = document.getElementById('nanny_list');
+              const detailsElement = document.getElementById('detailsContainer');
+              
+              if (listElement) listElement.classList.add('hide');
+              if (detailsElement) detailsElement.classList.add('show');
+              
+              // Scroll to top when showing details
+              window.scrollTo(0, 0);
+            }
+          };
 
-          const searchNanny = () => {
-            // If search results in no matches, clear selected nanny
-            if (filteredNannies.value.length === 0) {
+          const closeDetails = () => {
+            if (window.innerWidth <= 768) {
+              const listElement = document.getElementById('nanny_list');
+              const detailsElement = document.getElementById('detailsContainer');
+              
+              if (listElement) listElement.classList.remove('hide');
+              if (detailsElement) detailsElement.classList.remove('show');
+              
+              // On desktop, null the selection. On mobile, keep it
+              if (window.innerWidth > 768) {
+                selectedNanny.value = null;
+              }
+              
+              // Scroll to the previous position in the list
+              const nannyCard = document.querySelector(`[data-nanny-id="${selectedNanny.value.id}"]`);
+              if (nannyCard) {
+                nannyCard.scrollIntoView({ behavior: 'smooth' });
+              }
+            } else {
               selectedNanny.value = null;
             }
-            // If current selection is filtered out, select the first visible nanny
-            else if (!filteredNannies.value.includes(selectedNanny.value)) {
+          };
+
+          const searchNanny = () => {
+            if (filteredNannies.value.length === 0) {
+              selectedNanny.value = null;
+            } else if (!filteredNannies.value.includes(selectedNanny.value)) {
               selectedNanny.value = filteredNannies.value[0];
             }
           };
@@ -722,12 +742,6 @@
               currentUserId.value = user ? user.uid : null;
             });
             fetchNannies();
-
-            window.addEventListener('resize', () => {
-                    if (window.innerWidth > 576) {
-                        this.hideDetails();
-                    }
-                });
           });
 
           onUnmounted(() => {
@@ -740,6 +754,7 @@
             searchQuery,
             filteredNannies,
             showDetails,
+            closeDetails,
             searchNanny,
             sendMessage,
             currentUserId,
@@ -769,67 +784,65 @@
       import { logout } from "./backend/auth.js";
 
       async function loadNavbar(user) {
-    let fileToLoad = "unloggedin_navbar_template.html";
+        let fileToLoad = "unloggedin_navbar_template.html";
 
-    if (user) {
-        try {
+        if (user) {
+          try {
             const userDoc = await getDoc(doc(db, "USER", user.uid));
             if (userDoc.exists()) {
-                const userData = userDoc.data();
-                if (userData.role === "parent") {
-                    fileToLoad = "parent_navbar_template.html";
-                } else if (userData.role === "nanny") {
-                    fileToLoad = "nanny_navbar_template.html";
-                }
+              const userData = userDoc.data();
+              if (userData.role === "parent") {
+                fileToLoad = "parent_navbar_template.html";
+              } else if (userData.role === "nanny") {
+                fileToLoad = "nanny_navbar_template.html";
+              }
             }
-        } catch (error) {
+          } catch (error) {
             console.error("Error fetching user role:", error);
+          }
         }
-    }
 
-    try {
-        const response = await fetch(fileToLoad);
-        if (!response.ok) throw new Error("Network response was not ok");
+        try {
+          const response = await fetch(fileToLoad);
+          if (!response.ok) throw new Error("Network response was not ok");
 
-        const navbarHTML = await response.text();
-        document.getElementById("navbar").innerHTML = navbarHTML;
+          const navbarHTML = await response.text();
+          document.getElementById("navbar").innerHTML = navbarHTML;
 
-        // Add welcome message if we're on parent home page and have user data
-        if (window.location.pathname.endsWith('parent_home.html') && user) {
+          if (window.location.pathname.endsWith('parent_home.html') && user) {
             const userDoc = await getDoc(doc(db, "USER", user.uid));
             if (userDoc.exists()) {
-                const userData = userDoc.data();
-                const brandText = document.querySelector('.brand-text');
-                if (brandText) {
-                    brandText.textContent = `Welcome, ${userData.firstName}`; // Adjust 'name' to match your actual field name in Firestore
-                }
+              const userData = userDoc.data();
+              const brandText = document.querySelector('.brand-text');
+              if (brandText) {
+                brandText.textContent = `Welcome, ${userData.firstName}`;
+              }
             }
-        }
+          }
 
-        // Add event listener to logout link after navbar is loaded
-        const logoutLink = document.querySelector("#logoutBtn");
-        if (logoutLink) {
+          const logoutLink = document.querySelector("#logoutBtn");
+          if (logoutLink) {
             logoutLink.addEventListener("click", async (e) => {
-                e.preventDefault();
-                console.log("Logout clicked");
-                try {
-                    await logout();
-                } catch (error) {
-                    console.error("Logout failed:", error);
-                }
+              e.preventDefault();
+              console.log("Logout clicked");
+              try {
+                await logout();
+              } catch (error) {
+                console.error("Logout failed:", error);
+              }
             });
-        } else {
+          } else {
             console.log("Logout link not found");
+          }
+        } catch (error) {
+          console.error("Failed to load navbar:", error);
         }
-    } catch (error) {
-        console.error("Failed to load navbar:", error);
-    }
-}
+      }
 
-onAuthStateChanged(auth, (user) => {
-    console.log("Auth state changed");
-    loadNavbar(user);
-});
+      onAuthStateChanged(auth, (user) => {
+        console.log("Auth state changed");
+        loadNavbar(user);
+      });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
