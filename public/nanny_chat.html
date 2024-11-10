@@ -213,7 +213,7 @@
 
       .chat-messages {
         flex: 1;
-        padding: 20px;
+        padding: 20px 20px 0px 20px;
         overflow-y: auto;
         background-color: #f2ebfb;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Cg fill='%23dcdcdc' fill-opacity='0.15'%3E%3Cpath d='M45 45c-4 0-8 4-8 8s4 8 8 8 8-4 8-8-4-8-8-8zm160 0c-4 0-8 4-8 8s4 8 8 8 8-4 8-8-4-8-8-8z'/%3E%3Cpath d='M75 95l10-10h20l10 10v20l-10 10H85l-10-10z'/%3E%3Cpath d='M180 80c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M220 120h20v20h-20z' transform='rotate(45 230 130)'/%3E%3Cpath d='M280 95c0-8.3 6.7-15 15-15s15 6.7 15 15-6.7 15-15 15-15-6.7-15-15z'/%3E%3Cpath d='M95 180l-15 15 15 15 15-15z'/%3E%3Cpath d='M150 190l10 10-10 10-10-10zM240 180h30v30h-30z'/%3E%3Cpath d='M50 280l20-20 20 20-20 20z'/%3E%3Cpath d='M160 250c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20z'/%3E%3Cpath d='M260 260h20v20h-20zM50 350h25v25H50z'/%3E%3Cpath d='M150 360l15-15 15 15-15 15z'/%3E%3Cpath d='M240 340c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M80 420c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20zM180 440l10-10h20l10 10v20l-10 10h-20l-10-10z'/%3E%3Cpath d='M260 420h30v30h-30zM40 500c-6.6 0-12 5.4-12 12s5.4 12 12 12 12-5.4 12-12-5.4-12-12-12z'/%3E%3Cpath d='M135 500l25 25-25 25-25-25zM260 510h20v20h-20z'/%3E%3C/g%3E%3Cg fill='%23dcdcdc' fill-opacity='0.15'%3E%3Cpath d='M435 65c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM520 45l15 15-15 15-15-15zM460 150c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M500 180h30v30h-30zM420 260l20-20 20 20-20 20z'/%3E%3Cpath d='M530 250c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20z'/%3E%3Cpath d='M450 350h25v25h-25zM520 360l15-15 15 15-15 15z'/%3E%3Cpath d='M440 420c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M520 440l10-10h20l10 10v20l-10 10h-20l-10-10z'/%3E%3Cpath d='M440 500c-6.6 0-12 5.4-12 12s5.4 12 12 12 12-5.4 12-12-5.4-12-12-12z'/%3E%3Cpath d='M535 500l25 25-25 25-25-25z'/%3E%3C/g%3E%3Cpath d='M120 120c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12zm240 240c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12z' fill='%23dcdcdc' fill-opacity='0.15'/%3E%3Cpath d='M340 340c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12zm-240 240c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12z' fill='%23dcdcdc' fill-opacity='0.15'/%3E%3Cg fill='none' stroke='%23dcdcdc' stroke-width='2' stroke-opacity='0.15'%3E%3Cpath d='M310 70l20 20m-20 0l20-20M90 290l20 20m-20 0l20-20M510 290l20 20m-20 0l20-20'/%3E%3C/g%3E%3Cpath fill='%23dcdcdc' fill-opacity='0.15' d='M310 370h20v20h-20zM110 570h20v20h-20zM510 570h20v20h-20z'/%3E%3C/svg%3E");
@@ -540,6 +540,84 @@
         display: inline-block;
       }
 
+      @media (max-width: 575.98px) {
+        .container {
+          max-width: 100%; /* Take full width on very small screens */
+        }
+
+        .app-container {
+          margin: 0;
+          border-radius: 0;
+          padding-top: 0;
+          height: 100vh;
+        }
+
+        .chat-list {
+          width: 100%;
+        }
+
+        .message {
+          max-width: 50%;
+          padding: 10px 14px 18px;
+        }
+
+        .chat-messages {
+          padding: 12px;
+        }
+
+        .chat-preview {
+          padding: 8px;
+        }
+
+        .chat-input-container {
+          padding: 8px;
+        }
+
+        .chat-input {
+          padding: 6px 10px;
+        }
+
+        .chat-input textarea {
+          font-size: 14px;
+          padding: 4px;
+        }
+      }
+
+      @media (min-width: 576px) and (max-width: 767.98px) {
+        .container {
+          max-width: 100% !important;
+        }
+      }
+
+      @media (max-width: 767.98px) {
+        .chat-header {
+          padding: 8px;
+        }
+
+        .message {
+          max-width: 60%;
+        }
+
+        .chat-input {
+          padding: 8px;
+          max-width: 100%;
+        }
+
+        .chat-input-container {
+          padding: 8px 12px;
+        }
+
+        .chat-input input {
+          font-size: 14px;
+        }
+      }
+
+      @media (min-width: 768px) and (max-width: 991.98px) {
+        .container {
+          max-width: 100% !important;
+        }
+      }
+
       /* Media query for responsiveness */
       @media (max-width: 991.98px) {
         body {
@@ -592,6 +670,8 @@
           right: 0;
           background-color: white;
           z-index: 10;
+          padding: 10px 20px;
+          border-top: 1px solid #eee;
         }
 
         .chat-list {
@@ -643,10 +723,11 @@
           overflow-y: auto;
           -webkit-overflow-scrolling: touch;
           height: calc(
-            100vh - 70px - 60px - 60px
+            100vh - 70px - 60px - 80px
           ); /* Adjust for navbar, chat header, and input area */
           margin-top: 60px;
           padding: 20px;
+          padding-bottom: 20px; /* Add padding at bottom to prevent cutoff */
         }
 
         .timestamp {
@@ -655,10 +736,11 @@
 
         .chat-details {
           width: 100%;
-          height: calc(100vh - 70px); /* Adjust for navbar height */
+          height: 100%;
           margin-top: 0;
           display: flex;
           flex-direction: column;
+          padding-bottom: 60px;
         }
 
         .chat-input {
@@ -722,6 +804,10 @@
       }
 
       @media (min-width: 992px) {
+        .container {
+          max-width: 100% !important;
+        }
+
         .app-container {
           padding-top: 100px; /* Keep the 100px padding for desktop view */
         }
@@ -738,68 +824,6 @@
 
         .chat-header:not(.mobile-view) {
           display: flex;
-        }
-      }
-
-      @media (max-width: 767.98px) {
-        .chat-header {
-          padding: 8px;
-        }
-
-        .message {
-          max-width: 60%;
-        }
-
-        .chat-input {
-          padding: 8px;
-          max-width: 100%;
-        }
-
-        .chat-input-container {
-          padding: 8px 12px;
-        }
-
-        .chat-input input {
-          font-size: 14px;
-        }
-      }
-
-      @media (max-width: 575.98px) {
-        .app-container {
-          margin: 0;
-          border-radius: 0;
-          padding-top: 70px;
-          height: 100vh;
-        }
-
-        .chat-list {
-          width: 100%;
-        }
-
-        .message {
-          max-width: 50%;
-          padding: 10px 14px 18px;
-        }
-
-        .chat-messages {
-          padding: 12px;
-        }
-
-        .chat-preview {
-          padding: 8px;
-        }
-
-        .chat-input-container {
-          padding: 8px;
-        }
-
-        .chat-input {
-          padding: 6px 10px;
-        }
-
-        .chat-input textarea {
-          font-size: 14px;
-          padding: 4px;
         }
       }
     </style>

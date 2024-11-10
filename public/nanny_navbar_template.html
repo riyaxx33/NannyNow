@@ -23,11 +23,14 @@
   }
 
   .brand-text {
-    background: linear-gradient(45deg, #333, #666);
+    background: linear-gradient(45deg, #6366f1, #8b5cf6);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-  }
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-left: 1.5rem;
+}
 
   .nav-link {
     color: #333 !important;
@@ -36,7 +39,7 @@
     margin: 0 5px;
     position: relative;
     transition: all 0.3s ease;
-  }
+  } 
 
   .nav-link::after {
     content: "";
@@ -90,6 +93,14 @@
   }
 
   @media (max-width: 991.98px) {
+    .navbar {
+      height: 70px; /* Shorter height on mobile */
+    }
+
+    .navbar-brand img {
+      max-height: 30px; /* Slightly smaller logo on mobile */
+    }
+
     .navbar-collapse {
       background-color: rgba(255, 255, 255, 0.95);
       padding: 20px;
@@ -112,8 +123,8 @@
   <div class="container">
     <a class="navbar-brand" href="nanny_home.html">
       <img src="img/nany_logo.png" alt="Nanny logo" />
-      <span class="brand-text">Nanny</span>
     </a>
+    <span class="brand-text ms-3" id="brandText"></span>
 
     <button
       class="navbar-toggler"
