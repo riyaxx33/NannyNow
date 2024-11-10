@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <title>Nanny Post Job</title>
     <style>
+      body{
+        padding-top: 60px;
+      }
       .custom-cancel-btn {
         background-color: rgb(184, 184, 184);
         color: white;   
@@ -18,20 +21,6 @@
 
       .custom-cancel-btn:hover {
         background-color: rgb(222, 222, 222);
-      }
-
-      .logoo {
-        height: 60px;
-        width: auto;
-      }
-
-      h2 {
-        font-family: 'Poppins', sans-serif;
-        font-size: 30px;
-        color: #333;
-        margin-bottom: 2px;
-        margin-left: 80px;
-        margin-top: 20px;
       }
 
       h3 {
@@ -47,10 +36,11 @@
       form {
         display: flex;
         flex-direction: column;
-        background-color: #faf9f6;
+        background-color: white;
         padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        border-radius: 0 0 16px 16px;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+        padding-top:40px;
       }
 
       .posts-container {
@@ -155,6 +145,8 @@
 
       #submit {
         font-family: 'Poppins', sans-serif;
+        background-color: #6c5ce7;
+        color:white;
       }
 
       .nav-tabs .nav-link {
@@ -205,6 +197,34 @@
           grid-template-columns: 1fr;
         }
       }
+      .form-control:focus, .form-select:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+      }
+      .form-control, .form-select {
+        border: 1.5px solid rgba(108, 92, 231, 0.3);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s;
+        color: #000000;
+        background-color: white;
+      }
+      .card-header {
+        background-color: #6c5ce7 !important;
+        padding: 1rem 1.5rem;
+        border-radius: 16px 16px 0 0 !important;
+        margin-bottom: 0;
+        width: 100%;
+        color: white;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+      }
+
+      .card-header h5 {
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin: 0;
+        color: white !important;
+      }
     </style>
   </head>
 
@@ -212,19 +232,21 @@
     <header>
       <div id="navbar"></div>
     </header>
-    <h2>Post a Job</h2>
     <div id="app" class="container">
+      <div class="card-header">
+        <h5 class="mb-0">Post a Job</h5>
+      </div>
       <form @submit.prevent="handleSubmit" class="pt-2" ref="jobForm">
         <div class="row">
-          <div class="col-6">
+          <div class="col-sm-12 col-md-6 mb-3">
             <label for="date" class="form-label">When do you need a nanny?</label>
             <input type="date" class="form-control" id="date" v-model="date" required />
           </div>
-          <div class="col-6">
+          <div class="col-sm-12 col-md-6 mb-3">
             <label for="pay" class="form-label">Pay per hour</label>
             <input type="text" class="form-control" id="pay" v-model="pay" required />
           </div>
-          <div class="col-4 mt-3">
+          <div class="col-sm-12 col-md-4 mb-3">
             <label for="payNegotiation" class="form-label">Open to Pay Negotiation</label>
             <select class="form-control" id="payNegotiation" v-model="payNegotiation" required>
               <option value="" disabled selected>Select an option</option>
@@ -233,17 +255,17 @@
             </select>
           </div>
 
-          <div class="col-4 mt-3">
+          <div class="col-sm-12 col-md-4 mb-3">
             <label for="startTime" class="form-label">Start Time</label>
             <input type="time" class="form-control" id="startTime" v-model="startTime" required />
           </div>
-          <div class="col-4 mt-3">
+          <div class="col-sm-12 col-md-4 mb-3">
             <label for="endTime" class="form-label">End Time</label>
             <input type="time" class="form-control" id="endTime" v-model="endTime" required />
           </div>
         </div>
 
-        <div class="col-12 mt-3">
+        <div class="col-12 mb-3">
           <label for="request" class="form-label">Notes for Nanny</label>
           <textarea
             class="form-control"

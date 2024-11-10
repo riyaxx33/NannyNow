@@ -162,6 +162,9 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
+        .nav-tabs.active::after{
+            color:#6c5ce7 !important;
+        }
 
         .nav-tabs .nav-link.active {
             color: #6c5ce7;
@@ -423,7 +426,11 @@
                     });
 
                     console.log('Final filtered posts:', filteredByTab);
-                    return filteredByTab;
+                    return filteredByTab.sort((a, b) => {
+                    const dateA = new Date(`${a.date} ${a.startTime}`);
+                    const dateB = new Date(`${b.date} ${b.startTime}`);
+                    return dateB - dateA; // Most recent first
+                });
                 }
             },
             methods: {

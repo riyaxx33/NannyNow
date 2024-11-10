@@ -1358,7 +1358,42 @@
       </div>
     </div>
 
+<<<<<<< HEAD
+    <!-- Review Modal -->
+    <!-- Review Modal -->
+<div id="reviewModal" class="modal" v-show="showReviewModal">
+    <div class="modal-content">
+      <span class="close" @click="closeReviewModal">&times;</span>
+      <h2>How was your experience?</h2>
+      <p>Rate {{ selectedChat ? selectedChat.firstName : 'the nanny' }}</p>
+      <div class="star-rating">
+        <span 
+          v-for="star in 5" 
+          :key="star" 
+          class="star" 
+          :class="{ active: star <= (hoverRating || rating) }"
+          @click="setRating(star)"
+          @mouseover="hoverRating = star"
+          @mouseleave="hoverRating = 0"
+        >
+          &#9733;
+        </span>
+      </div>
+      <textarea 
+        v-model="reviewComment" 
+        class="review-textarea" 
+        placeholder="Share more about your experience and interactions with this nanny"
+        maxlength="400"
+      ></textarea>
+      <div class="text-right">{{ reviewComment.length }}/400</div>
+      <button @click="submitReview" class="review-submit" :disabled="!rating">Submit Review</button>
+    </div>
+  </div>
+
+    <!-- Your existing scripts remain the same -->
+=======
     <!-- SCRIPTS -->
+>>>>>>> origin
     <script type="module">
       // Import necessary modules from Firebase
       import { firebaseConfig } from "./backend/firebase-config.js";
