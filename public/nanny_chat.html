@@ -1285,79 +1285,121 @@
 
             this.currentUserId = user.uid;
 
-            // Get current user's details including profile picture
-            const currentUserDetails = await this.getUserDetails(
-              this.currentUserId
-            );
-            this.currentUserProfilePic = currentUserDetails.profilePictureUrl;
-
-            // Define the handler function
-            const handleSnapshot = async (snapshot) => {
-              const chatMap = new Map();
-              const processedMessages = new Map();
-
-              // Track the latest message for each chat
-              for (const doc of snapshot.docs) {
-                const data = doc.data();
-                const otherUserId =
-                  data.from_user_id === this.currentUserId
-                    ? data.to_user_id
-                    : data.from_user_id;
-                const messageTimestamp = data.timestamp?.seconds
-                  ? data.timestamp.seconds * 1000
-                  : data.timestamp || 0;
-
-                // Check if this is the latest message for this chat
-                if (
-                  !processedMessages.has(otherUserId) ||
-                  processedMessages.get(otherUserId).timestamp <
-                    messageTimestamp
-                ) {
-                  processedMessages.set(otherUserId, {
-                    lastMessage: data.message,
-                    timestamp: messageTimestamp,
-                  });
-                }
-              }
-
-              // Process each unique chat
-              for (const [otherUserId, messageData] of processedMessages) {
-                // Get user details from USER collection
-                const userDetails = await this.getUserDetails(otherUserId);
-                chatMap.set(otherUserId, {
-                  userId: otherUserId,
-                  firstName: userDetails.firstName,
-                  lastName: userDetails.lastName,
-                  profilePictureUrl: userDetails.profilePictureUrl,
-                  lastMessage: messageData.lastMessage,
-                  timestamp: messageData.timestamp,
-                  role: userDetails.role,
-                });
-              }
-
-              // Convert chatMap to array and sort by timestamp
-              this.chats = Array.from(chatMap.values()).sort(
-                (a, b) => b.timestamp - a.timestamp
+            try {
+              // Get current user's details including profile picture
+              const currentUserDetails = await this.getUserDetails(
+                this.currentUserId
               );
-              this.originalChats = [...this.chats];
-            };
+              this.currentUserProfilePic = currentUserDetails.profilePictureUrl;
 
-            // Create listeners for sent and received messages
-            const sentMessagesUnsubscribe = db
-              .collection("CHATS")
-              .where("from_user_id", "==", this.currentUserId)
-              .onSnapshot(handleSnapshot);
+              // Maintain a global state of processed messages across both listeners
+              const globalProcessedMessages = new Map();
 
-            const receivedMessagesUnsubscribe = db
-              .collection("CHATS")
-              .where("to_user_id", "==", this.currentUserId)
-              .onSnapshot(handleSnapshot);
+              // Define the handler function
+              const handleSnapshot = async (snapshot) => {
+                const chatMap = new Map();
 
-            // Store both unsubscribe functions
-            this.unsubscribe = () => {
-              sentMessagesUnsubscribe();
-              receivedMessagesUnsubscribe();
-            };
+                // Track the latest message for each chat
+                snapshot.docs.forEach((doc) => {
+                  const data = doc.data();
+                  const otherUserId =
+                    data.from_user_id === this.currentUserId
+                      ? data.to_user_id
+                      : data.from_user_id;
+
+                  const messageTimestamp =
+                    data.timestamp?.toMillis?.() ||
+                    (data.timestamp?.seconds
+                      ? data.timestamp.seconds * 1000
+                      : 0);
+
+                  // Update only if this is the latest message
+                  const currentProcessed =
+                    globalProcessedMessages.get(otherUserId);
+                  if (
+                    !currentProcessed ||
+                    currentProcessed.timestamp < messageTimestamp
+                  ) {
+                    globalProcessedMessages.set(otherUserId, {
+                      lastMessage: data.message,
+                      timestamp: messageTimestamp,
+                      name: data.name, // Include name if you need it
+                    });
+                  }
+                });
+
+                // Process each unique chat with Promise.all for better performance
+                await Promise.all(
+                  Array.from(globalProcessedMessages).map(
+                    async ([otherUserId, messageData]) => {
+                      try {
+                        const userDetails = await this.getUserDetails(
+                          otherUserId
+                        );
+                        chatMap.set(otherUserId, {
+                          userId: otherUserId,
+                          firstName: userDetails.firstName,
+                          lastName: userDetails.lastName,
+                          profilePictureUrl: userDetails.profilePictureUrl,
+                          lastMessage: messageData.lastMessage,
+                          timestamp: messageData.timestamp,
+                          role: userDetails.role,
+                          name: messageData.name, // Include name if you need it
+                        });
+                      } catch (error) {
+                        console.error(
+                          `Failed to get user details for ${otherUserId}:`,
+                          error
+                        );
+                      }
+                    }
+                  )
+                );
+
+                // Convert chatMap to array and sort by timestamp
+                this.chats = Array.from(chatMap.values()).sort(
+                  (a, b) => b.timestamp - a.timestamp
+                );
+                this.originalChats = [...this.chats];
+              };
+
+              // Create listeners for sent and received messages using the existing index
+              const sentMessagesUnsubscribe = db
+                .collection("CHATS")
+                .where("from_user_id", "==", this.currentUserId)
+                .onSnapshot(
+                  async (snapshot) => {
+                    await handleSnapshot(snapshot);
+                  },
+                  (error) => {
+                    console.error("Error in sent messages listener:", error);
+                  }
+                );
+
+              const receivedMessagesUnsubscribe = db
+                .collection("CHATS")
+                .where("to_user_id", "==", this.currentUserId)
+                .onSnapshot(
+                  async (snapshot) => {
+                    await handleSnapshot(snapshot);
+                  },
+                  (error) => {
+                    console.error(
+                      "Error in received messages listener:",
+                      error
+                    );
+                  }
+                );
+
+              // Store both unsubscribe functions
+              this.unsubscribe = () => {
+                sentMessagesUnsubscribe();
+                receivedMessagesUnsubscribe();
+              };
+            } catch (error) {
+              console.error("Error initializing chat:", error);
+              throw error;
+            }
           },
           async selectChat(chat) {
             this.selectedChat = chat;
