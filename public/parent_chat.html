@@ -548,6 +548,20 @@
         font-size: 1rem;
       }
 
+      .star-icon {
+        width: 2rem;
+        height: 2rem;
+        color: #ddd;
+        stroke: #ffd700; /* Gold outline */
+        transition: all 0.2s ease;
+      }
+
+      .star-icon.filled {
+        color: #ffd700; /* Gold fill */
+        fill: #ffd700;
+        stroke: #ffd700;
+      }
+
       .review-star-rating {
         display: flex;
         justify-content: center;
@@ -565,6 +579,13 @@
 
       .review-star-button:hover {
         transform: scale(1.1);
+      }
+
+      /* Add hover effect for stars */
+      .review-star-button:hover .star-icon {
+        color: #ffd700;
+        fill: #ffd700;
+        stroke: #ffd700;
       }
 
       .review-star-button i {
@@ -767,7 +788,7 @@
               <div class="chat-header-left">
                 <div class="user-avatar">
                   <a
-                    :href="parent_displaynannyprofile.html?id=${selectedChat.userId}"
+                    :href="`parent_displaynannyprofile.html?id=${selectedChat.userId}`"
                     style="text-decoration: none"
                   >
                     <img
@@ -785,7 +806,7 @@
                 </div>
                 <button
                   v-if="selectedChat.role === 'nanny'"
-                  @click="openReviewModal"
+                  @click="handleReviewClick"
                   class="btn btn-outline-primary btn-sm ml-4"
                 >
                   Leave Review
@@ -851,50 +872,36 @@
     </div>
 
     <!-- Review Modal -->
-    <div
-      v-if="showReviewModal"
-      class="review-modal"
-      @click.self="closeReviewModal"
-    >
+    <div id="reviewModal" class="review-modal" style="display: none">
       <div class="review-modal-content">
-        <button class="review-modal-close" @click="closeReviewModal">
+        <button class="review-modal-close" onclick="closeReviewModal()">
           <i data-lucide="x"></i>
         </button>
 
         <div class="review-modal-header">
           <h2>Rate Your Experience</h2>
-          <p>How was your experience with {{ selectedChat?.firstName }}?</p>
+          <p id="reviewModalSubtitle">How was your experience?</p>
         </div>
 
-        <div class="review-star-rating">
-          <button
-            v-for="star in 5"
-            :key="star"
-            class="review-star-button"
-            @mouseover="hoverRating = star"
-            @mouseleave="hoverRating = 0"
-            @click="setRating(star)"
-          >
-            <i
-              data-lucide="star"
-              :class="{ 'filled': star <= (hoverRating || rating) }"
-            ></i>
-          </button>
+        <div class="review-star-rating" id="starRating">
+          <!-- Stars will be added dynamically -->
         </div>
 
         <div class="review-form">
           <textarea
-            v-model="reviewComment"
+            id="reviewComment"
             class="review-textarea"
             placeholder="Share your experience with this nanny..."
             maxlength="400"
+            onkeyup="updateCharCount()"
           ></textarea>
-          <div class="review-char-count">{{ reviewComment.length }}/400</div>
+          <div class="review-char-count" id="charCount">0/400</div>
 
           <button
-            @click="submitReview"
+            onclick="submitReview()"
             class="review-submit-btn"
-            :disabled="!rating"
+            id="submitReviewBtn"
+            disabled
           >
             Submit Review
           </button>
@@ -902,7 +909,7 @@
       </div>
     </div>
 
-    <!-- Your existing scripts remain the same -->
+    <!-- SCRIPTS -->
     <script type="module">
       // Import necessary modules from Firebase
       import { firebaseConfig } from "./backend/firebase-config.js";
@@ -910,6 +917,160 @@
       const db = firebase.firestore();
       const auth = firebase.auth();
 
+      // Review Modal Functions
+      const reviewModal = {
+        currentRating: 0,
+        currentNannyId: null,
+        currentNannyName: null,
+
+        initializeStarRating() {
+          const starRating = document.getElementById("starRating");
+          starRating.innerHTML = "";
+
+          for (let i = 1; i <= 5; i++) {
+            const starButton = document.createElement("button");
+            starButton.className = "review-star-button";
+
+            // Create the star icon using Lucide
+            const starIcon = document.createElement("i");
+            starIcon.setAttribute("data-lucide", "star");
+            starIcon.className = "star-icon";
+
+            starButton.appendChild(starIcon);
+
+            starButton.addEventListener("mouseover", () =>
+              this.highlightStars(i)
+            );
+            starButton.addEventListener("mouseout", () =>
+              this.highlightStars(this.currentRating)
+            );
+            starButton.addEventListener("click", () => this.setRating(i));
+
+            starRating.appendChild(starButton);
+          }
+
+          // Combined configuration for star icons
+          lucide.createIcons({
+            selector: "#starRating [data-lucide]", // Only target star rating icons
+            attrs: {
+              stroke: "currentColor",
+              fill: "none",
+              "stroke-width": "2",
+              "stroke-linecap": "round",
+              "stroke-linejoin": "round",
+            },
+          });
+        },
+
+        highlightStars(count) {
+          const stars = document.querySelectorAll(".star-icon");
+          stars.forEach((star, index) => {
+            if (index < count) {
+              star.classList.add("filled");
+              // Also update the SVG fill attribute
+              const svgElement = star.querySelector("svg");
+              if (svgElement) {
+                svgElement.style.fill = "currentColor";
+              }
+            } else {
+              star.classList.remove("filled");
+              // Remove fill for unselected stars
+              const svgElement = star.querySelector("svg");
+              if (svgElement) {
+                svgElement.style.fill = "none";
+              }
+            }
+          });
+        },
+
+        setRating(rating) {
+          this.currentRating = rating;
+          this.highlightStars(rating);
+          document.getElementById("submitReviewBtn").disabled = false;
+        },
+
+        updateCharCount() {
+          const comment = document.getElementById("reviewComment").value;
+          document.getElementById(
+            "charCount"
+          ).textContent = `${comment.length}/400`;
+        },
+
+        open(nannyId, nannyName) {
+          this.currentNannyId = nannyId;
+          this.currentNannyName = nannyName;
+          document.getElementById(
+            "reviewModalSubtitle"
+          ).textContent = `How was your experience with ${nannyName}?`;
+          document.getElementById("reviewModal").style.display = "flex";
+          this.initializeStarRating();
+          this.currentRating = 0;
+          document.getElementById("reviewComment").value = "";
+          document.getElementById("submitReviewBtn").disabled = true;
+          this.updateCharCount();
+        },
+
+        close() {
+          document.getElementById("reviewModal").style.display = "none";
+          this.currentRating = 0;
+          this.currentNannyId = null;
+          this.currentNannyName = null;
+        },
+
+        async submitReview() {
+          if (!this.currentRating || !this.currentNannyId) return;
+
+          const submitButton = document.getElementById("submitReviewBtn");
+          const comment = document.getElementById("reviewComment").value;
+
+          try {
+            submitButton.textContent = "Submitting...";
+            submitButton.disabled = true;
+
+            await db.collection("REVIEW").add({
+              from_userID: auth.currentUser.uid,
+              to_userID: this.currentNannyId,
+              rating: this.currentRating,
+              comments: comment,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            });
+
+            alert("Review submitted successfully!");
+            this.close();
+          } catch (error) {
+            console.error("Error submitting review:", error);
+            alert("Failed to submit review. Please try again.");
+          } finally {
+            submitButton.textContent = "Submit Review";
+            submitButton.disabled = false;
+          }
+        },
+      };
+
+      // Add event listeners for the modal
+      document.getElementById("reviewModal").addEventListener("click", (e) => {
+        if (e.target.id === "reviewModal") {
+          reviewModal.close();
+        }
+      });
+
+      document
+        .querySelector(".review-modal-close")
+        .addEventListener("click", () => {
+          reviewModal.close();
+        });
+
+      document.getElementById("reviewComment").addEventListener("keyup", () => {
+        reviewModal.updateCharCount();
+      });
+
+      document
+        .getElementById("submitReviewBtn")
+        .addEventListener("click", () => {
+          reviewModal.submitReview();
+        });
+
+      // VUE APP
       const app = Vue.createApp({
         data() {
           return {
@@ -929,11 +1090,6 @@
             isSearching: false,
             originalChats: [],
             highlightedMessageId: null,
-            // New properties for review functionality
-            showReviewModal: false,
-            rating: 0,
-            hoverRating: 0,
-            reviewComment: "",
           };
         },
 
@@ -1381,58 +1537,12 @@
             }
           },
 
-          // New methods for review functionality
-          openReviewModal() {
-            this.showReviewModal = true;
-            this.rating = 0;
-            this.hoverRating = 0;
-            this.reviewComment = "";
-            // Force Lucide icons to render after modal opens
-            this.$nextTick(() => {
-              lucide.createIcons();
-            });
-          },
-
-          closeReviewModal() {
-            this.showReviewModal = false;
-            this.rating = 0;
-            this.hoverRating = 0;
-            this.reviewComment = "";
-          },
-
-          setRating(star) {
-            this.rating = star;
-          },
-
-          async submitReview() {
-            if (!this.rating) return;
-
-            try {
-              // Show loading state
-              const submitButton = document.querySelector(".review-submit-btn");
-              const originalText = submitButton.textContent;
-              submitButton.textContent = "Submitting...";
-              submitButton.disabled = true;
-
-              await db.collection("REVIEW").add({
-                from_userID: this.currentUserId,
-                to_userID: this.selectedChat.userId,
-                rating: this.rating,
-                comments: this.reviewComment,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-              });
-
-              // Show success message
-              alert("Review submitted successfully!");
-              this.closeReviewModal();
-            } catch (error) {
-              console.error("Error submitting review:", error);
-              alert("Failed to submit review. Please try again.");
-            } finally {
-              // Reset button state
-              const submitButton = document.querySelector(".review-submit-btn");
-              submitButton.textContent = "Submit Review";
-              submitButton.disabled = false;
+          handleReviewClick() {
+            if (this.selectedChat && this.selectedChat.userId) {
+              reviewModal.open(
+                this.selectedChat.userId,
+                this.selectedChat.firstName
+              );
             }
           },
         },
