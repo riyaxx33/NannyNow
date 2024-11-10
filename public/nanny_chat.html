@@ -52,7 +52,7 @@
         flex-direction: column;
         width: 100%;
         max-width: 1400px;
-        height: calc(100vh - 100px);
+        height: calc(100vh - 10px);
         padding-top: 100px;
         background-color: white;
         border-radius: 12px;
@@ -540,6 +540,84 @@
         display: inline-block;
       }
 
+      @media (max-width: 575.98px) {
+        .container {
+          max-width: 100%; /* Take full width on very small screens */
+        }
+
+        .app-container {
+          margin: 0;
+          border-radius: 0;
+          padding-top: 0;
+          height: 100vh;
+        }
+
+        .chat-list {
+          width: 100%;
+        }
+
+        .message {
+          max-width: 50%;
+          padding: 10px 14px 18px;
+        }
+
+        .chat-messages {
+          padding: 12px;
+        }
+
+        .chat-preview {
+          padding: 8px;
+        }
+
+        .chat-input-container {
+          padding: 8px;
+        }
+
+        .chat-input {
+          padding: 6px 10px;
+        }
+
+        .chat-input textarea {
+          font-size: 14px;
+          padding: 4px;
+        }
+      }
+
+      @media (min-width: 576px) and (max-width: 767.98px) {
+        .container {
+          max-width: 100% !important;
+        }
+      }
+
+      @media (max-width: 767.98px) {
+        .chat-header {
+          padding: 8px;
+        }
+
+        .message {
+          max-width: 60%;
+        }
+
+        .chat-input {
+          padding: 8px;
+          max-width: 100%;
+        }
+
+        .chat-input-container {
+          padding: 8px 12px;
+        }
+
+        .chat-input input {
+          font-size: 14px;
+        }
+      }
+
+      @media (min-width: 768px) and (max-width: 991.98px) {
+        .container {
+          max-width: 100% !important;
+        }
+      }
+
       /* Media query for responsiveness */
       @media (max-width: 991.98px) {
         body {
@@ -726,6 +804,10 @@
       }
 
       @media (min-width: 992px) {
+        .container {
+          max-width: 100% !important;
+        }
+
         .app-container {
           padding-top: 100px; /* Keep the 100px padding for desktop view */
         }
@@ -742,68 +824,6 @@
 
         .chat-header:not(.mobile-view) {
           display: flex;
-        }
-      }
-
-      @media (max-width: 767.98px) {
-        .chat-header {
-          padding: 8px;
-        }
-
-        .message {
-          max-width: 60%;
-        }
-
-        .chat-input {
-          padding: 8px;
-          max-width: 100%;
-        }
-
-        .chat-input-container {
-          padding: 8px 12px;
-        }
-
-        .chat-input input {
-          font-size: 14px;
-        }
-      }
-
-      @media (max-width: 575.98px) {
-        .app-container {
-          margin: 0;
-          border-radius: 0;
-          padding-top: 70px;
-          height: 100vh;
-        }
-
-        .chat-list {
-          width: 100%;
-        }
-
-        .message {
-          max-width: 50%;
-          padding: 10px 14px 18px;
-        }
-
-        .chat-messages {
-          padding: 12px;
-        }
-
-        .chat-preview {
-          padding: 8px;
-        }
-
-        .chat-input-container {
-          padding: 8px;
-        }
-
-        .chat-input {
-          padding: 6px 10px;
-        }
-
-        .chat-input textarea {
-          font-size: 14px;
-          padding: 4px;
         }
       }
     </style>
