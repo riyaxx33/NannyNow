@@ -581,11 +581,43 @@
           font-size: 14px;
           padding: 4px;
         }
+
+        .review-modal-content {
+          padding: 1rem;
+          margin: 0.5rem;
+          max-width: calc(100% - 1rem);
+        }
+
+        .review-modal-header h2 {
+          font-size: 1.25rem;
+        }
+
+        .review-modal-header p {
+          font-size: 0.875rem;
+        }
+
+        .review-star-rating {
+          gap: 0.25rem;
+        }
+
+        .star-icon {
+          width: 1.75rem;
+          height: 1.75rem;
+        }
+
+        .review-textarea {
+          min-height: 100px;
+        }
       }
 
       @media (min-width: 576px) and (max-width: 767.98px) {
         .container {
           max-width: 100% !important;
+        }
+
+        .review-modal-content {
+          padding: 1.5rem;
+          max-width: 90%;
         }
       }
 
@@ -840,6 +872,7 @@
         justify-content: center;
         z-index: 1000;
         animation: fadeIn 0.2s ease-out;
+        padding: 1rem;
       }
 
       .review-modal-content {
@@ -850,6 +883,9 @@
         max-width: 500px;
         position: relative;
         animation: slideIn 0.3s ease-out;
+        margin: auto;
+        overflow-y: auto;
+        max-height: 90vh;
       }
 
       .review-modal-close {
@@ -862,6 +898,7 @@
         padding: 0.5rem;
         color: #666;
         transition: color 0.2s;
+        z-index: 2;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -874,6 +911,7 @@
       .review-modal-header {
         margin-bottom: 1.5rem;
         text-align: center;
+        padding: 0 1rem;
       }
 
       .review-modal-header h2 {
@@ -886,6 +924,12 @@
       .review-modal-header p {
         color: #666;
         font-size: 1rem;
+      }
+
+      @media (hover: hover) {
+        .review-modal-close:hover {
+          color: #333;
+        }
       }
 
       .star-icon {
@@ -907,6 +951,7 @@
         justify-content: center;
         gap: 0.5rem;
         margin-bottom: 1.5rem;
+        flex-wrap: wrap;
       }
 
       .review-star-button {
@@ -915,6 +960,9 @@
         cursor: pointer;
         padding: 0.25rem;
         transition: transform 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .review-star-button:hover {
@@ -948,7 +996,7 @@
 
       .review-textarea {
         width: 100%;
-        height: 120px;
+        min-height: 120px;
         padding: 0.75rem;
         border: 1px solid #ddd;
         border-radius: 8px;
@@ -979,6 +1027,10 @@
         font-weight: 500;
         cursor: pointer;
         transition: background-color 0.2s;
+        width: 100%;
+        max-width: 200px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .review-submit-btn:hover:not(:disabled) {
@@ -1008,6 +1060,16 @@
         to {
           opacity: 1;
           transform: translateY(0);
+        }
+      }
+
+      /* Safe area insets for modern mobile browsers */
+      @supports (padding: max(0px)) {
+        .review-modal {
+          padding: max(1rem, env(safe-area-inset-top))
+            max(1rem, env(safe-area-inset-right))
+            max(1rem, env(safe-area-inset-bottom))
+            max(1rem, env(safe-area-inset-left));
         }
       }
     </style>
@@ -1157,7 +1219,7 @@
                     </h3>
                   </div>
                   <button
-                    v-if="selectedChat && selectedChat.role === 'nanny'"
+                    v-if="selectedChat"
                     @click="handleReviewClick"
                     class="btn btn-outline-primary btn-sm ml-4"
                   >
@@ -1188,7 +1250,7 @@
                     </h3>
                   </div>
                   <button
-                    v-if="selectedChat && selectedChat.role === 'nanny'"
+                    v-if="selectedChat"
                     @click="handleReviewClick"
                     class="btn btn-outline-primary btn-sm ml-4"
                   >
@@ -1264,7 +1326,9 @@
 
           <div class="review-modal-header">
             <h2>Rate Your Experience</h2>
-            <p id="reviewModalSubtitle">How was your experience?</p>
+            <p id="reviewModalSubtitle" class="text-muted">
+              How was your experience?
+            </p>
           </div>
 
           <div class="review-star-rating" id="starRating">
@@ -1279,7 +1343,7 @@
               maxlength="400"
               onkeyup="updateCharCount()"
             ></textarea>
-            <div class="review-char-count" id="charCount">0/400</div>
+            <div class="review-char-count text-end" id="charCount">0/400</div>
 
             <button
               onclick="submitReview()"
@@ -1294,42 +1358,7 @@
       </div>
     </div>
 
-<<<<<<< HEAD
-    <!-- Review Modal -->
-    <!-- Review Modal -->
-<div id="reviewModal" class="modal" v-show="showReviewModal">
-    <div class="modal-content">
-      <span class="close" @click="closeReviewModal">&times;</span>
-      <h2>How was your experience?</h2>
-      <p>Rate {{ selectedChat ? selectedChat.firstName : 'the nanny' }}</p>
-      <div class="star-rating">
-        <span 
-          v-for="star in 5" 
-          :key="star" 
-          class="star" 
-          :class="{ active: star <= (hoverRating || rating) }"
-          @click="setRating(star)"
-          @mouseover="hoverRating = star"
-          @mouseleave="hoverRating = 0"
-        >
-          &#9733;
-        </span>
-      </div>
-      <textarea 
-        v-model="reviewComment" 
-        class="review-textarea" 
-        placeholder="Share more about your experience and interactions with this nanny"
-        maxlength="400"
-      ></textarea>
-      <div class="text-right">{{ reviewComment.length }}/400</div>
-      <button @click="submitReview" class="review-submit" :disabled="!rating">Submit Review</button>
-    </div>
-  </div>
-
-    <!-- Your existing scripts remain the same -->
-=======
     <!-- SCRIPTS -->
->>>>>>> origin
     <script type="module">
       // Import necessary modules from Firebase
       import { firebaseConfig } from "./backend/firebase-config.js";
@@ -1523,6 +1552,7 @@
             }
             return [...this.chats].sort((a, b) => b.timestamp - a.timestamp);
           },
+
           canSendMessage() {
             return this.newMessage.trim().length > 0;
           },
@@ -1685,14 +1715,12 @@
                   firstName: userData.firstName || "",
                   lastName: userData.lastName || "",
                   profilePictureUrl: userData.profilePictureUrl,
-                  role: userData.role, // Include the role
                 };
               }
               return {
                 firstName: "Unknown",
                 lastName: "User",
                 profilePictureUrl: "/api/placeholder/40/40",
-                role: "unknown",
               };
             } catch (error) {
               console.error("Error fetching user details:", error);
@@ -1700,7 +1728,6 @@
                 firstName: "Unknown",
                 lastName: "User",
                 profilePictureUrl: "/api/placeholder/40/40",
-                role: "unknown",
               };
             }
           },
@@ -1710,56 +1737,65 @@
             if (!user) return;
 
             this.currentUserId = user.uid;
+
             // Get current user's details including profile picture
             const currentUserDetails = await this.getUserDetails(
               this.currentUserId
             );
             this.currentUserProfilePic = currentUserDetails.profilePictureUrl;
 
-            // Define the handler function first
+            // Define the handler function
             const handleSnapshot = async (snapshot) => {
-              const chatMap = new Map(
-                this.chats.map((chat) => [chat.userId, chat])
-              );
+              const chatMap = new Map();
+              const processedMessages = new Map();
 
+              // Track the latest message for each chat
               for (const doc of snapshot.docs) {
                 const data = doc.data();
                 const otherUserId =
                   data.from_user_id === this.currentUserId
                     ? data.to_user_id
                     : data.from_user_id;
-
-                const existingChat = chatMap.get(otherUserId);
                 const messageTimestamp = data.timestamp?.seconds
                   ? data.timestamp.seconds * 1000
-                  : data.timestamp;
+                  : data.timestamp || 0;
 
+                // Check if this is the latest message for this chat
                 if (
-                  !existingChat ||
-                  existingChat.timestamp < messageTimestamp
+                  !processedMessages.has(otherUserId) ||
+                  processedMessages.get(otherUserId).timestamp <
+                    messageTimestamp
                 ) {
-                  // Get user details from USER collection
-                  const userDetails = await this.getUserDetails(otherUserId);
-
-                  chatMap.set(otherUserId, {
-                    userId: otherUserId,
-                    firstName: userDetails.firstName,
-                    lastName: userDetails.lastName,
-                    profilePictureUrl: userDetails.profilePictureUrl,
+                  processedMessages.set(otherUserId, {
                     lastMessage: data.message,
                     timestamp: messageTimestamp,
-                    role: userDetails.role, // Include the role
                   });
                 }
               }
 
+              // Process each unique chat
+              for (const [otherUserId, messageData] of processedMessages) {
+                // Get user details from USER collection
+                const userDetails = await this.getUserDetails(otherUserId);
+                chatMap.set(otherUserId, {
+                  userId: otherUserId,
+                  firstName: userDetails.firstName,
+                  lastName: userDetails.lastName,
+                  profilePictureUrl: userDetails.profilePictureUrl,
+                  lastMessage: messageData.lastMessage,
+                  timestamp: messageData.timestamp,
+                  role: userDetails.role,
+                });
+              }
+
+              // Convert chatMap to array and sort by timestamp
               this.chats = Array.from(chatMap.values()).sort(
                 (a, b) => b.timestamp - a.timestamp
               );
               this.originalChats = [...this.chats];
             };
 
-            // Create two listeners - one for sent messages and one for received messages
+            // Create listeners for sent and received messages
             const sentMessagesUnsubscribe = db
               .collection("CHATS")
               .where("from_user_id", "==", this.currentUserId)
@@ -1779,6 +1815,9 @@
           async selectChat(chat) {
             this.selectedChat = chat;
             await this.loadChatMessages();
+            if (this.isMobileView) {
+              this.isSidebarOpen = false;
+            }
           },
           async loadChatMessages() {
             if (!this.selectedChat) return;
@@ -1838,6 +1877,11 @@
               message: this.newMessage,
               timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Use server timestamp
             });
+
+            // Reset textarea height after sending
+            if (this.$refs.messageInput) {
+              this.$refs.messageInput.style.height = "auto";
+            }
 
             this.newMessage = "";
             await this.loadChatMessages();
