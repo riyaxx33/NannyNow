@@ -766,11 +766,17 @@
             <div class="chat-header">
               <div class="chat-header-left">
                 <div class="user-avatar">
-                  <img
-                    :src="selectedChat.profilePictureUrl"
-                    :alt="selectedChat.firstName"
-                    @error="handleImageError($event)"
-                  />
+                  <a
+                    :href="parent_displaynannyprofile.html?id=${selectedChat.userId}"
+                    style="text-decoration: none"
+                  >
+                    <img
+                      :src="selectedChat.profilePictureUrl"
+                      :alt="selectedChat.firstName"
+                      @error="handleImageError($event)"
+                      style="cursor: pointer"
+                    />
+                  </a>
                 </div>
                 <div>
                   <h3>
