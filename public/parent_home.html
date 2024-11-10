@@ -279,15 +279,15 @@
 
       /* Responsive styles for smaller screens */
       @media (max-width: 768px) {
-        .col-md-6#nanny_list {
+        #nanny_list {
           display: block;
         }
-        
-        .col-md-6#nanny_list.hide {
+
+        #nanny_list.hide {
           display: none;
         }
-        
-        .col-md-6#detailsContainer {
+
+        #detailsContainer {
           display: none;
           position: fixed;
           top: 0;
@@ -299,11 +299,11 @@
           overflow-y: auto;
           padding: 20px;
         }
-        
-        .col-md-6#detailsContainer.show {
+
+        #detailsContainer.show {
           display: block;
         }
-        
+
         .back-to-nanny {
           position: fixed;
           bottom: 20px;
@@ -317,20 +317,21 @@
           display: flex;
           align-items: center;
           gap: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-        
+
         .back-to-nanny:hover {
           background: #0056b3;
           text-decoration: none;
         }
-      }
+    }
 
-      @media (min-width: 769px) {
+    @media (min-width: 769px) {
         .back-to-nanny {
           display: none;
         }
-      }
+    }
+
 
     </style>
   </head>
@@ -515,6 +516,7 @@
     <a class="back-to-nanny" v-if="selectedNanny" @click.prevent="closeDetails">
       <i class="fas fa-arrow-left"></i> Back to List
     </a>
+    
 
     <script type="module">
       import {
@@ -693,39 +695,30 @@
 
           const showDetails = (nanny) => {
             selectedNanny.value = nanny;
+
+            const listElement = document.getElementById('nanny_list');
+            const detailsElement = document.getElementById('detailsContainer');
+
             if (window.innerWidth <= 768) {
-              const listElement = document.getElementById('nanny_list');
-              const detailsElement = document.getElementById('detailsContainer');
-              
+              // On mobile, hide the list and show the details
               if (listElement) listElement.classList.add('hide');
               if (detailsElement) detailsElement.classList.add('show');
-              
+
               // Scroll to top when showing details
               window.scrollTo(0, 0);
             }
           };
 
           const closeDetails = () => {
-            if (window.innerWidth <= 768) {
-              const listElement = document.getElementById('nanny_list');
-              const detailsElement = document.getElementById('detailsContainer');
-              
-              if (listElement) listElement.classList.remove('hide');
-              if (detailsElement) detailsElement.classList.remove('show');
-              
-              // On desktop, null the selection. On mobile, keep it
-              if (window.innerWidth > 768) {
-                selectedNanny.value = null;
-              }
-              
-              // Scroll to the previous position in the list
-              const nannyCard = document.querySelector(`[data-nanny-id="${selectedNanny.value.id}"]`);
-              if (nannyCard) {
-                nannyCard.scrollIntoView({ behavior: 'smooth' });
-              }
-            } else {
-              selectedNanny.value = null;
-            }
+            const listElement = document.getElementById('nanny_list');
+            const detailsElement = document.getElementById('detailsContainer');
+
+            // Reset selected nanny to hide details view
+            selectedNanny.value = null;
+
+            // Show list and hide details on both mobile and desktop
+            if (listElement) listElement.classList.remove('hide');
+            if (detailsElement) detailsElement.classList.remove('show');
           };
 
           const searchNanny = () => {
