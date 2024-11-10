@@ -465,17 +465,31 @@
           max-height: none;
         }
 
-        #backToPostBtn {
-          position: fixed;
-          bottom: 20px;
-          right: 20px;
-          z-index: 1001;
-          display: none;
-        }
-
         #backToPostBtn.show {
           display: block;
         }
+        #backToPostBtn.show {
+          display: block;
+        }
+      }
+
+      @media (min-width: 577px) {
+        #backToPostBtn {
+          display: none !important;
+        }
+      }
+      #backToPostBtn {
+        display: none; /* Hidden by default */
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1001;
+        background-color: #6c5ce7;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
       }
 
       .list-group::-webkit-scrollbar,
@@ -492,14 +506,7 @@
         display: none;
       }
 
-      #backToPostBtn {
-        background-color: #6c5ce7;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      }
+      
 
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyWvgXsZY9SAUG2voyScZejgbHaKIztZA"></script>
@@ -618,8 +625,7 @@
         </div>
       </div>
       <button id="backToPostBtn" class="btn" >Back to Post</button>
-      <!-- style="display: none;" -->
-    </div>
+    </div> 
         
 
 
@@ -1319,9 +1325,9 @@
             geocodeAddress(address);
 
             if (window.innerWidth <= 576) {
-            document.body.classList.add('details-visible');
-            document.getElementById("detailsContainer").classList.add("show");
-            document.getElementById("backToPostBtn").classList.add("show");
+              document.body.classList.add('details-visible');
+              document.getElementById("detailsContainer").classList.add("show");
+              document.getElementById("backToPostBtn").classList.add("show");  // This adds the show class
           }
           }
         } catch (error) {
@@ -1330,9 +1336,9 @@
       }
 
       document.getElementById("backToPostBtn").addEventListener("click", () => {
-        document.body.classList.remove('details-visible');
-        document.getElementById("detailsContainer").classList.remove("show");
-        document.getElementById("backToPostBtn").classList.remove("show");
+      document.body.classList.remove('details-visible');
+      document.getElementById("detailsContainer").classList.remove("show");
+      document.getElementById("backToPostBtn").classList.remove("show");
       });
       // Geocoding API
       function geocodeAddress(address) {
