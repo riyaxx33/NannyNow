@@ -957,11 +957,13 @@
                   <div class="user-avatar">
                     <a
                       :href="`nanny_displayparentprofile.html?id=${selectedChat.userId}`"
+                      style="text-decoration: none"
                     >
                       <img
                         :src="selectedChat.profilePictureUrl"
                         :alt="selectedChat.firstName"
                         @error="handleImageError($event)"
+                        style="cursor: pointer"
                       />
                     </a>
                   </div>
@@ -979,7 +981,7 @@
                   <div class="user-avatar">
                     <!-- Updated href with correct URL -->
                     <a
-                      :href="`nanny_displayparentprofile.html?id=${selectedChat.userId}`"
+                      :href="'nanny_displayparentprofile.html?id=' + selectedChat.userId"
                       style="text-decoration: none"
                     >
                       <img

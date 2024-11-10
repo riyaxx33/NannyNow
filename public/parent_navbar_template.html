@@ -4,16 +4,12 @@
   }
 
   .navbar {
-    height: 50px;
-    background-color: rgba(255, 255, 255, 0.9) !important;
-    backdrop-filter: blur(10px);
-    padding: 15px 0;
-    transition: all 0.3s ease;
-  } 
-
-  .navbar.scrolled {
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    height: 100px;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    background: white; /* Ensure navbar has background */
+    transition: height 0.3s ease;
   }
 
   .navbar-brand {
@@ -34,7 +30,7 @@
     font-size: 1.5rem;
     font-weight: 600;
     margin-left: 1.5rem;
-}
+  }
 
   .nav-link {
     color: #333 !important;
@@ -72,6 +68,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
     padding: 10px;
+    z-index: 10000;
   }
 
   .dropdown-item {
@@ -96,6 +93,14 @@
   }
 
   @media (max-width: 991.98px) {
+    .navbar {
+      height: 70px; /* Shorter height on mobile */
+    }
+
+    .navbar-brand img {
+      max-height: 30px; /* Slightly smaller logo on mobile */
+    }
+
     .navbar-collapse {
       background-color: rgba(255, 255, 255, 0.95);
       padding: 20px;
@@ -113,64 +118,60 @@
     }
   }
 </style>
-<body>
-  <header>
-    <!-- Only the navbar itself, no extra wrappers -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
-      <div class="container">
-        <a class="navbar-brand" href="parent_home.html">
-          <img src="img/nany_logo.png" alt="Nanny logo" />
-      </a>
-      <span class="brand-text ms-3" id="brandText"></span>
+<!-- Only the navbar itself, no extra wrappers -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="parent_home.html">
+      <img src="img/nany_logo.png" alt="Nanny logo" />
+    </a>
+    <span class="brand-text ms-3" id="brandText"></span>
 
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="parent_home.html">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="post_parent.html">My Posts</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="parent_chat.html">Chat</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="parent_home.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="post_parent.html">My Posts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="parent_chat.html">Chat</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="navbarDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+          >
+            Profile
+          </a>
+          <ul
+            class="dropdown-menu dropdown-menu-end"
+            aria-labelledby="navbarDropdown"
+          >
+            <li>
+              <a class="dropdown-item" href="parent_profilePage.html"
+                >My Account</a
               >
-                Profile
-              </a>
-              <ul
-                class="dropdown-menu dropdown-menu-end"
-                aria-labelledby="navbarDropdown"
-              >
-                <li>
-                  <a class="dropdown-item" href="parent_profilePage.html"
-                    >My Account</a
-                  >
-                </li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a class="dropdown-item" href="#" id="logoutBtn">Logout</a>
-                </li>
-              </ul>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item" href="#" id="logoutBtn">Logout</a>
             </li>
           </ul>
-        </div>
-      </div>
-    </nav>
-  </header>
-</body>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

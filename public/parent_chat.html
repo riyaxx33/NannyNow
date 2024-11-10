@@ -29,9 +29,19 @@
       body {
         font-family: "Poppins", sans-serif;
         background-color: white;
-        padding-top: 100px; /* For navbar */
         margin: 0;
-        min-height: 100vh;
+        padding: 0;
+        height: 100vh;
+        overflow: hidden; /* Prevent body scrolling */
+      }
+
+      .navbar {
+        height: 100px;
+        position: fixed;
+        width: 100%;
+        z-index: 1000;
+        background: white;
+        transition: height 0.3s ease;
       }
 
       /* Main container styles */
@@ -40,20 +50,18 @@
         position: relative;
         display: flex;
         flex-direction: column;
-        width: 100%; /* Take up full width */
-        max-width: 1400px; /* Maximum width to prevent stretching on very wide screens */
-        min-width: 800px; /* Minimum width to prevent squishing */
-        height: calc(100vh - 70px); /* Account for navbar and some padding */
-        margin: 12px auto; /* Center horizontally and add some vertical spacing */
+        width: 100%;
+        max-width: 1400px;
+        height: calc(100vh - 10px);
+        padding-top: 100px;
         background-color: white;
         border-radius: 12px;
-        overflow: hidden; /* Keep children from spilling out */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Lighter shadow */
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
       }
 
       .chat-container {
         display: flex;
-        min-height: 0;
         height: 100%;
         width: 100%; /* Make container take full width */
       }
@@ -67,6 +75,7 @@
         flex-direction: column;
         min-height: 0;
         flex-shrink: 0;
+        transition: all 0.3s ease;
       }
 
       /* Add a wrapper for the scrollable content */
@@ -76,19 +85,15 @@
         overflow-x: hidden;
       }
 
-      /* Header styling */
-      .sidebar-header,
-      .chat-header {
-        height: 60px;
-        padding: 0 16px; /* Reduced padding */
-        background-color: white;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-        display: flex;
-        align-items: center;
+      .sidebar-header {
+        padding: 16px 16px 8px 16px;
+        gap: 10px;
       }
 
-      .sidebar-header {
-        gap: 10px;
+      .sidebar-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
       }
 
       .chat-preview {
@@ -103,11 +108,11 @@
       }
 
       .chat-preview:hover {
-        background-color: #fff5f5;
+        background-color: #f0f2f5;
       }
 
       .chat-preview.active {
-        background-color: #fff5f5;
+        background-color: #e8eaf6;
       }
 
       .chat-preview img {
@@ -161,7 +166,32 @@
       }
 
       .chat-header {
+        height: 60px;
+        padding: 0 16px; /* Reduced padding */
+        background-color: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        position: relative; /* Add this */
         justify-content: space-between;
+        z-index: 1; /* Add this - make sure it's lower than navbar z-index */
+      }
+
+      .chat-header .user-avatar {
+        position: relative; /* Add this */
+        z-index: 1; /* Add this */
+      }
+
+      .chat-header .user-avatar a {
+        display: block; /* Add this */
+        width: 100%; /* Add this */
+        height: 100%; /* Add this */
+      }
+
+      .chat-header .user-avatar img {
+        width: 100%; /* Add this if not already set */
+        height: 100%; /* Add this if not already set */
+        object-fit: cover; /* Add this if not already set */
       }
 
       .chat-header-left {
@@ -183,9 +213,9 @@
 
       .chat-messages {
         flex: 1;
-        padding: 20px;
+        padding: 20px 20px 0px 20px;
         overflow-y: auto;
-        background-color: #fff5f5;
+        background-color: #f2ebfb;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Cg fill='%23dcdcdc' fill-opacity='0.15'%3E%3Cpath d='M45 45c-4 0-8 4-8 8s4 8 8 8 8-4 8-8-4-8-8-8zm160 0c-4 0-8 4-8 8s4 8 8 8 8-4 8-8-4-8-8-8z'/%3E%3Cpath d='M75 95l10-10h20l10 10v20l-10 10H85l-10-10z'/%3E%3Cpath d='M180 80c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M220 120h20v20h-20z' transform='rotate(45 230 130)'/%3E%3Cpath d='M280 95c0-8.3 6.7-15 15-15s15 6.7 15 15-6.7 15-15 15-15-6.7-15-15z'/%3E%3Cpath d='M95 180l-15 15 15 15 15-15z'/%3E%3Cpath d='M150 190l10 10-10 10-10-10zM240 180h30v30h-30z'/%3E%3Cpath d='M50 280l20-20 20 20-20 20z'/%3E%3Cpath d='M160 250c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20z'/%3E%3Cpath d='M260 260h20v20h-20zM50 350h25v25H50z'/%3E%3Cpath d='M150 360l15-15 15 15-15 15z'/%3E%3Cpath d='M240 340c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M80 420c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20zM180 440l10-10h20l10 10v20l-10 10h-20l-10-10z'/%3E%3Cpath d='M260 420h30v30h-30zM40 500c-6.6 0-12 5.4-12 12s5.4 12 12 12 12-5.4 12-12-5.4-12-12-12z'/%3E%3Cpath d='M135 500l25 25-25 25-25-25zM260 510h20v20h-20z'/%3E%3C/g%3E%3Cg fill='%23dcdcdc' fill-opacity='0.15'%3E%3Cpath d='M435 65c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM520 45l15 15-15 15-15-15zM460 150c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M500 180h30v30h-30zM420 260l20-20 20 20-20 20z'/%3E%3Cpath d='M530 250c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20z'/%3E%3Cpath d='M450 350h25v25h-25zM520 360l15-15 15 15-15 15z'/%3E%3Cpath d='M440 420c-8.3 0-15 6.7-15 15s6.7 15 15 15 15-6.7 15-15-6.7-15-15-15z'/%3E%3Cpath d='M520 440l10-10h20l10 10v20l-10 10h-20l-10-10z'/%3E%3Cpath d='M440 500c-6.6 0-12 5.4-12 12s5.4 12 12 12 12-5.4 12-12-5.4-12-12-12z'/%3E%3Cpath d='M535 500l25 25-25 25-25-25z'/%3E%3C/g%3E%3Cpath d='M120 120c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12zm240 240c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12z' fill='%23dcdcdc' fill-opacity='0.15'/%3E%3Cpath d='M340 340c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12zm-240 240c0 6.6-5.4 12-12 12s-12-5.4-12-12 5.4-12 12-12 12 5.4 12 12z' fill='%23dcdcdc' fill-opacity='0.15'/%3E%3Cg fill='none' stroke='%23dcdcdc' stroke-width='2' stroke-opacity='0.15'%3E%3Cpath d='M310 70l20 20m-20 0l20-20M90 290l20 20m-20 0l20-20M510 290l20 20m-20 0l20-20'/%3E%3C/g%3E%3Cpath fill='%23dcdcdc' fill-opacity='0.15' d='M310 370h20v20h-20zM110 570h20v20h-20zM510 570h20v20h-20z'/%3E%3C/svg%3E");
         background-repeat: repeat;
         background-size: 300px 300px;
@@ -195,19 +225,20 @@
         max-width: 70%;
         min-width: 80px;
         margin: 10px 0;
-        padding: 12px 16px;
-        padding-bottom: 20px;
+        padding: 12px 16px 20px;
         border-radius: 20px;
         position: relative;
         display: inline-block; /* This makes the bubble wrap to content */
         word-wrap: break-word;
+        white-space: pre-wrap; /* Preserve line breaks but wrap text */
         width: fit-content; /* This makes the bubble fit the content */
         line-height: 1.4; /* Add line height for better text spacing */
+        overflow: hidden; /* Prevent content overflow */
         transition: background-color 0.3s ease;
       }
 
       .message.sent {
-        background-color: #ff6b6b;
+        background-color: #6c5ce7;
         color: white;
         margin-left: auto;
         border-bottom-right-radius: 4px;
@@ -253,24 +284,43 @@
         padding: 10px 20px;
         background-color: white;
         border-top: 1px solid #eee;
+        position: sticky;
+        bottom: 0;
+        width: 100%; /* Ensure container takes full width */
       }
 
       .chat-input {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 8px;
         background-color: white;
         border: 1px solid #e0e0e0;
         padding: 8px 12px;
         border-radius: 8px;
+        width: 100%;
+        min-height: 40px;
+        transition: min-height 0.2s ease; /* Smooth height transition */
       }
 
-      .chat-input input {
+      /* Textarea styles */
+      .chat-input textarea {
         flex: 1;
         border: none;
-        padding: 8px;
+        background: none;
+        padding: 6px;
         outline: none;
-        font-size: 15px;
+        font-size: 14px;
+        min-height: 24px;
+        max-height: 100px;
+        resize: none;
+        line-height: 1.4;
+        font-family: inherit;
+        margin: 0;
+        width: 100%;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        transition: height 0.2s ease; /* Smooth height transition */
       }
 
       .chat-input button {
@@ -283,13 +333,16 @@
       .send-button {
         background: transparent;
         border: none;
-        padding: 8px;
+        padding: 6px;
+        height: 30px;
+        width: 30px;
         cursor: pointer;
-        color: #ff6b6b;
+        color: #6c5ce7;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: opacity 0.2s;
+        flex-shrink: 0;
+        margin-top: auto; /* Align to bottom when textarea grows */
       }
 
       .send-button.disabled {
@@ -300,6 +353,20 @@
 
       .send-button:not(.disabled):hover {
         opacity: 0.8;
+      }
+
+      /* Remove default textarea styles */
+      .chat-input textarea::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .chat-input textarea::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .chat-input textarea::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
       }
 
       .search-bar {
@@ -322,9 +389,9 @@
       /* Add focus state effects */
       .search-bar input:focus {
         background-color: white;
-        box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2); /* Subtle red glow */
+        box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2); /* Subtle purple glow */
         border-radius: 8px 8px 0 0; /* Flatten bottom corners when focused */
-        border-bottom: 2px solid #ff6b6b; /* Red underline */
+        border-bottom: 2px solid #6c5ce7; /* Purple underline */
       }
 
       /* Search icon positioning */
@@ -404,7 +471,7 @@
           transform: scale(1.02);
         }
         100% {
-          background-color: #ff6b6b; /* Return to original sent message color */
+          background-color: #6c5ce7; /* Return to original sent message color */
           color: white; /* Return to original text color */
           transform: scale(1);
         }
@@ -430,9 +497,12 @@
         bottom: 4px;
         right: 12px;
         opacity: 0.7;
+        padding-left: 8px;
+        margin-top: 4px;
         white-space: nowrap;
         text-align: right;
         min-width: 55px;
+        background: inherit;
       }
 
       /* Update the no-chat-selected styling */
@@ -470,97 +540,475 @@
         display: inline-block;
       }
 
-      /* Media query for responsiveness */
-      @media (max-width: 1200px) {
-        .app-container {
-          width: 100%;
+      @media (max-width: 575.98px) {
+        .container {
+          max-width: 100%; /* Take full width on very small screens */
         }
-      }
 
-      @media (max-width: 900px) {
         .app-container {
-          width: 100%;
-          height: calc(100vh - 50px);
           margin: 0;
           border-radius: 0;
+          padding-top: 0;
+          height: 100vh;
+        }
+
+        .chat-list {
+          width: 100%;
+        }
+
+        .message {
+          max-width: 50%;
+          padding: 10px 14px 18px;
+        }
+
+        .chat-messages {
+          padding: 12px;
+        }
+
+        .chat-preview {
+          padding: 8px;
+        }
+
+        .chat-input-container {
+          padding: 8px;
+        }
+
+        .chat-input {
+          padding: 6px 10px;
+        }
+
+        .chat-input textarea {
+          font-size: 14px;
+          padding: 4px;
         }
       }
 
-      /* Styles for the review modal */
-      .modal {
-        display: none;
+      @media (min-width: 576px) and (max-width: 767.98px) {
+        .container {
+          max-width: 100% !important;
+        }
+      }
+
+      @media (max-width: 767.98px) {
+        .chat-header {
+          padding: 8px;
+        }
+
+        .message {
+          max-width: 60%;
+        }
+
+        .chat-input {
+          padding: 8px;
+          max-width: 100%;
+        }
+
+        .chat-input-container {
+          padding: 8px 12px;
+        }
+
+        .chat-input input {
+          font-size: 14px;
+        }
+      }
+
+      @media (min-width: 768px) and (max-width: 991.98px) {
+        .container {
+          max-width: 100% !important;
+        }
+      }
+
+      /* Media query for responsiveness */
+      @media (max-width: 991.98px) {
+        body {
+          padding-top: 70px;
+          overflow: hidden;
+        }
+
+        /* Make navbar shorter on mobile */
+        .navbar {
+          height: 70px;
+        }
+
+        /* Adjust navbar collapse on mobile */
+        .navbar-collapse {
+          position: absolute;
+          top: 70px; /* Match navbar height */
+          left: 0;
+          right: 0;
+          background-color: white;
+          padding: 20px;
+          border-radius: 0 0 12px 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          z-index: 1000;
+        }
+
+        .nav-link {
+          padding: 12px 16px !important;
+        }
+
+        .nav-link::after {
+          bottom: 8px;
+        }
+
+        .app-container {
+          margin: 0;
+          border-radius: 0;
+          height: calc(100vh - 70px); /* Adjust for navbar height */
+          padding-top: 0;
+        }
+
+        .chat-container {
+          position: relative;
+          height: 100%;
+        }
+
+        .chat-input-container {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background-color: white;
+          z-index: 10;
+          padding: 10px 20px;
+          border-top: 1px solid #eee;
+        }
+
+        .chat-list {
+          width: 100%;
+          position: fixed;
+          left: 0;
+          top: 70px;
+          bottom: 0px;
+          height: calc(100vh - 70px); /* Set a specific height */
+          z-index: 20;
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden; /* Hide overflow */
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        /* Chat list content scrolling */
+        .chat-list-scrollable {
+          flex: 1;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+          height: calc(
+            100vh - 70px - 60px
+          ); /* Adjust for navbar and search bar height */
+        }
+
+        .chat-list.show {
+          transform: translateX(0);
+        }
+
+        /* Improve visibility of the active chat */
+        .chat-preview.active {
+          background-color: #e8eaf6;
+          border-left: 4px solid #6c5ce7;
+        }
+
+        .message {
+          max-width: 75%;
+          font-size: 0.95em; /* slighly smaller font on mobile */
+          padding-bottom: 24px;
+        }
+
+        /* Ensure chat messages area only scrolls within its container */
+        .chat-messages {
+          flex: 1;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          height: calc(
+            100vh - 70px - 60px - 80px
+          ); /* Adjust for navbar, chat header, and input area */
+          margin-top: 60px;
+          padding: 20px;
+          padding-bottom: 20px; /* Add padding at bottom to prevent cutoff */
+        }
+
+        .timestamp {
+          bottom: 6px;
+        }
+
+        .chat-details {
+          width: 100%;
+          height: 100%;
+          margin-top: 0;
+          display: flex;
+          flex-direction: column;
+          padding-bottom: 60px;
+        }
+
+        .chat-input {
+          width: 100%;
+          margin: 0;
+        }
+
+        /* Ensure proper header positioning */
+        .chat-header {
+          position: fixed;
+          top: 70px; /* Position right below navbar */
+          left: 0;
+          right: 0;
+          z-index: 10;
+          background: white;
+        }
+
+        /* Mobile header styles */
+        .chat-header.mobile-view {
+          padding: 8px 16px;
+          display: flex;
+          align-items: center;
+          background: white;
+          border-bottom: 1px solid #e9edef;
+        }
+
+        .chat-header.mobile-view .back-button {
+          padding: 8px;
+          margin-right: 12px;
+          background: none;
+          border: none;
+          cursor: pointer;
+        }
+
+        .chat-header.mobile-view .chat-header-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex: 1;
+        }
+
+        .back-button {
+          background: none;
+          border: none;
+          padding: 8px;
+          margin-right: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          color: #666;
+        }
+
+        .back-button:hover {
+          color: #6c5ce7;
+        }
+
+        /* Hide desktop header when in mobile view */
+        .chat-header:not(.mobile-view) {
+          display: none;
+        }
+      }
+
+      @media (min-width: 992px) {
+        .container {
+          max-width: 100% !important;
+        }
+
+        .app-container {
+          padding-top: 100px; /* Keep the 100px padding for desktop view */
+        }
+
+        /* Desktop specific styles */
+        .chat-list {
+          position: relative;
+          transform: none;
+        }
+
+        .chat-header.mobile-view {
+          display: none;
+        }
+
+        .chat-header:not(.mobile-view) {
+          display: flex;
+        }
+      }
+
+      /* Review Modal Styles */
+      .review-modal {
         position: fixed;
-        z-index: 1000;
-        left: 0;
         top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0,0,0,0.4);
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn 0.2s ease-out;
       }
 
-      .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
+      .review-modal-content {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        width: 90%;
         max-width: 500px;
-        border-radius: 8px;
+        position: relative;
+        animation: slideIn 0.3s ease-out;
       }
 
-      .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
+      .review-modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
         cursor: pointer;
+        padding: 0.5rem;
+        color: #666;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      .close:hover,
-      .close:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
+      .review-modal-close:hover {
+        color: #333;
       }
 
-      .star-rating {
+      .review-modal-header {
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      .review-modal-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+      }
+
+      .review-modal-header p {
+        color: #666;
+        font-size: 1rem;
+      }
+
+      .star-icon {
+        width: 2rem;
+        height: 2rem;
+        color: #ddd;
+        stroke: #ffd700; /* Gold outline */
+        transition: all 0.2s ease;
+      }
+
+      .star-icon.filled {
+        color: #ffd700; /* Gold fill */
+        fill: #ffd700;
+        stroke: #ffd700;
+      }
+
+      .review-star-rating {
         display: flex;
         justify-content: center;
-        font-size: 24px;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
       }
 
-      .star {
-        color: #ddd;
+      .review-star-button {
+        background: none;
+        border: none;
         cursor: pointer;
-        transition: color 0.2s;
+        padding: 0.25rem;
+        transition: transform 0.2s;
       }
 
-      .star.active {
+      .review-star-button:hover {
+        transform: scale(1.1);
+      }
+
+      /* Add hover effect for stars */
+      .review-star-button:hover .star-icon {
         color: #ffd700;
+        fill: #ffd700;
+        stroke: #ffd700;
+      }
+
+      .review-star-button i {
+        width: 2rem;
+        height: 2rem;
+        color: #ddd;
+        transition: color 0.2s, fill 0.2s;
+      }
+
+      .review-star-button i.filled {
+        color: #ffd700;
+        fill: #ffd700;
+      }
+
+      .review-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
       }
 
       .review-textarea {
         width: 100%;
-        height: 100px;
-        margin-top: 10px;
-        padding: 10px;
+        height: 120px;
+        padding: 0.75rem;
         border: 1px solid #ddd;
-        border-radius: 4px;
-        resize: vertical;
+        border-radius: 8px;
+        resize: none;
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: border-color 0.2s;
       }
 
-      .review-submit {
-        margin-top: 10px;
-        padding: 10px 20px;
-        background-color: #4CAF50;
+      .review-textarea:focus {
+        outline: none;
+        border-color: #ff6b6b;
+      }
+
+      .review-char-count {
+        text-align: right;
+        color: #666;
+        font-size: 0.875rem;
+      }
+
+      .review-submit-btn {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background-color: #ff6b6b;
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 8px;
+        font-weight: 500;
         cursor: pointer;
+        transition: background-color 0.2s;
       }
 
-      .review-submit:hover {
-        background-color: #45a049;
+      .review-submit-btn:hover:not(:disabled) {
+        background-color: #ff5252;
+      }
+
+      .review-submit-btn:disabled {
+        background-color: #ddd;
+        cursor: not-allowed;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
     </style>
   </head>
@@ -568,196 +1016,285 @@
     <header>
       <div id="navbar"></div>
     </header>
-    <div id="app" class="app-container">
-      <div class="chat-container">
-        <!-- Sidebar -->
-        <div class="chat-list">
-          <div class="sidebar-header">
-            <h3>Chats</h3>
-          </div>
 
-          <div class="search-bar">
-            <input type="text" v-model="searchTerm" placeholder="Search..." />
-          </div>
+    <div class="container-fluid p-0">
+      <div id="app" class="app-container">
+        <div class="chat-container">
+          <!-- Sidebar -->
+          <div class="chat-list" :class="{ show: isSidebarOpen }">
+            <div class="sidebar-header">
+              <h3>Chats</h3>
+            </div>
 
-          <!-- Add wrapper for scrollable content -->
-          <div class="chat-list-scrollable">
-            <!-- Search Results -->
-            <div v-if="searchTerm.trim()" class="search-results">
-              <!-- Contacts Section -->
-              <div v-if="searchResults.contacts.length" class="search-section">
-                <div class="search-section-header">Chats</div>
+            <div class="search-bar">
+              <input type="text" v-model="searchTerm" placeholder="Search..." />
+            </div>
+
+            <!-- Add wrapper for scrollable content -->
+            <div class="chat-list-scrollable">
+              <!-- Search Results -->
+              <div v-if="searchTerm.trim()" class="search-results">
+                <!-- Contacts Section -->
                 <div
-                  v-for="contact in searchResults.contacts"
-                  :key="'contact-' + contact.userId"
-                  class="chat-preview"
-                  @click="selectChat(contact)"
+                  v-if="searchResults.contacts.length"
+                  class="search-section"
                 >
-                  <div class="user-avatar">
-                    <img
-                      :src="contact.profilePictureUrl"
-                      :alt="contact.firstName"
-                      @error="handleImageError($event)"
-                    />
-                  </div>
-                  <div class="chat-preview-content">
-                    <div class="chat-preview-header">
-                      <h4>{{ contact.firstName }} {{ contact.lastName }}</h4>
-                      <span class="chat-preview-time"
-                        >{{ formatChatTime(contact.timestamp) }}</span
-                      >
+                  <div class="search-section-header">Chats</div>
+                  <div
+                    v-for="contact in searchResults.contacts"
+                    :key="'contact-' + contact.userId"
+                    class="chat-preview"
+                    @click="selectChat(contact)"
+                  >
+                    <div class="user-avatar">
+                      <img
+                        :src="contact.profilePictureUrl"
+                        :alt="contact.firstName"
+                        @error="handleImageError($event)"
+                      />
                     </div>
-                    <p class="last-message">{{ contact.lastMessage }}</p>
+                    <div class="chat-preview-content">
+                      <div class="chat-preview-header">
+                        <h4>{{ contact.firstName }} {{ contact.lastName }}</h4>
+                        <span class="chat-preview-time"
+                          >{{ formatChatTime(contact.timestamp) }}</span
+                        >
+                      </div>
+                      <p class="last-message">{{ contact.lastMessage }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Message Section -->
+                <div
+                  v-if="searchResults.messages.length"
+                  class="search-section"
+                >
+                  <div class="search-section-header">Messages</div>
+                  <div
+                    v-for="message in searchResults.messages"
+                    :key="'message-' + message.messageId"
+                    class="chat-preview"
+                    @click="scrollToMessage(message.messageId, message.userId)"
+                  >
+                    <div class="user-avatar">
+                      <img
+                        :src="message.profilePictureUrl"
+                        :alt="message.firstName"
+                        @error="handleImageError($event)"
+                      />
+                    </div>
+                    <div class="chat-preview-content">
+                      <div class="chat-preview-header">
+                        <h4>{{ message.firstName }} {{ message.lastName }}</h4>
+                        <span class="chat-preview-time"
+                          >{{ formatChatTime(message.timestamp) }}</span
+                        >
+                      </div>
+                      <p
+                        class="message-preview"
+                        v-html="message.highlightedMessage"
+                      ></p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Message Section -->
-              <div v-if="searchResults.messages.length" class="search-section">
-                <div class="search-section-header">Messages</div>
+              <!-- Regular Chat List -->
+              <div v-else>
                 <div
-                  v-for="message in searchResults.messages"
-                  :key="'message-' + message.messageId"
-                  class="chat-preview"
-                  @click="scrollToMessage(message.messageId, message.userId)"
+                  v-for="chat in sortedChats"
+                  :key="chat.userId"
+                  :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
+                  @click="selectChat(chat)"
                 >
                   <div class="user-avatar">
                     <img
-                      :src="message.profilePictureUrl"
-                      :alt="message.firstName"
+                      :src="chat.profilePictureUrl"
+                      :alt="chat.firstName"
                       @error="handleImageError($event)"
                     />
                   </div>
                   <div class="chat-preview-content">
                     <div class="chat-preview-header">
-                      <h4>{{ message.firstName }} {{ message.lastName }}</h4>
+                      <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
                       <span class="chat-preview-time"
-                        >{{ formatChatTime(message.timestamp) }}</span
+                        >{{ formatChatTime(chat.timestamp) }}</span
                       >
                     </div>
-                    <p
-                      class="message-preview"
-                      v-html="message.highlightedMessage"
-                    ></p>
+                    <p class="last-message">{{ chat.lastMessage }}</p>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Regular Chat List -->
-            <div v-else>
-              <div
-                v-for="chat in sortedChats"
-                :key="chat.userId"
-                :class="['chat-preview', { active: selectedChat && selectedChat.userId === chat.userId }]"
-                @click="selectChat(chat)"
-              >
-                <div class="user-avatar">
-                  <img
-                    :src="chat.profilePictureUrl"
-                    :alt="chat.firstName"
-                    @error="handleImageError($event)"
-                  />
-                </div>
-                <div class="chat-preview-content">
-                  <div class="chat-preview-header">
-                    <h4>{{ chat.firstName }} {{ chat.lastName }}</h4>
-                    <span class="chat-preview-time"
-                      >{{ formatChatTime(chat.timestamp) }}</span
+          <!-- Main Chat Area -->
+          <div class="chat-details">
+            <template v-if="selectedChat">
+              <!-- Mobile header (shows only on mobile) -->
+              <div class="chat-header mobile-view" v-if="isMobileView">
+                <button class="back-button" @click="showChatList">
+                  <i data-lucide="arrow-left"></i>
+                </button>
+                <div class="chat-header-left">
+                  <div class="user-avatar">
+                    <a
+                      :href="`parent_displaynannyprofile.html?id=${selectedChat.userId}`"
+                      style="text-decoration: none"
                     >
+                      <img
+                        :src="selectedChat.profilePictureUrl"
+                        :alt="selectedChat.firstName"
+                        @error="handleImageError($event)"
+                        style="cursor: pointer"
+                      />
+                    </a>
                   </div>
-                  <p class="last-message">{{ chat.lastMessage }}</p>
+                  <div>
+                    <h3>
+                      {{ selectedChat.firstName }} {{ selectedChat.lastName }}
+                    </h3>
+                  </div>
+                  <button
+                    v-if="selectedChat && selectedChat.role === 'nanny'"
+                    @click="handleReviewClick"
+                    class="btn btn-outline-primary btn-sm ml-4"
+                  >
+                    Leave Review
+                  </button>
                 </div>
               </div>
+
+              <!-- Desktop header -->
+              <div class="chat-header" v-else>
+                <div class="chat-header-left">
+                  <div class="user-avatar">
+                    <a
+                      :href="`parent_displaynannyprofile.html?id=${selectedChat.userId}`"
+                      style="text-decoration: none"
+                    >
+                      <img
+                        :src="selectedChat.profilePictureUrl"
+                        :alt="selectedChat.firstName"
+                        @error="handleImageError($event)"
+                        style="cursor: pointer"
+                      />
+                    </a>
+                  </div>
+                  <div>
+                    <h3>
+                      {{ selectedChat.firstName }} {{ selectedChat.lastName }}
+                    </h3>
+                  </div>
+                  <button
+                    v-if="selectedChat && selectedChat.role === 'nanny'"
+                    @click="handleReviewClick"
+                    class="btn btn-outline-primary btn-sm ml-4"
+                  >
+                    Leave Review
+                  </button>
+                </div>
+              </div>
+
+              <div class="chat-messages" ref="messageContainer">
+                <div
+                  v-for="group in groupMessagesByDate(selectedChatMessages)"
+                  :key="group.date"
+                >
+                  <!-- Date separator -->
+                  <div class="date-separator">
+                    <span class="date-label"
+                      >{{ formatDateForGroup(group.date) }}</span
+                    >
+                  </div>
+
+                  <!-- Messages for this date -->
+                  <div
+                    v-for="message in group.messages"
+                    :key="message.timestamp"
+                    class="message-container"
+                  >
+                    <div
+                      :data-message-id="message.id"
+                      :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received', { 'highlighted' : message.id === highlightedMessage }]"
+                    >
+                      {{ message.message }}
+                      <div class="timestamp">
+                        {{ formatMessageTime(message.timestamp) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="chat-input-container">
+                <div class="chat-input">
+                  <textarea
+                    v-model.trim="newMessage"
+                    @keydown="handleKeydown"
+                    placeholder="Write a message..."
+                    rows="1"
+                    ref="messageInput"
+                  ></textarea>
+                  <button
+                    class="send-button"
+                    :class="{ 'disabled': !canSendMessage }"
+                    @click="sendMessage"
+                    :disabled="!canSendMessage"
+                  >
+                    <i data-lucide="send"></i>
+                  </button>
+                </div>
+              </div>
+            </template>
+            <div v-else class="no-chat-selected">
+              <h2>Select a chat to start messaging</h2>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Main Chat Area -->
-        <div class="chat-details">
-          <template v-if="selectedChat">
-            <div class="chat-header">
-              <div class="chat-header-left">
-                <div class="user-avatar">
-                  <img
-                    :src="selectedChat.profilePictureUrl"
-                    :alt="selectedChat.firstName"
-                    @error="handleImageError($event)"
-                  />
-                  </a>
-                </div>
-                <div>
-                  <h3>
-                    {{ selectedChat.firstName }} {{ selectedChat.lastName }}
-                  </h3>
-                </div>
-                <button 
-                  v-if="selectedChat.role === 'nanny'"
-                  @click="openReviewModal"
-                  class="btn btn-outline-primary btn-sm ml-4"
-                >
-                  Leave Review
-                </button>
-              </div>
-            </div>
+      <!-- Review Modal -->
+      <div id="reviewModal" class="review-modal" style="display: none">
+        <div class="review-modal-content">
+          <button class="review-modal-close" onclick="closeReviewModal()">
+            <i data-lucide="x"></i>
+          </button>
 
-            <div class="chat-messages" ref="messageContainer">
-              <div
-                v-for="group in groupMessagesByDate(selectedChatMessages)"
-                :key="group.date"
-              >
-                <!-- Date separator -->
-                <div class="date-separator">
-                  <span class="date-label"
-                    >{{ formatDateForGroup(group.date) }}</span
-                  >
-                </div>
+          <div class="review-modal-header">
+            <h2>Rate Your Experience</h2>
+            <p id="reviewModalSubtitle">How was your experience?</p>
+          </div>
 
-                <!-- Messages for this date -->
-                <div
-                  v-for="message in group.messages"
-                  :key="message.timestamp"
-                  class="message-container"
-                >
-                  <div
-                    :data-message-id="message.id"
-                    :class="['message', message.from_user_id === currentUserId ? 'sent' : 'received', { 'highlighted' : message.id === highlightedMessage }]"
-                  >
-                    {{ message.message }}
-                    <div class="timestamp">
-                      {{ formatMessageTime(message.timestamp) }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="review-star-rating" id="starRating">
+            <!-- Stars will be added dynamically -->
+          </div>
 
-            <div class="chat-input-container">
-              <div class="chat-input">
-                <input
-                  type="text"
-                  v-model.trim="newMessage"
-                  @keyup.enter="sendMessage"
-                  placeholder="Write a message..."
-                />
-                <button
-                  class="send-button"
-                  :class="{ 'disabled': !canSendMessage }"
-                  @click="sendMessage"
-                  :disabled="!canSendMessage"
-                >
-                  <i data-lucide="send"></i>
-                </button>
-              </div>
-            </div>
-          </template>
-          <div v-else class="no-chat-selected">
-            <h2>Select a chat to start messaging</h2>
+          <div class="review-form">
+            <textarea
+              id="reviewComment"
+              class="review-textarea"
+              placeholder="Share your experience with this nanny..."
+              maxlength="400"
+              onkeyup="updateCharCount()"
+            ></textarea>
+            <div class="review-char-count" id="charCount">0/400</div>
+
+            <button
+              onclick="submitReview()"
+              class="review-submit-btn"
+              id="submitReviewBtn"
+              disabled
+            >
+              Submit Review
+            </button>
           </div>
         </div>
       </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Review Modal -->
     <!-- Review Modal -->
 <div id="reviewModal" class="modal" v-show="showReviewModal">
@@ -790,6 +1327,9 @@
   </div>
 
     <!-- Your existing scripts remain the same -->
+=======
+    <!-- SCRIPTS -->
+>>>>>>> origin
     <script type="module">
       // Import necessary modules from Firebase
       import { firebaseConfig } from "./backend/firebase-config.js";
@@ -797,11 +1337,165 @@
       const db = firebase.firestore();
       const auth = firebase.auth();
 
+      // Review Modal Functions
+      const reviewModal = {
+        currentRating: 0,
+        currentNannyId: null,
+        currentNannyName: null,
+
+        initializeStarRating() {
+          const starRating = document.getElementById("starRating");
+          starRating.innerHTML = "";
+
+          for (let i = 1; i <= 5; i++) {
+            const starButton = document.createElement("button");
+            starButton.className = "review-star-button";
+
+            // Create the star icon using Lucide
+            const starIcon = document.createElement("i");
+            starIcon.setAttribute("data-lucide", "star");
+            starIcon.className = "star-icon";
+
+            starButton.appendChild(starIcon);
+
+            starButton.addEventListener("mouseover", () =>
+              this.highlightStars(i)
+            );
+            starButton.addEventListener("mouseout", () =>
+              this.highlightStars(this.currentRating)
+            );
+            starButton.addEventListener("click", () => this.setRating(i));
+
+            starRating.appendChild(starButton);
+          }
+
+          // Combined configuration for star icons
+          lucide.createIcons({
+            selector: "#starRating [data-lucide]", // Only target star rating icons
+            attrs: {
+              stroke: "currentColor",
+              fill: "none",
+              "stroke-width": "2",
+              "stroke-linecap": "round",
+              "stroke-linejoin": "round",
+            },
+          });
+        },
+
+        highlightStars(count) {
+          const stars = document.querySelectorAll(".star-icon");
+          stars.forEach((star, index) => {
+            if (index < count) {
+              star.classList.add("filled");
+              // Also update the SVG fill attribute
+              const svgElement = star.querySelector("svg");
+              if (svgElement) {
+                svgElement.style.fill = "currentColor";
+              }
+            } else {
+              star.classList.remove("filled");
+              // Remove fill for unselected stars
+              const svgElement = star.querySelector("svg");
+              if (svgElement) {
+                svgElement.style.fill = "none";
+              }
+            }
+          });
+        },
+
+        setRating(rating) {
+          this.currentRating = rating;
+          this.highlightStars(rating);
+          document.getElementById("submitReviewBtn").disabled = false;
+        },
+
+        updateCharCount() {
+          const comment = document.getElementById("reviewComment").value;
+          document.getElementById(
+            "charCount"
+          ).textContent = `${comment.length}/400`;
+        },
+
+        open(nannyId, nannyName) {
+          this.currentNannyId = nannyId;
+          this.currentNannyName = nannyName;
+          document.getElementById(
+            "reviewModalSubtitle"
+          ).textContent = `How was your experience with ${nannyName}?`;
+          document.getElementById("reviewModal").style.display = "flex";
+          this.initializeStarRating();
+          this.currentRating = 0;
+          document.getElementById("reviewComment").value = "";
+          document.getElementById("submitReviewBtn").disabled = true;
+          this.updateCharCount();
+        },
+
+        close() {
+          document.getElementById("reviewModal").style.display = "none";
+          this.currentRating = 0;
+          this.currentNannyId = null;
+          this.currentNannyName = null;
+        },
+
+        async submitReview() {
+          if (!this.currentRating || !this.currentNannyId) return;
+
+          const submitButton = document.getElementById("submitReviewBtn");
+          const comment = document.getElementById("reviewComment").value;
+
+          try {
+            submitButton.textContent = "Submitting...";
+            submitButton.disabled = true;
+
+            await db.collection("REVIEWS").add({
+              from_userID: auth.currentUser.uid,
+              to_userID: this.currentNannyId,
+              rating: this.currentRating,
+              comments: comment,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            });
+
+            alert("Review submitted successfully!");
+            this.close();
+          } catch (error) {
+            console.error("Error submitting review:", error);
+            alert("Failed to submit review. Please try again.");
+          } finally {
+            submitButton.textContent = "Submit Review";
+            submitButton.disabled = false;
+          }
+        },
+      };
+
+      // Add event listeners for the modal
+      document.getElementById("reviewModal").addEventListener("click", (e) => {
+        if (e.target.id === "reviewModal") {
+          reviewModal.close();
+        }
+      });
+
+      document
+        .querySelector(".review-modal-close")
+        .addEventListener("click", () => {
+          reviewModal.close();
+        });
+
+      document.getElementById("reviewComment").addEventListener("keyup", () => {
+        reviewModal.updateCharCount();
+      });
+
+      document
+        .getElementById("submitReviewBtn")
+        .addEventListener("click", () => {
+          reviewModal.submitReview();
+        });
+
+      // VUE APP
       const app = Vue.createApp({
         data() {
           return {
             currentUserId: null,
-            currentUserProfilePic: "",
+            currentUserProfilePic: "/api/placeholder/40/40",
             chats: [],
             selectedChat: null,
             selectedChatMessages: [],
@@ -816,11 +1510,8 @@
             isSearching: false,
             originalChats: [],
             highlightedMessageId: null,
-            // New properties for review functionality
-            showReviewModal: false,
-            rating: 0,
-            hoverRating: 0,
-            reviewComment: "",
+            isMobileView: window.innerWidth < 992,
+            isSidebarOpen: true,
           };
         },
 
@@ -838,6 +1529,55 @@
         },
 
         methods: {
+          showChatList() {
+            if (this.isMobileView) {
+              this.isSidebarOpen = true;
+              this.selectedChat = null; // Clear selected chat when going back to list
+            }
+          },
+
+          handleResize() {
+            this.isMobileView = window.innerWidth < 992;
+            if (!this.isMobileView) {
+              this.isSidebarOpen = true;
+            }
+          },
+
+          autoResizeTextarea(event) {
+            const textarea = event.target;
+            textarea.style.height = "auto";
+            textarea.style.height = textarea.scrollHeight + "px";
+          },
+
+          handleKeydown(event) {
+            if (event.key === "Enter") {
+              if (event.shiftKey) {
+                // Immediately resize the textarea
+                this.$nextTick(() => {
+                  this.resizeTextarea(event.target);
+                });
+                return;
+              } else {
+                event.preventDefault();
+                this.sendMessage();
+              }
+            }
+          },
+
+          resizeTextarea(textarea) {
+            // Reset height first to get the correct scrollHeight
+            textarea.style.height = "auto";
+            // Set new height based on content
+            textarea.style.height = textarea.scrollHeight + "px";
+
+            // Also adjust container if needed
+            const container = textarea.closest(".chat-input");
+            if (container) {
+              container.style.minHeight =
+                Math.max(40, textarea.scrollHeight + 16) + "px";
+            }
+          },
+
           handleImageError(event) {
             event.target.src = "/api/placeholder/40/40"; // Fallback to placeholder
           },
@@ -1268,40 +2008,12 @@
             }
           },
 
-          // New methods for review functionality
-          openReviewModal() {
-            this.showReviewModal = true;
-            document.getElementById('reviewModal').style.display = 'block';
-          },
-
-          closeReviewModal() {
-            this.showReviewModal = false;
-            document.getElementById('reviewModal').style.display = 'none';
-            this.rating = 0;
-            this.reviewComment = '';
-          },
-
-          setRating(star) {
-            this.rating = star;
-          },
-
-          async submitReview() {
-            if (!this.rating) return;
-
-            try {
-              await db.collection("REVIEW").add({
-                from_userID: this.currentUserId,
-                to_userID: this.selectedChat.userId,
-                rating: this.rating,
-                comments: this.reviewComment,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-              });
-
-              this.closeReviewModal();
-              // You might want to show a success message here
-            } catch (error) {
-              console.error("Error submitting review:", error);
-              // You might want to show an error message here
+          handleReviewClick() {
+            if (this.selectedChat && this.selectedChat.userId) {
+              reviewModal.open(
+                this.selectedChat.userId,
+                this.selectedChat.firstName
+              );
             }
           },
         },
@@ -1318,13 +2030,46 @@
               this.isSearching = false;
             }
           }, 300),
+
+          newMessage(val) {
+            this.$nextTick(() => {
+              const textarea = this.$el.querySelector(".chat-input textarea");
+              if (textarea) {
+                this.resizeTextarea(textarea);
+              }
+            });
+          },
         },
 
         mounted() {
+          // Resize listener
+          window.addEventListener("resize", this.handleResize);
+          this.handleResize(); // Initial check
+
+          const urlParams = new URLSearchParams(window.location.search);
+          const parentId = urlParams.get("parentId");
+          const autoSelect = urlParams.get("autoSelect");
           // Check if user is logged in
           auth.onAuthStateChanged((user) => {
             if (user) {
               this.initialize();
+              // After initialization, check if we need to auto-select a chat
+              if (parentId && autoSelect === "true") {
+                // Set up a watcher for the chats array
+                const checkForChat = setInterval(() => {
+                  const targetChat = this.chats.find(
+                    (chat) => chat.userId === parentId
+                  );
+
+                  if (targetChat) {
+                    clearInterval(checkForChat);
+                    this.selectChat(targetChat);
+                  }
+                }, 100); // Check every 100ms
+
+                // Clear interval after 5 seconds to prevent infinite checking
+                setTimeout(() => clearInterval(checkForChat), 5000);
+              }
             } else {
               // Redirect to login page or handle unauthorized access
               console.log("User not logged in");
@@ -1345,6 +2090,9 @@
         },
 
         beforeUnmount() {
+          // Remove resize listener
+          window.removeEventListener("resize", this.handleResize);
+
           // Clean up listener
           if (this.unsubscribe) {
             this.unsubscribe();
