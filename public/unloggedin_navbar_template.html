@@ -1,146 +1,200 @@
 <style>
   body {
-      font-family: "Poppins", sans-serif;
-      margin: 0;
-      padding: 0;
+    font-family: "Poppins", sans-serif;
   }
-  
+
   .navbar {
-      height: 100px;
-      position: relative;
-      width: 100%;
-      z-index: 1000;
-      background: white;
-      transition: height 0.3s ease;
-      top: 0;
-      left: 0;
+    height: 100px;
+    position: fixed;
+    width: 100%;
+    z-index: 10000;
+    background: white;
+    transition: height 0.3s ease;
   }
-  
+
   .navbar-brand {
-      font-weight: 600;
-      font-size: 1.5rem;
+    font-weight: 600;
+    font-size: 1.5rem;
   }
-  
+
   .navbar-brand img {
-      max-height: 40px;
-      margin-right: 10px;
+    max-height: 40px;
+    margin-right: 10px;
   }
-  
-  .login {
-    color: #6366f1;
+
+  .nav-link {
+    color: #333 !important;
     font-weight: 500;
-    padding: 0.5rem 1.25rem;
-    border: 2px solid #6366f1;
-    border-radius: 0.5rem;
+    padding: 8px 16px !important;
+    margin: 0 5px;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background: linear-gradient(45deg, #333, #666);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+  }
+
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    width: 80%;
+  }
+
+  .nav-link:hover {
+    color: #000 !important;
+    transform: translateY(-2px);
+  }
+
+  .dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 10px;
+    z-index: 10000;
+  }
+
+  .dropdown-item {
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .dropdown-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: translateX(5px);
+  }
+
+  .navbar-toggler {
+    border: none;
+    padding: 0;
+  }
+
+  .navbar-toggler:focus {
+    box-shadow: none;
+  }
+
+  /* Login and Signup specific styles */
+  .login-signup-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .login-link,
+  .signup-btn {
+    color: #333 !important;
+    font-weight: 500;
+    padding: 8px 16px !important;
+    margin: 0 5px;
+    position: relative;
     transition: all 0.3s ease;
     text-decoration: none;
-}
+  }
 
-.login:hover {
-    background-color: rgba(99, 102, 241, 0.1);
-    transform: translateY(-2px);
-}
-  
-  /* Custom styling for login/signup buttons */
-  .auth-buttons {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+  .signup-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
   }
-  
-  .btn-auth {
-      padding: 8px 20px;
-      font-weight: 500;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      font-size: 0.95rem;
+
+  .login-link::after,
+  .signup-btn::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background: linear-gradient(45deg, #333, #666);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
   }
-  
-  .btn-login {
-      color: #6366f1;
-      background: transparent;
-      border: 2px solid #6366f1;
+
+  .login-link:hover::after,
+  .signup-btn:hover::after {
+    width: 80%;
   }
-  
-  .btn-login:hover {
-      background: rgba(99, 102, 241, 0.1);
-      transform: translateY(-2px);
-  }
-  
-  .btn-signup {
-      color: white;
-      background: linear-gradient(45deg, #6366f1, #8b5cf6);
-      border: none;
-  }
-  
-  .btn-signup:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-  }
-  
-  .dropdown-menu {
-      border: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border-radius: 12px;
-      padding: 10px;
-      z-index: 10000;
-  }
-  
-  .dropdown-item {
-      font-weight: 500;
-      padding: 8px 20px;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-  }
-  
-  .dropdown-item:hover {
-      background-color: rgba(0, 0, 0, 0.05);
-      transform: translateX(5px);
-  }
-  
+
   @media (max-width: 991.98px) {
-      .navbar {
-          height: 70px;
-      }
-  
-      .navbar-brand img {
-          max-height: 30px;
-      }
-  
-      .auth-buttons {
-          margin-top: 0;
-      }
-  
-      .btn-auth {
-          padding: 6px 16px;
-          font-size: 0.9rem;
-      }
+    .navbar {
+      height: 70px;
+    }
+
+    .navbar-brand img {
+      max-height: 30px;
+    }
+
+    .navbar-collapse {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-signup-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .login-link,
+    .signup-btn {
+      width: 100%;
+      padding: 12px 16px !important;
+    }
   }
-  </style>
-  
-  <nav class="navbar navbar-expand-lg navbar-light">
-      <div class="container">
-          <a class="navbar-brand" href="index.html">
-              <img src="img/nany_logo.png" alt="Nany logo" />
-          </a>
-          
-          <div class="auth-buttons ms-auto">
-            <a href="login_page.html" class="login">
-              Login
-          </a>
-              <div class="dropdown d-inline-block">
-                  <button class="btn-auth btn-signup dropdown-toggle"
-                      type="button"
-                      id="signupDropdown"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false">
-                      Sign Up
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="signupDropdown">
-                      <li><a class="dropdown-item" href="parent_signup.html">Parent</a></li>
-                      <li><a class="dropdown-item" href="nanny_signup.html">Nanny</a></li>
-                  </ul>
-              </div>
-          </div>
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="img/nany_logo.png" alt="Nany logo" />
+    </a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <div class="ms-auto login-signup-container">
+        <a class="login-link" href="login_page.html">Log In</a>
+        <div class="dropdown">
+          <button
+            class="signup-btn dropdown-toggle"
+            type="button"
+            id="signupDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Sign Up
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="signupDropdown">
+            <li>
+              <a class="dropdown-item" href="parent_signup.html">Parent</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="nanny_signup.html">Nanny</a>
+            </li>
+          </ul>
+        </div>
       </div>
-  </nav>
+    </div>
+  </div>
+</nav>

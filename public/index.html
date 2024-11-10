@@ -16,7 +16,7 @@
         @media (min-width: 768px) {
             .tagline-container.night-mode .tagline,
             .tagline-container.night-mode .sub-tagline {
-                color: #fff;
+                color: white !important;
             }
         }
         .action-button {
@@ -287,7 +287,6 @@
             fill: white;
             opacity: 0.8;
         }
-
 .form-control {
     padding: 0.5rem;
     margin-bottom: 1rem;
@@ -682,12 +681,165 @@
   transition: background-color 0.3s ease;
   z-index: 0;
 }
+.navbar {
+    height: 100px;
+    background-color: transparent !important;
+    box-shadow: none;
+    border-bottom: none;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    transition: all 0.3s ease;
+  }
+  
+  .navbar-brand {
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
+  
+  .navbar-brand img {
+    max-height: 80px;
+    margin-right: 30px;
+    width: auto;
+    height: auto;
+  }
+  
+  /* Navigation items container */
+  .nav-items-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  /* Style for both login link and signup button */
+  .login,
+  .btn-signup {
+    padding: 0.5rem 1rem;
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    color: #333;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-signup {
+    border: none;
+    background: transparent;
+  }
+  
+  .login:hover,
+  .btn-signup:hover {
+    color: #666;
+  }
+  
+  /* Dropdown styling */
+  .dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+    padding: 0.5rem 0;
+  }
+  
+  .dropdown-item {
+    padding: 0.7rem 1.5rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  /* Mobile menu styling */
+  @media (max-width: 768px) {
+    .navbar {
+      height: auto;
+      padding: 1rem 0;
+    }
+  
+    .navbar-brand img {
+      max-height: 60px;
+    }
+  
+    .navbar-collapse {
+      background-color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-top: 1rem;
+    }
+  
+    .nav-items-container {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+  
+    .login,
+    .btn-signup {
+      text-align: left;
+      padding: 0.7rem 1rem;
+      width: 100%;
+    }
+  
+    .dropdown-menu {
+      position: static !important;
+      box-shadow: none;
+      border: none;
+      padding-left: 1rem;
+    }
+  
+    .dropdown-item {
+      padding: 0.5rem 1rem;
+    }
+  }
     </style>
 </head>
 <body>
     <!-- Header Section -->
     <header>
-        <div id="navbar"></div>
+        <nav class="navbar navbar-expand-md navbar-light">
+            <div class="container">
+              <a class="navbar-brand" href="index.html">
+                <img src="img/nany_logo_black.png" alt="Nany logo" class="logoo" />
+              </a>
+              <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+              >
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto nav-items-container">
+                  <a class="login" href="login_page.html">Log In</a>
+                  <div class="dropdown">
+                    <button
+                      class="btn-signup dropdown-toggle"
+                      type="button"
+                      id="signupDropdown"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      Sign Up
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="signupDropdown">
+                      <li>
+                        <a class="dropdown-item" href="parent_signup.html">Parent</a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="nanny_signup.html">Nanny</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </nav>
     </header>
 
     <!-- Animation Container -->
@@ -815,55 +967,7 @@ onAuthStateChanged(auth, async (user) => {
             window.location.href = 'index.html';
         }
     }
-    
-    // Load appropriate navbar
-    loadNavbar(user);
 });
-
-// Your existing loadNavbar function remains the same
-async function loadNavbar(user) {
-    let fileToLoad = 'unloggedin_navbar_template.html';
-    
-    if (user) {
-        try {
-            const userDoc = await getDoc(doc(db, "USER", user.uid));
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                if (userData.role === 'parent') {
-                    fileToLoad = 'parent_navbar_template.html';
-                } else if (userData.role === 'nanny') {
-                    fileToLoad = 'nanny_navbar_template.html';
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching user role:', error);
-        }
-    }
-
-    try {
-        const response = await fetch(fileToLoad);
-        if (!response.ok) throw new Error('Network response was not ok');
-
-        const navbarHTML = await response.text();
-        document.getElementById('navbar').innerHTML = navbarHTML;
-
-        const logoutLink = document.querySelector('#logoutBtn');
-        if (logoutLink) {
-            logoutLink.addEventListener('click', async (e) => {
-                e.preventDefault();
-                console.log("Logout clicked");
-                try {
-                    await logout();
-                } catch (error) {
-                    console.error('Logout failed:', error);
-                }
-            });
-        }
-    } catch (error) {
-        console.error('Failed to load navbar:', error);
-    }
-}
-
         // Add navbar background change on scroll
         window.addEventListener('scroll', () => {
             const navbar = document.querySelector('.navbar');
