@@ -117,6 +117,79 @@
           border-color: var(--linkedin-blue);
           color: var(--linkedin-blue);
         }
+        .no-jobs-message {
+  color: rgba(0, 0, 0, 0.6);
+  text-align: center;
+  padding: 20px;
+  background-color: var(--linkedin-background);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.job-card {
+  background: white;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.job-header {
+  margin-bottom: 16px;
+}
+
+.job-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.badge-completed {
+  background-color: var(--linkedin-blue);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.job-date {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 4px;
+}
+
+.job-details {
+  border-top: 1px solid var(--card-border);
+  padding-top: 16px;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+@media (max-width: 767px) {
+  .detail-row {
+    flex-direction: column;
+  }
+  
+  .detail-label {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+}
   
         /* Responsive Breakpoints */
         @media (min-width: 768px) {
@@ -247,121 +320,228 @@
             </div>
           </div>
         </div>
+        <!-- Add this after your Qualifications Section -->
+    <div v-if="!loading" class="profile-section">
+        <h2 class="section-title">Completed Jobs</h2>
+        <div class="row">
+          <div class="col-12">
+            <div v-if="completedJobs.length === 0" class="no-jobs-message">
+              No completed jobs with this nanny yet.
+            </div>
+            
+            <div v-else>
+              <div v-for="job in completedJobs" :key="job.id" class="job-card mb-3">
+                <div class="job-header">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="job-title mb-0">Job ID: {{ job.jobId }}</h5>
+                    <span class="badge badge-completed">Completed</span>
+                  </div>
+                  <p class="job-date mb-2">{{ formatDate(job.date) }}</p>
+                </div>
+                
+                <div class="job-details">
+                  <div class="detail-row">
+                    <span class="detail-label">Time:</span>
+                    <span class="detail-value">{{ job.startTime }} - {{ job.endTime }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Pay:</span>
+                    <span class="detail-value">${{ job.pay }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Pay Negotiable:</span>
+                    <span class="detail-value">{{ job.payNegotiation ? 'Yes' : 'No' }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Notes:</span>
+                    <span class="detail-value">{{ job.description }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       </div>
     </div>
 
-    <script type="module">
-      import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
-      import { db, storage } from "./backend/firebase-config.js";
-      import { initAuth, getCurrentUser, getUserRole } from "./backend/auth.js";
-      import { doc, getDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-      import { ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+    
+      
 
-      createApp({
-        data() {
-          return {
+
+    <script type="module">
+import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+import { db, storage } from "./backend/firebase-config.js";
+import { initAuth, getCurrentUser, getUserRole } from "./backend/auth.js";
+import { doc, getDoc, addDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+
+createApp({
+    data() {
+        return {
             profileData: null,
             loading: true,
             error: null,
             nannyId: null,
-          };
-        },
-        created() {
-          console.log("Created hook started");
-          const urlParams = new URLSearchParams(window.location.search);
-          this.nannyId = urlParams.get('id');
-          console.log("Nanny ID from URL:", this.nannyId);
-          
-          if (!this.nannyId) {
+            completedJobs: []
+        };
+    },
+
+    created() {
+        console.log("Created hook started");
+        const urlParams = new URLSearchParams(window.location.search);
+        this.nannyId = urlParams.get('id');
+        console.log("Nanny ID from URL:", this.nannyId);
+        
+        if (!this.nannyId) {
             this.error = "No nanny ID provided";
             this.loading = false;
             return;
-          }
-          
-          this.initializeAuthListener();
-        },
-        methods: {
-          initializeAuthListener() {
-            console.log("Initializing auth listener");
-            initAuth(async (user) => {
-              console.log("Auth state changed, user:", user?.uid);
-              if (user) {
+        }
+        
+        // Initialize auth listener
+        initAuth(async (user) => {
+            console.log("Auth state changed, user:", user?.uid);
+            if (user) {
                 try {
-                  const role = await getUserRole(user.uid);
-                  console.log("User role:", role);
-                  if (role !== "parent") {
-                    this.error = "Access denied. This page is for parents only.";
-                    return;
-                  }
-                  await this.fetchNannyProfile(this.nannyId);
+                    const role = await getUserRole(user.uid);
+                    console.log("User role:", role);
+                    if (role !== "parent") {
+                        this.error = "Access denied. This page is for parents only.";
+                        this.loading = false;
+                        return;
+                    }
+                    await this.fetchNannyProfile(this.nannyId);
+                    await this.fetchNannyCompletedJobs();
                 } catch (error) {
-                  console.error("Auth error:", error);
-                  this.error = "Error: " + error.message;
+                    console.error("Auth error:", error);
+                    this.error = "Error: " + error.message;
+                } finally {
+                    this.loading = false;
                 }
-              } else {
+            } else {
                 window.location.href = "login.html";
-              }
-              this.loading = false;
-            });
-          },
-          async fetchNannyProfile(nannyId) {
-            try {
-              const userDocRef = doc(db, "USER", nannyId);
-              const userDocSnap = await getDoc(userDocRef);
-
-              if (userDocSnap.exists()) {
-                this.profileData = userDocSnap.data();
-
-                if (this.profileData.profilePictureUrl) {
-                  this.profileData.profilePicture = await this.getProfilePictureUrl(
-                    this.profileData.profilePictureUrl
-                  );
-                }
-
-                const nannyDocRef = doc(db, "NANNY", nannyId);
-                const nannyDocSnap = await getDoc(nannyDocRef);
-
-                if (nannyDocSnap.exists()) {
-                  this.profileData = {
-                    ...this.profileData,
-                    ...nannyDocSnap.data()
-                  };
-                } else {
-                  this.error = "No nanny data found.";
-                }
-              } else {
-                this.error = "No user data found";
-              }
-            } catch (error) {
-              this.error = "Error fetching profile data";
-              console.error("Error fetching profile data:", error);
             }
-          },
-          async getProfilePictureUrl(filePath) {
+        });
+    },
+
+    methods: {
+        async fetchNannyProfile(nannyId) {
+            try {
+                const userDocRef = doc(db, "USER", nannyId);
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    this.profileData = userDocSnap.data();
+
+                    if (this.profileData.profilePictureUrl) {
+                        this.profileData.profilePicture = await this.getProfilePictureUrl(
+                            this.profileData.profilePictureUrl
+                        );
+                    }
+
+                    const nannyDocRef = doc(db, "NANNY", nannyId);
+                    const nannyDocSnap = await getDoc(nannyDocRef);
+
+                    if (nannyDocSnap.exists()) {
+                        this.profileData = {
+                            ...this.profileData,
+                            ...nannyDocSnap.data()
+                        };
+                    } else {
+                        this.error = "No nanny data found.";
+                    }
+                } else {
+                    this.error = "No user data found";
+                }
+            } catch (error) {
+                this.error = "Error fetching profile data";
+                console.error("Error fetching profile data:", error);
+            }
+        },
+
+        async getProfilePictureUrl(filePath) {
             const storageRef = ref(storage, filePath);
             return await getDownloadURL(storageRef);
-          },
-          async startChat() {
+        },
+
+        async startChat() {
             try {
-              const currentUser = await getCurrentUser();
-              const chatData = {
-                to_user_id: this.nannyId,
-                from_user_id: currentUser.uid,
-                timestamp: new Date(),
-                message: "Hi, I'm interested in connecting with you regarding childcare services."
-              };
-              
-              await addDoc(collection(db, "CHATS"), chatData);
-              window.location.href = `parent_chat.html?nannyId=${this.nannyId}&autoSelect=true`;
+                const currentUser = await getCurrentUser();
+                const chatData = {
+                    to_user_id: this.nannyId,
+                    from_user_id: currentUser.uid,
+                    timestamp: new Date(),
+                    message: "Hi, I'm interested in connecting with you regarding childcare services."
+                };
+                
+                await addDoc(collection(db, "CHATS"), chatData);
+                window.location.href = `parent_chat.html?nannyId=${this.nannyId}&autoSelect=true`;
             } catch (error) {
-              console.error("Error starting chat:", error);
-              alert("Failed to start chat. Please try again.");
+                console.error("Error starting chat:", error);
+                alert("Failed to start chat. Please try again.");
             }
-          }
+        },
+
+        async fetchNannyCompletedJobs() {
+            try {
+                console.log("Fetching completed jobs for nanny:", this.nannyId);
+                const postsCollection = collection(db, "POSTS");
+                const querySnapshot = await getDocs(postsCollection);
+                
+                const allPosts = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    jobId: doc.id,
+                    ...doc.data()
+                }));
+                console.log("All posts:", allPosts);
+
+                // Filter for completed jobs
+                this.completedJobs = allPosts
+                    .filter(post => {
+                        const isNannyJob = post.nanny_id === this.nannyId;
+                        const isCompleted = post.completed === true;
+                        const isInactive = post.status === false;
+
+                        console.log(`Post ${post.id} check:`, {
+                            nanny_id: post.nanny_id,
+                            expectedNannyId: this.nannyId,
+                            isNannyJob,
+                            completed: post.completed,
+                            isCompleted,
+                            status: post.status,
+                            isInactive
+                        });
+
+                        return isNannyJob && isCompleted && isInactive;
+                    })
+                    .map(post => ({
+                        ...post,
+                        formattedDate: this.formatDate(post.date)
+                    }))
+                    .sort((a, b) => {
+                        const dateA = new Date(a.date);
+                        const dateB = new Date(b.date);
+                        return dateB - dateA;
+                    });
+
+                console.log("Filtered completed jobs:", this.completedJobs);
+            } catch (error) {
+                console.error("Error fetching completed jobs:", error);
+            }
+        },
+
+        formatDate(date) {
+            if (date && typeof date === 'string') {
+                const [year, month, day] = date.split('-');
+                return `${day}/${month}/${year}`;
+            }
+            return "";
         }
-      }).mount("#app");
-    </script>
+    }
+}).mount("#app");
+</script>
 
 <script type="module">
     import { auth, db } from "./backend/firebase-config.js";
