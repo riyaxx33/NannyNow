@@ -1,157 +1,202 @@
 <style>
-  body {
-    font-family: "Poppins", sans-serif;
-  }
+body {
+  font-family: "Poppins", sans-serif;
+}
 
+.navbar {
+  height: 100px;
+  position: fixed;
+  width: 100%;
+  z-index: 10000;
+  background: white;
+  transition: height 0.3s ease;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.navbar-brand img {
+  max-height: 40px;
+  margin-right: 10px;
+}
+
+.nav-link {
+  color: #333 !important;
+  font-weight: 500;
+  padding: 8px 16px !important;
+  margin: 0 5px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background: linear-gradient(45deg, #333, #666);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 80%;
+}
+
+.nav-link:hover {
+  color: #000 !important;
+  transform: translateY(-2px);
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 10px;
+  z-index: 10000;
+}
+
+.dropdown-item {
+  font-weight: 500;
+  padding: 8px 20px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateX(5px);
+}
+
+.navbar-toggler {
+  border: none;
+  padding: 0;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+/* Login and Signup specific styles */
+.login-signup-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.login-link,
+.signup-btn {
+  color: #333 !important;
+  font-weight: 500;
+  padding: 8px 16px !important;
+  margin: 0 5px;
+  position: relative;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.signup-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding-right: 28px !important; /* Make room for dropdown arrow */
+}
+
+/* Remove default dropdown arrow */
+.dropdown-toggle::after {
+  display: none;
+}
+
+/* Custom dropdown arrow */
+.signup-btn::before {
+  content: "▼";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8em;
+  transition: all 0.3s ease;
+}
+
+/* Hover line effect for login */
+.login-link::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background: linear-gradient(45deg, #333, #666);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.login-link:hover::after {
+  width: 80%;
+}
+
+/* Hover line effect for signup */
+.signup-btn::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background: linear-gradient(45deg, #333, #666);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+/* Expand line and rotate arrow on hover */
+.signup-btn:hover::after,
+.dropdown.show .signup-btn::after {
+  width: 80%;
+}
+
+.signup-btn:hover::before,
+.dropdown.show .signup-btn::before {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Mobile responsive styles */
+@media (max-width: 991.98px) {
   .navbar {
-    height: 100px;
-    position: fixed;
-    width: 100%;
-    z-index: 10000;
-    background: white;
-    transition: height 0.3s ease;
-  }
-
-  .navbar-brand {
-    font-weight: 600;
-    font-size: 1.5rem;
+    height: 70px;
   }
 
   .navbar-brand img {
-    max-height: 40px;
-    margin-right: 10px;
+    max-height: 30px;
   }
 
-  .nav-link {
-    color: #333 !important;
-    font-weight: 500;
-    padding: 8px 16px !important;
-    margin: 0 5px;
-    position: relative;
-    transition: all 0.3s ease;
-  }
-
-  .nav-link::after {
-    content: "";
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: 0;
-    left: 50%;
-    background: linear-gradient(45deg, #333, #666);
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-  }
-
-  .nav-link:hover::after,
-  .nav-link.active::after {
-    width: 80%;
-  }
-
-  .nav-link:hover {
-    color: #000 !important;
-    transform: translateY(-2px);
-  }
-
-  .dropdown-menu {
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  .navbar-collapse {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 20px;
     border-radius: 12px;
-    padding: 10px;
-    z-index: 10000;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
-  .dropdown-item {
-    font-weight: 500;
-    padding: 8px 20px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-  }
-
-  .dropdown-item:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    transform: translateX(5px);
-  }
-
-  .navbar-toggler {
-    border: none;
-    padding: 0;
-  }
-
-  .navbar-toggler:focus {
-    box-shadow: none;
-  }
-
-  /* Login and Signup specific styles */
   .login-signup-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .login-link,
   .signup-btn {
-    color: #333 !important;
-    font-weight: 500;
-    padding: 8px 16px !important;
-    margin: 0 5px;
-    position: relative;
-    transition: all 0.3s ease;
-    text-decoration: none;
+    width: 100%;
+    padding: 12px 16px !important;
   }
-
+  
   .signup-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
+    padding-right: 32px !important;
   }
-
-  .login-link::after,
-  .signup-btn::after {
-    content: "";
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: 0;
-    left: 50%;
-    background: linear-gradient(45deg, #333, #666);
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-  }
-
-  .login-link:hover::after,
-  .signup-btn:hover::after {
-    width: 80%;
-  }
-
-  @media (max-width: 991.98px) {
-    .navbar {
-      height: 70px;
-    }
-
-    .navbar-brand img {
-      max-height: 30px;
-    }
-
-    .navbar-collapse {
-      background-color: rgba(255, 255, 255, 0.95);
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .login-signup-container {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .login-link,
-    .signup-btn {
-      width: 100%;
-      padding: 12px 16px !important;
-    }
-  }
+}
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-light fixed-top">
@@ -189,7 +234,7 @@
             <li>
               <a class="dropdown-item" href="parent_signup.html">Parent</a>
             </li>
-            <li>
+            <li> 
               <a class="dropdown-item" href="nanny_signup.html">Nanny</a>
             </li>
           </ul>
