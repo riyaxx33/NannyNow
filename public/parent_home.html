@@ -308,7 +308,7 @@
           position: fixed;
           bottom: 20px;
           right: 20px;
-          background: #007bff;
+          background: #6c5ce7;
           color: white !important;
           padding: 10px 20px;
           border-radius: 5px;
@@ -321,7 +321,7 @@
         }
 
         .back-to-nanny:hover {
-          background: #0056b3;
+          background: #6c5ce7;
           text-decoration: none;
         }
     }
@@ -511,12 +511,11 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <a class="back-to-nanny" v-if="selectedNanny" @click.prevent="closeDetails">
-      <i class="fas fa-arrow-left"></i> Back to List
-    </a>
-    
+      <a href="#" class="back-to-nanny" v-if="selectedNanny" @click.prevent="closeDetails">
+        <i class="fas fa-arrow-left"></i> Back to List
+      </a>
+    </div>
 
     <script type="module">
       import {
