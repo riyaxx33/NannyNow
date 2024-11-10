@@ -410,12 +410,17 @@
 
           <div v-if="selectedNanny">
             <div class="d-flex align-items-start gap-4 mb-4">
-              <img
-                :src="selectedNanny.profilePictureUrl || '/api/placeholder/100/100'"
-                :alt="selectedNanny.firstName + ' ' + selectedNanny.lastName"
-                class="rounded-circle"
-                style="width: 100px; height: 100px; object-fit: cover; border:none;"
-              />
+              <a 
+                :href="`parent_displaynannyprofile.html?id=${selectedNanny.id}`"
+                style="text-decoration: none;"
+              >
+                <img
+                  :src="selectedNanny.profilePictureUrl || '/api/placeholder/100/100'"
+                  :alt="selectedNanny.firstName + ' ' + selectedNanny.lastName"
+                  class="rounded-circle"
+                  style="width: 100px; height: 100px; object-fit: cover; border:none; cursor: pointer;"
+                />
+              </a>
               
               <div>
                 <h2 class="text-4xl font-bold mb-2">{{ selectedNanny.firstName }} {{ selectedNanny.lastName }}</h2>
@@ -581,10 +586,6 @@ const fetchNannies = async () => {
 
     nannies.value = nannyData;
 
-    // Automatically select the first nanny if there are any nannies
-    if (nannyData.length > 0) {
-      selectedNanny.value = nannyData[0];
-    }
 
     console.log("Fetched nannies:", nannyData);
   } catch (error) {
@@ -612,21 +613,9 @@ const fetchNannies = async () => {
                 status: "sent",
               };
 
-              // Add the document to the CHATS collection
-              const chatRef = await addDoc(collection(db, "CHATS"), chatData);
+            // Redirect to chat page instead of showing alert
+            window.location.href = `parent_chat.html?nannyId=${selectedNanny.value.id}&autoSelect=true`;
 
-              // Optionally, you can update the document after creation to confirm the server timestamp
-              const chatDoc = await getDoc(chatRef);
-              if (chatDoc.exists()) {
-                const serverTime = chatDoc.data().timestamp;
-                if (serverTime) {
-                  await updateDoc(chatRef, {
-                    confirmedTimestamp: serverTime.toDate().toISOString(),
-                  });
-                }
-              }
-
-              alert("Message sent successfully!");
             } catch (error) {
               console.error("Error sending message:", error);
               alert("Failed to send message. Please try again.");
