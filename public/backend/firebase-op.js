@@ -303,22 +303,34 @@ export async function updateExpiredPosts() {
   try {
     const postsCollection = collection(db, "POSTS");
     const postSnapshot = await getDocs(postsCollection);
-    const today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
+    const now = new Date(); // Current date and time
+    const today = now.toISOString().split('T')[0]; // Today's date in YYYY-MM-DD
 
-    const batch = writeBatch(db); // Use batch write for better performance
+    const batch = writeBatch(db);
     let updateCount = 0;
 
     postSnapshot.docs.forEach((doc) => {
       const data = doc.data();
-      // Check if post date has passed and status is still true
-      if (data.status && data.date < today) {
-        const postRef = doc.ref;
-        batch.update(postRef, { status: false });
-        updateCount++;
+      
+      if (data.status) { // Only check active posts
+        const postDate = data.date; // YYYY-MM-DD
+        const postEndTime = data.endTime; // HH:mm format
+        
+        // Create a Date object for the post's end time
+        const [hours, minutes] = postEndTime.split(':');
+        const postDateTime = new Date(postDate);
+        postDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+        // Check if post has expired (date and time have passed)
+        if (postDateTime < now) {
+          const postRef = doc.ref;
+          batch.update(postRef, { status: false });
+          updateCount++;
+          console.log(`Post ${doc.id} expired at ${postDateTime}`);
+        }
       }
     });
 
-    // Only commit the batch if there are updates to make
     if (updateCount > 0) {
       await batch.commit();
       console.log(`Updated status for ${updateCount} expired posts`);
