@@ -1219,7 +1219,7 @@
                     </h3>
                   </div>
                   <button
-                    v-if="selectedChat && selectedChat.role === 'nanny'"
+                    v-if="selectedChat"
                     @click="handleReviewClick"
                     class="btn btn-outline-primary btn-sm ml-4"
                   >
@@ -1250,7 +1250,7 @@
                     </h3>
                   </div>
                   <button
-                    v-if="selectedChat && selectedChat.role === 'nanny'"
+                    v-if="selectedChat"
                     @click="handleReviewClick"
                     class="btn btn-outline-primary btn-sm ml-4"
                   >
@@ -1552,6 +1552,7 @@
             }
             return [...this.chats].sort((a, b) => b.timestamp - a.timestamp);
           },
+
           canSendMessage() {
             return this.newMessage.trim().length > 0;
           },
@@ -1714,14 +1715,12 @@
                   firstName: userData.firstName || "",
                   lastName: userData.lastName || "",
                   profilePictureUrl: userData.profilePictureUrl,
-                  role: userData.role, // Include the role
                 };
               }
               return {
                 firstName: "Unknown",
                 lastName: "User",
                 profilePictureUrl: "/api/placeholder/40/40",
-                role: "unknown",
               };
             } catch (error) {
               console.error("Error fetching user details:", error);
@@ -1729,7 +1728,6 @@
                 firstName: "Unknown",
                 lastName: "User",
                 profilePictureUrl: "/api/placeholder/40/40",
-                role: "unknown",
               };
             }
           },
@@ -1739,55 +1737,65 @@
             if (!user) return;
 
             this.currentUserId = user.uid;
+
             // Get current user's details including profile picture
             const currentUserDetails = await this.getUserDetails(
               this.currentUserId
             );
             this.currentUserProfilePic = currentUserDetails.profilePictureUrl;
 
-            // Define the handler function first
+            // Define the handler function
             const handleSnapshot = async (snapshot) => {
-              const chatMap = new Map(
-                this.chats.map((chat) => [chat.userId, chat])
-              );
+              const chatMap = new Map();
+              const processedMessages = new Map();
 
+              // Track the latest message for each chat
               for (const doc of snapshot.docs) {
                 const data = doc.data();
                 const otherUserId =
                   data.from_user_id === this.currentUserId
                     ? data.to_user_id
                     : data.from_user_id;
-
-                const existingChat = chatMap.get(otherUserId);
                 const messageTimestamp = data.timestamp?.seconds
                   ? data.timestamp.seconds * 1000
-                  : data.timestamp;
+                  : data.timestamp || 0;
 
+                // Check if this is the latest message for this chat
                 if (
-                  !existingChat ||
-                  existingChat.timestamp < messageTimestamp
+                  !processedMessages.has(otherUserId) ||
+                  processedMessages.get(otherUserId).timestamp <
+                    messageTimestamp
                 ) {
-                  // Get user details from USER collection
-                  const userDetails = await this.getUserDetails(otherUserId);
-
-                  chatMap.set(otherUserId, {
-                    userId: otherUserId,
-                    firstName: userDetails.firstName,
-                    lastName: userDetails.lastName,
-                    profilePictureUrl: userDetails.profilePictureUrl,
+                  processedMessages.set(otherUserId, {
                     lastMessage: data.message,
                     timestamp: messageTimestamp,
                   });
                 }
               }
 
+              // Process each unique chat
+              for (const [otherUserId, messageData] of processedMessages) {
+                // Get user details from USER collection
+                const userDetails = await this.getUserDetails(otherUserId);
+                chatMap.set(otherUserId, {
+                  userId: otherUserId,
+                  firstName: userDetails.firstName,
+                  lastName: userDetails.lastName,
+                  profilePictureUrl: userDetails.profilePictureUrl,
+                  lastMessage: messageData.lastMessage,
+                  timestamp: messageData.timestamp,
+                  role: userDetails.role,
+                });
+              }
+
+              // Convert chatMap to array and sort by timestamp
               this.chats = Array.from(chatMap.values()).sort(
                 (a, b) => b.timestamp - a.timestamp
               );
               this.originalChats = [...this.chats];
             };
 
-            // Create two listeners - one for sent messages and one for received messages
+            // Create listeners for sent and received messages
             const sentMessagesUnsubscribe = db
               .collection("CHATS")
               .where("from_user_id", "==", this.currentUserId)
@@ -1869,6 +1877,11 @@
               message: this.newMessage,
               timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Use server timestamp
             });
+
+            // Reset textarea height after sending
+            if (this.$refs.messageInput) {
+              this.$refs.messageInput.style.height = "auto";
+            }
 
             this.newMessage = "";
             await this.loadChatMessages();
