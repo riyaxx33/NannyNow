@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>Nanny Post Job</title>
+    <title>Parent Post Job</title>
     <style>
       body {
         padding-top: 100px;
@@ -103,12 +103,13 @@
       .post-title h5 {
         margin: 0;
         font-size: 1.1rem;
+        color: #6c5ce7;
       }
 
       .post-content {
         padding: 15px 0;
-        border-top: 1px solid #dee2e6;
-        border-bottom: 1px solid #dee2e6;
+        border-top: 1px solid rgba(108, 92, 231, 0.1);
+        border-bottom: 1px solid rgba(108, 92, 231, 0.1);
         margin-bottom: 15px;
       }
 
@@ -155,53 +156,107 @@
         font-family: "Poppins", sans-serif;
       }
 
+      .modal-header {
+        border-bottom: 1px solid rgba(108, 92, 231, 0.1);
+      }
+
+      .modal-footer {
+        border-top: 1px solid rgba(108, 92, 231, 0.1);
+      }
+
+      .card-header {
+        background-color: #6c5ce7 !important;
+        padding: 1rem 1.5rem;
+        border-radius: 16px 16px 0 0 !important;
+        margin-bottom: 0;
+        width: 100%;
+        color: white;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+      }
+
+      .card-header h5 {
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin: 0;
+        color: white !important;
+      }
+
       #submit {
         font-family: "Poppins", sans-serif;
         background-color: #6c5ce7;
         color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+      }
+
+      #submit:hover {
+        background-color: #5a4bd1;
+      }
+
+      /* Updated Tab Styles */
+      .nav-tabs {
+        border-bottom: 2px solid rgba(108, 92, 231, 0.1);
+        margin-bottom: 30px;
       }
 
       .nav-tabs .nav-link {
         font-family: "Poppins", sans-serif;
         color: #666;
-        border: 1px solid transparent;
-        margin-bottom: -1px;
-        padding: 0.5rem 1rem;
+        border: none;
+        margin-bottom: -2px;
+        padding: 0.8rem 1.5rem;
         cursor: pointer;
+        transition: all 0.3s ease;
       }
 
       .nav-tabs .nav-link.active {
-        color: #495057;
-        background-color: #fff;
-        border-color: #dee2e6 #dee2e6 #fff;
+        color: #6c5ce7;
+        background-color: transparent;
+        border-bottom: 2px solid #6c5ce7;
       }
 
       .nav-tabs .nav-link:hover:not(.active) {
-        border-color: #e9ecef #e9ecef #dee2e6;
+        color: #6c5ce7;
+        background-color: rgba(108, 92, 231, 0.05);
       }
 
+      /* Updated Badge Styles */
       .badge {
         font-family: "Poppins", sans-serif;
-        padding: 8px 12px;
-        border-radius: 4px;
+        padding: 6px 12px;
+        border-radius: 12px;
         font-size: 0.85em;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        border: 1px solid transparent;
+        background-color: rgba(108, 92, 231, 0.1);
+        backdrop-filter: blur(4px);
       }
 
       .badge-expired {
-        background-color: #6c757d;
+        background-color: rgba(255, 107, 107, 0.1);
+        color: #ff6b6b;
+        border-color: rgba(255, 107, 107, 0.2);
       }
 
       .badge-completed {
-        background-color: #198754;
+        background-color: rgba(46, 213, 115, 0.1);
+        color: #2ed573;
+        border-color: rgba(46, 213, 115, 0.2);
       }
 
       .badge-active {
-        background-color: #0d6efd;
+        background-color: rgba(108, 92, 231, 0.1);
+        color: #6c5ce7;
+        border-color: rgba(108, 92, 231, 0.2);
       }
 
       .badge-upcoming {
-        background-color: #ffc107;
-        color: #000;
+        background-color: rgba(255, 159, 67, 0.1);
+        color: #ff9f43;
+        border-color: rgba(255, 159, 67, 0.2);
       }
 
       @media (max-width: 768px) {
@@ -377,7 +432,10 @@
         <div v-for="post in filteredPosts" :key="post.id" class="post-item">
           <div class="post-header">
             <div class="post-title">
-              <h5>Job ID: {{ post.jobId }}</h5>
+              <h5>
+                <span class="job-id-label">Job ID: </span>
+                <span class="job-id-value">{{ post.jobId }}</span>
+              </h5>
               <span :class="getStatusBadgeClass(post)" class="badge">
                 {{ getStatusLabel(post) }}
               </span>
