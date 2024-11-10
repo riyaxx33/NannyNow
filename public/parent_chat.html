@@ -1777,7 +1777,6 @@
                     profilePictureUrl: userDetails.profilePictureUrl,
                     lastMessage: data.message,
                     timestamp: messageTimestamp,
-                    role: userDetails.role, // Include the role
                   });
                 }
               }
@@ -1808,6 +1807,9 @@
           async selectChat(chat) {
             this.selectedChat = chat;
             await this.loadChatMessages();
+            if (this.isMobileView) {
+              this.isSidebarOpen = false;
+            }
           },
           async loadChatMessages() {
             if (!this.selectedChat) return;
