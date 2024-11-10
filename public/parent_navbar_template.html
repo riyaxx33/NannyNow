@@ -27,11 +27,14 @@
   }
 
   .brand-text {
-    background: linear-gradient(45deg, #333, #666);
+    background: linear-gradient(45deg, #6366f1, #8b5cf6);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-  }
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-left: 1.5rem;
+}
 
   .nav-link {
     color: #333 !important;
@@ -117,8 +120,8 @@
       <div class="container">
         <a class="navbar-brand" href="parent_home.html">
           <img src="img/nany_logo.png" alt="Nanny logo" />
-          <span class="brand-text">Parent</span>
-        </a>
+      </a>
+      <span class="brand-text ms-3" id="brandText"></span>
 
         <button
           class="navbar-toggler"
