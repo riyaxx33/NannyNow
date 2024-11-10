@@ -231,7 +231,6 @@
         </div>
 
         <!-- Personal Information Section -->
-        <!-- Personal Information Section -->
         <div class="profile-section">
           <h2 class="section-title">Personal Information</h2>
           <div class="row">
@@ -243,8 +242,45 @@
             </div>
           </div>
         </div>
+
+        <!-- REVIEW SECTION -->
+        <div class="profile-section">
+          <h2 class="section-title">Reviews</h2>
+          <div class="row">
+            <div class="col-md-3 text-center">
+              <h1 class="display-4 fw-bold" v-if="averageRating">{{ averageRating.toFixed(2) }}</h1>
+              <div class="text-muted">
+                <span v-if="reviews.length === 1">({{ reviews.length }} Review)</span>
+                <span v-else>({{ reviews.length }} Reviews)</span>
+              </div>
+              <div class="mt-2">
+                <span v-for="i in 5" :key="i" class="fs-5">
+                  <span v-if="i <= Math.round(averageRating)" style="color: #14B8A6;">★</span>
+                  <span v-else style="color: #D1D5DB;">★</span>
+                </span>
+              </div>
+            </div>
+            <div class="col-md-9">
+              <div v-for="review in reviews" :key="review.id" class="mb-4">
+                <div class="d-flex align-items-center mb-2">
+                  <h5 class="mb-0">{{ review.reviewerName }}</h5>
+                  <span class="ms-3 text-muted">· {{ formatTimeAgo(review.timestamp) }}</span>
+                </div>
+                <div class="mb-2">
+                  <span v-for="i in 5" :key="i">
+                    <span v-if="i <= review.rating" style="color: #14B8A6;">★</span>
+                    <span v-else style="color: #D1D5DB;">★</span>
+                  </span>
+                </div>
+                <p class="mb-0">{{ review.remark }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
+    
 
     <script type="module">
       import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
@@ -257,7 +293,7 @@
       } from "./backend/auth.js";
       import {
         doc,
-        getDoc,
+        getDoc, collection, query, where, getDocs
       } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
       import {
         getStorage,
@@ -271,6 +307,9 @@
             profileData: null,
             loading: true,
             error: null,
+            reviews: [],
+            averageRating: 0,
+            userId: null, 
           };
         },
         created() {
@@ -287,7 +326,9 @@
                       "Access denied. This page is for nannies only.";
                     return;
                   }
+                  this.userId = user.uid;
                   await this.fetchUserProfile(user.uid);
+                  await this.fetchReviews();
                 } catch (error) {
                   this.error = "Error: " + error.message;
                 }
@@ -307,17 +348,16 @@
 
                 // Fetch and set profile picture from Firebase Storage
                 if (this.profileData.profilePictureUrl) {
-                  this.profileData.profilePicture =
-                    await this.getProfilePictureUrl(
-                      this.profileData.profilePictureUrl
-                    );
+                  this.profileData.profilePicture = await this.getProfilePictureUrl(
+                    this.profileData.profilePictureUrl
+                  );
                 }
               } else {
                 this.error = "No user data found";
                 return;
               }
 
-              // Fetch PARENT-specific data
+              // Fetch NANNY-specific data
               const role = await getUserRole(userId);
 
               if (role === "nanny") {
@@ -325,7 +365,7 @@
                 const nannyDocSnap = await getDoc(nannyDocRef);
 
                 if (nannyDocSnap.exists()) {
-                  // Merge parent-specific data
+                  // Merge nanny-specific data
                   this.profileData = {
                     ...this.profileData,
                     ...nannyDocSnap.data(),
@@ -337,6 +377,64 @@
             } catch (error) {
               this.error = "Error fetching profile data";
               console.error("Error fetching profile data:", error);
+            }
+          },
+          async fetchReviews() {
+            try {
+              const reviewsCollection = collection(db, "REVIEWS");
+              const q = query(reviewsCollection, where("to_userID", "==", this.userId));
+              const reviewsSnapshot = await getDocs(q);
+              
+              const reviewPromises = reviewsSnapshot.docs.map(async (reviewDoc) => {
+                const reviewData = reviewDoc.data();
+                
+                // Fetch reviewer's name from USER collection
+                const userDocRef = doc(db, "USER", reviewData.from_userID);
+                const userDocSnap = await getDoc(userDocRef);
+                const userData = userDocSnap.data();
+                
+                return {
+                  id: reviewDoc.id,
+                  reviewerName: `${userData.firstName} ${userData.lastName}`,
+                  rating: reviewData.rating,
+                  remark: reviewData.remark,
+                  timestamp: reviewData.timestamp.toDate(),
+                };
+              });
+              
+              this.reviews = await Promise.all(reviewPromises);
+              
+              // Calculate average rating
+              if (this.reviews.length > 0) {
+                const totalRating = this.reviews.reduce((sum, review) => sum + review.rating, 0);
+                this.averageRating = totalRating / this.reviews.length;
+              }
+              
+              // Sort reviews by timestamp (newest first)
+              this.reviews.sort((a, b) => b.timestamp - a.timestamp);
+              
+            } catch (error) {
+              console.error("Error fetching reviews:", error);
+              this.error = "Error loading reviews";
+            }
+          },
+
+          formatTimeAgo(date) {
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+            const diffMinutes = Math.floor(diffTime / (1000 * 60));
+            
+            if (diffDays > 30) {
+              const months = Math.floor(diffDays / 30);
+              return `${months} month${months > 1 ? 's' : ''} ago`;
+            } else if (diffDays > 0) {
+              return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            } else if (diffHours > 0) {
+              return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            } else {
+              return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
             }
           },
           async getProfilePictureUrl(filePath) {
