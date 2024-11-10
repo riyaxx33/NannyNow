@@ -1269,13 +1269,6 @@
             let detailsHTML = `
               <h5>About:</h5>
               <p>${parentDetails.aboutMe || "No information provided"}</p>
-              <h5>Job Details:</h5>
-              <p>
-                Job ID: ${postId}<br>
-                Date: ${new Date(postData.date).toLocaleDateString()}<br>
-                Time: ${postData.startTime} - ${postData.endTime}<br>
-                Expected Pay: $${postData.pay}/hr
-              </p>
             `;
 
             // Add children information
@@ -1301,6 +1294,13 @@
 
             // Update description section
             let descriptionHTML = `
+                <h5>Job Details:</h5>
+              <p>
+                Job ID: ${postId}<br>
+                Date: ${new Date(postData.date).toLocaleDateString()}<br>
+                Time: ${postData.startTime} - ${postData.endTime}<br>
+                Expected Pay: $${postData.pay}/hr
+              </p>
                 <h5>Job Description:</h5>
                 <p>${postData.description}</p>
             `;

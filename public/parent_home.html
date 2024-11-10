@@ -270,9 +270,6 @@
       .remove-filter:hover {
         color: #5849c4;
       }
-      .details{
-        color: #6c5ce7;
-      }
       .col-md-6 {
         transition: all 0.3s ease;
       }
@@ -473,38 +470,53 @@
           <div class="col-md-6" id="detailsContainer" :class="{ 'show': selectedNanny }">
             <div v-if="selectedNanny">
               <div class="d-flex align-items-start gap-4 mb-4">
-                <a 
-                  :href="`parent_displaynannyprofile.html?id=${selectedNanny.id}`"
-                  style="text-decoration: none;"
-                >
-                  <img
-                    :src="selectedNanny.profilePictureUrl || '/api/placeholder/100/100'"
-                    :alt="selectedNanny.firstName + ' ' + selectedNanny.lastName"
-                    class="rounded-circle"
-                    style="width: 100px; height: 100px; object-fit: cover; border:none; cursor: pointer;"
-                  />
-                </a>
-                
+              <a
+                :href="`parent_displaynannyprofile.html?id=${selectedNanny.id}`"
+                style="text-decoration: none;"
+              >
+                <img
+                  :src="selectedNanny.profilePictureUrl || '/api/placeholder/100/100'"
+                  :alt="selectedNanny.firstName + ' ' + selectedNanny.lastName"
+                  class="rounded-circle"
+                  style="width: 100px; height: 100px; object-fit: cover; border:none; cursor: pointer;"
+                />
+              </a>
+              
+              <div class="d-flex justify-content-between flex-grow-1">
                 <div>
-                  <h2 class="text-4xl font-bold mb-2">{{ selectedNanny.firstName }} {{ selectedNanny.lastName }}</h2>
-                  <div class="text-xl text-gray-600">
-                    <span class="details">{{ selectedNanny.gender.charAt(0).toUpperCase() + selectedNanny.gender.slice(1) }} | {{ calculateAge(selectedNanny.dob) }} years old</span>
-                  </div>
-                  <div class="chat-button-container">
-                    <button 
-                      class="chat-button"
-                      @click="sendMessage"
-                      :disabled="!currentUserId || !selectedNanny">
-                      Chat Now
-                    </button>
+                  <h2 class="text-4xl font-bold mb-2" style="color: #6c5ce7">
+                    {{ selectedNanny.firstName }} {{ selectedNanny.lastName }}
+                  </h2>
+                  <div class="text-xl" style="color: #666">
+                    <span class="details">
+                      {{ selectedNanny.gender.charAt(0).toUpperCase() + selectedNanny.gender.slice(1) }} 
+                      | {{ calculateAge(selectedNanny.dob) }} years old
+                    </span>
                   </div>
                 </div>
+                
+                <div class="chat-button-container">
+                  <button
+                    class="chat-button"
+                    @click="sendMessage"
+                    :disabled="!currentUserId || !selectedNanny">
+                    Chat Now
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="nanny-details" style="margin-top: 12px;">
+              <div class="experience-section" style="margin-bottom: 12px;">
+                <span style="color: #6c5ce7; font-size: 1rem; display: block; margin-bottom: 4px;">Experience:</span>
+                <p style="margin: 0; font-size: 0.95rem;">{{ selectedNanny.yrsExperience || 'N/A' }} years</p>
               </div>
               
-              <div class="mt-2">
-                <p>Experience: {{ selectedNanny.yrsExperience || 'N/A' }} years<br>
-                  About Me: {{ selectedNanny.description }}</p>
+              <div class="about-section">
+                <span style="color: #6c5ce7; font-size: 1rem; display: block; margin-bottom: 4px;">About Me:</span>
+                <p style="margin: 0; font-size: 0.95rem; line-height: 1.4; max-width: 800px;">{{ selectedNanny.description }}</p>
               </div>
+            </div>
             </div>
             <div v-else>
               <p>Select a nanny to view details</p>
