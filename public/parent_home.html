@@ -113,17 +113,27 @@
       }
 
       .search-bar {
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        font-family: "Poppins", sans-serif;
-        height: 30px;
+          display: flex;
+          gap: 15px;
+          align-items: center;
+          font-family: "Poppins", sans-serif;
+          /* Remove fixed height to allow flexibility */
+          flex-wrap: wrap; /* Add this to allow wrapping on smaller screens */
       }
 
-      .search-input-group{
-        border: 1px solid #6c5ce7;
-        border-radius: 6px;
-        height: 45px;
+      .search-input-group {
+          border: 1px solid #6c5ce7;
+          border-radius: 6px;
+          flex-grow: 1;
+          position: relative;
+      }
+
+      .search-input {
+          padding-left: 40px;
+          border-radius: 6px;
+          border: 1px solid #6c5ce7;
+          height: 45px;
+          width: 100%; /* Add this to ensure input fills the container */
       }
 
       .search-input-group {
@@ -136,14 +146,6 @@
         left: 15px;
         top: 50%;
         transform: translateY(-50%);
-        color: #6c5ce7;
-      }
-
-      .search-input {
-        padding-left: 40px;
-        border-radius: 6px;
-        border: 1px solid #6c5ce7;
-        height: 45px;
       }
 
       .filter-dropdown {
