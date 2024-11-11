@@ -463,9 +463,11 @@
                 message: "Hi, I'm interested in connecting with you regarding childcare."
               };
               
-              await addDoc(collection(db, "CHATS"), chatData);
-              alert("Chat initiated successfully!");
-              window.location.href = "nanny_chat.html";
+              // Add the chat and get the chat document reference
+              const chatRef = await addDoc(collection(db, "CHATS"), chatData);
+              
+              // Redirect to chat page with chat ID as URL parameter
+              window.location.href = `nanny_chat.html?chatId=${chatRef.id}&userId=${this.parentId}`;
             } catch (error) {
               console.error("Error starting chat:", error);
               alert("Failed to start chat. Please try again.");
