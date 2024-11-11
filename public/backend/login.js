@@ -6,7 +6,7 @@ const errorMsg = document.getElementById("error");
 
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
+ 
   // Get user input
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
