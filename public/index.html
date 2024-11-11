@@ -11,7 +11,34 @@
             color: #000;
             transition: color 0.3s ease;
         } 
+/* Add these CSS rules to your existing styles */
+.navbar .login,
+.navbar .btn-signup {
+    transition: color 0.3s ease;
+}
 
+.navbar.move .login,
+.navbar.move .btn-signup {
+    color: white !important;
+}
+
+/* Update dropdown styles for night mode */
+.navbar.move .dropdown-menu {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.navbar.move .dropdown-item {
+    color: white;
+}
+
+.navbar.move .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Update navbar toggler for night mode */
+.navbar.move .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
         /* Add new styles for color change on scroll */
         @media (min-width: 300px) {
             .tagline-container.night-mode .tagline,
@@ -291,7 +318,7 @@
     padding: 0.5rem;
     margin-bottom: 1rem;
 }
-
+ 
 .btn-login {
     background-color: #7952EC ;
     color: white;
@@ -976,6 +1003,11 @@ onAuthStateChanged(auth, async (user) => {
             } else {
                 navbar.classList.remove('scrolled');
             }
+            if (scrollProgress > 0.7) {
+        navbar.classList.add('move');
+    } else {
+        navbar.classList.remove('move');
+    }
         });
     </script>
 
