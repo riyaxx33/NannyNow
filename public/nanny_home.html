@@ -431,50 +431,110 @@
         padding-left: 15px;
       }
 
-      @media (max-width: 576px) {
-        .col-md-6 {
-          width: 100%;
-        }
+      @media (max-width: 768px) {
+        /* Adjust container padding */
+    .container {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin-top: 100px !important; /* Adjust based on your navbar height */
 
-        body.details-visible .search-container {
-          display: none;
-        }
+    }
 
-        #detailsContainer {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          z-index: 1000;
-          height: 100vh;
-          margin-top: 0;
-          display: none;
-        }
+    /* Adjust column width and padding */
+    .col-md-6 {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 
-        #detailsContainer.show {
-          display: block;
-        }
+    /* Adjust job card styles */
+    .job-card {
+        margin: 10px 0;
+        width: 100% !important;
+        border-left: none;
+        border-right: none;
+        border-radius: 0;
+    }
 
-        #detailsContainer.show ~ .search-container,
-        #detailsContainer.show ~ .container .search-container {
-          display: none;
-        }
+    /* Adjust list group styles */
+    .list-group {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    #detailsContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        background: white;
+        padding: 20px;
+        overflow-y: auto;
+        display: none;
+        height: 100vh;
+        margin-top: 0;
+    }
 
-        .list-group {
-          height: calc(100vh - 100px);
-          max-height: none;
-        }
+    #detailsContainer.show {
+        display: block;
+    }
 
-        #backToPostBtn.show {
-          display: block;
-        }
-        #backToPostBtn.show {
-          display: block;
-        }
-      }
+    .job-card {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+        width: 100% ;
+    }
 
-      @media (min-width: 577px) {
+    /* Hide scrollbar on mobile */
+    #detailsContainer::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Ensure the list is scrollable on mobile */
+    .list-group {
+        height: calc(100vh - 100px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+
+    /* Hide search container when details are shown */
+    body.details-visible .search-container {
+        display: none;
+    }
+
+    /* Back button styling */
+    #backToPostBtn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1001;
+        background-color: #6c5ce7;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: none;
+    }
+
+    #backToPostBtn.show {
+        display: block;
+    }
+}
+@media (max-width: 576px) { /* sm breakpoint */
+    .container {
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+    }
+}
+
+      @media (min-width: 769px) {
         #backToPostBtn {
           display: none !important;
         }
@@ -557,7 +617,7 @@
               type="text"
               id="jobSearch"
               class="form-control"
-              placeholder="Search postID..."
+              placeholder="Search Job ID..."
               onkeyup="searchJobs()"
             />
           </div>
@@ -1056,36 +1116,44 @@
 
       // Display filtered posts
       function displayFilteredPosts(posts) {
-        const jobListContainer = document.querySelector(".list-group");
-        jobListContainer.innerHTML = "";
+    const jobListContainer = document.querySelector(".list-group");
+    jobListContainer.innerHTML = "";
 
-        posts.forEach(({ postData, parentData, postDoc }) => {
-          const profileImage = parentData.profilePictureUrl || "/api/placeholder/60/60";
-          const { firstName, lastName } = parentData;
+    posts.forEach(({ postData, parentData, postDoc }) => {
+        const profileImage = parentData.profilePictureUrl || "/api/placeholder/60/60";
+        const { firstName, lastName } = parentData;
 
-          const jobCard = document.createElement("div");
-          jobCard.className = "list-group-item job-card";
-          jobCard.onclick = () => showDetails(postData.userId, postDoc.id);
-
-          jobCard.innerHTML = `
+        const jobCard = document.createElement("div");
+        jobCard.className = "list-group-item job-card";
+        // Add data attributes to store necessary information
+        jobCard.setAttribute('data-user-id', postData.userId);
+        jobCard.setAttribute('data-post-id', postDoc.id);
+        
+        jobCard.innerHTML = `
             <div class="job-card-content">
-              <img src="${profileImage}" alt="Profile" />
-              <div class="job-description">
-                <h5>${firstName} ${lastName}</h5>
-                <p>
-                  Job ID: ${postDoc.id}<br>
-                  Date of Job: ${new Date(postData.date).toLocaleDateString()}<br>
-                  Time of Job: ${postData.startTime} - ${postData.endTime}<br>
-                  Expected Pay: $${postData.pay}/hr
-                </p>
-              </div>
+                <img src="${profileImage}" alt="Profile" />
+                <div class="job-description">
+                    <h5>${firstName} ${lastName}</h5>
+                    <p>
+                        Job ID: ${postDoc.id}<br>
+                        Date of Job: ${new Date(postData.date).toLocaleDateString()}<br>
+                        Time of Job: ${postData.startTime} - ${postData.endTime}<br>
+                        Expected Pay: $${postData.pay}/hr
+                    </p>
+                </div>
             </div>
-          `;
+        `;
 
-          jobListContainer.appendChild(jobCard);
+        // Add click event listener
+        jobCard.addEventListener('click', function() {
+            const userId = this.getAttribute('data-user-id');
+            const postId = this.getAttribute('data-post-id');
+            showDetails(userId, postId);
         });
-      }
 
+        jobListContainer.appendChild(jobCard);
+    });
+}
       // Function to calculate age from DOB
       function calculateAge(dob, gender) {
         const birthDate = new Date(dob);
@@ -1306,6 +1374,12 @@
                 document.getElementById(
                     "profileSubtext"
                 ).innerHTML = `${gender} | ${age} years old`;
+                
+                if (window.innerWidth <= 7) {
+            document.body.classList.add('details-visible');
+            detailsContainer.classList.add('show');
+            document.getElementById('backToPostBtn').classList.add('show');
+        }
 
             // Update parent details
             let detailsHTML = `
@@ -1360,7 +1434,7 @@
             const address = parentDetails.homeAddress;
             geocodeAddress(address);
 
-            if (window.innerWidth <= 576) {
+            if (window.innerWidth <= 768) {
               document.body.classList.add('details-visible');
               document.getElementById("detailsContainer").classList.add("show");
               document.getElementById("backToPostBtn").classList.add("show");  // This adds the show class
@@ -1371,11 +1445,11 @@
         }
       }
 
-      document.getElementById("backToPostBtn").addEventListener("click", () => {
-      document.body.classList.remove('details-visible');
-      document.getElementById("detailsContainer").classList.remove("show");
-      document.getElementById("backToPostBtn").classList.remove("show");
-      });
+      document.getElementById('backToPostBtn').addEventListener('click', () => {
+    document.body.classList.remove('details-visible');
+    document.getElementById('detailsContainer').classList.remove('show');
+    document.getElementById('backToPostBtn').classList.remove('show');
+});
       // Geocoding API
       function geocodeAddress(address) {
         const geocoder = new google.maps.Geocoder();
