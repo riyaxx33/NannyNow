@@ -1,5 +1,17 @@
 # Nany
 Connecting nannies and parents from day to night
+
+Login Credentials:
+Parent:
+Username: samueltan61@gmail.com 
+Password: Abc123098
+
+Nanny:
+Username: jackchan@gmail.com 
+Password: jackchan1
+
+
+
 Instructions to deploy:
 
 Option 1:

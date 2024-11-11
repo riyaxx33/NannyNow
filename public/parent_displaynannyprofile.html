@@ -238,17 +238,6 @@
           </div>
         </div>
 
-        <!-- Qualifications Section -->
-        <div class="profile-section">
-          <h2 class="section-title">Qualifications</h2>
-          <div class="row">
-            <div class="col-12">
-              <p><strong>Education Level:</strong> {{ profileData.educationLevel }}</p>
-              <p><strong>Certifications:</strong> {{ profileData.certifications }}</p>
-            </div>
-          </div>
-        </div>
-
         <!-- REVIEW SECTION -->
         <div class="profile-section">
           <h2 class="section-title">Reviews</h2>
@@ -405,38 +394,51 @@
 
           async fetchNannyProfile(nannyId) {
             try {
-              const userDocRef = doc(db, "USER", nannyId);
-              const userDocSnap = await getDoc(userDocRef);
+                const userDocRef = doc(db, "USER", nannyId);
+                const userDocSnap = await getDoc(userDocRef);
 
-              if (userDocSnap.exists()) {
-                this.profileData = userDocSnap.data();
+                if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                this.profileData = {
+                    firstName: userData.firstName,
+                    lastName: userData.lastName,
+                    email: userData.email,
+                    phoneNumber: userData.phoneNumber,
+                    dob: userData.dob,
+                    gender: userData.gender
+                };
 
-                if (this.profileData.profilePictureUrl) {
-                  this.profileData.profilePicture = await this.getProfilePictureUrl(
-                    this.profileData.profilePictureUrl
-                  );
+                // Handle profile picture
+                if (userData.profilePictureUrl) {
+                    this.profileData.profilePicture = await this.getProfilePictureUrl(
+                    userData.profilePictureUrl
+                    );
                 }
 
+                // Get additional nanny-specific data
                 const nannyDocRef = doc(db, "NANNY", nannyId);
                 const nannyDocSnap = await getDoc(nannyDocRef);
 
                 if (nannyDocSnap.exists()) {
-                  this.profileData = {
+                    const nannyData = nannyDocSnap.data();
+                    this.profileData = {
                     ...this.profileData,
-                    ...nannyDocSnap.data()
-                  };
-                  await this.fetchReviews();
+                    aboutMe: nannyData.description, // Map description to aboutMe
+                    yearsOfExperience: nannyData.yrsExperience, // Map yrsExperience to yearsOfExperience
+                    experienceDetails: nannyData.description // Use description for experience details too
+                    };
+                    await this.fetchReviews();
                 } else {
-                  this.error = "No nanny data found.";
+                    this.error = "No nanny data found.";
                 }
-              } else {
+                } else {
                 this.error = "No user data found";
-              }
+                }
             } catch (error) {
-              this.error = "Error fetching profile data";
-              console.error("Error fetching profile data:", error);
+                this.error = "Error fetching profile data";
+                console.error("Error fetching profile data:", error);
             }
-          },
+            },
           async getProfilePictureUrl(filePath) {
             const storageRef = ref(storage, filePath);
             return await getDownloadURL(storageRef);
