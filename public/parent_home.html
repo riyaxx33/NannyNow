@@ -662,27 +662,31 @@
           };
 
           const sendMessage = async () => {
-            if (!currentUserId.value || !selectedNanny.value) {
-              alert("Please log in to send messages");
-              return;
-            }
+              if (!currentUserId.value || !selectedNanny.value) {
+                alert("Please log in to send messages");
+                return;
+              }
 
-            try {
-              const chatData = {
-                to_user_id: selectedNanny.value.id,
-                from_user_id: currentUserId.value,
-                timestamp: serverTimestamp(),
-                message: `Hi, I would like to hire you and discuss details.`,
-                localTimestamp: new Date().toISOString(),
-                status: "sent",
-              };
+              try {
+            // Create chat data
+            const chatData = {
+              from_user_id: auth.currentUser.uid,
+              to_user_id: selectedNanny.value.id,
+              message: `Hi, I would like to hire you and discuss details.`,
+              timestamp: serverTimestamp(),
+            };
 
-              window.location.href = `parent_chat.html?nannyId=${selectedNanny.value.id}&autoSelect=true`;
-            } catch (error) {
-              console.error("Error sending message:", error);
-              alert("Failed to send message. Please try again.");
-            }
-          };
+            // Send message first
+            await addDoc(collection(db, "CHATS"), chatData);
+            console.log("Message sent successfully");
+
+            // Redirect to parent_chat with the correct userId parameter
+            window.location.href = `parent_chat.html?userId=${selectedNanny.value.id}`;
+          } catch (error) {
+            console.error("Error sending message:", error);
+            alert("Failed to send message. Please try again.");
+          }
+            };
 
           const filteredNannies = computed(() => {
             const query = searchQuery.value.toLowerCase();
@@ -787,6 +791,8 @@
         getDoc,
       } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
       import { logout } from "./backend/auth.js";
+      import { serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
 
       async function loadNavbar(user) {
         let fileToLoad = "unloggedin_navbar_template.html";
