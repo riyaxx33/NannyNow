@@ -13,14 +13,32 @@
       rel="stylesheet"
     />
     <style>
-      body, input, button, .filter-dropdown, .job-card, #detailsContainer {
+      body,
+      input,
+      button,
+      .filter-dropdown,
+      .job-card,
+      #detailsContainer {
         font-family: "Poppins", sans-serif;
       }
       body {
         padding-top: 100px;
         overflow: hidden;
       }
-      
+
+      /* Nanny list container (left side) */
+      #nanny_list {
+        height: calc(100vh - 200px);
+        overflow-y: auto;
+        padding-right: 10px;
+      }
+
+      #nanny_list::-webkit-scrollbar,
+      #detailsContainer::-webkit-scrollbar,
+      #nanny_list::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+      }
+
       /* Make the right details container fixed */
       #detailsContainer {
         position: sticky;
@@ -45,11 +63,11 @@
         margin-top: 15px;
       }
       .nanny-profile-pic {
-          width: 80px;
-          height: 80px;
-          margin-right: 15px;
-          border-radius: 50%;
-          object-fit: cover;
+        width: 80px;
+        height: 80px;
+        margin-right: 15px;
+        border-radius: 50%;
+        object-fit: cover;
       }
       /* Job card styling */
       .job-card {
@@ -113,27 +131,27 @@
       }
 
       .search-bar {
-          display: flex;
-          gap: 15px;
-          align-items: center;
-          font-family: "Poppins", sans-serif;
-          /* Remove fixed height to allow flexibility */
-          flex-wrap: wrap; /* Add this to allow wrapping on smaller screens */
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        font-family: "Poppins", sans-serif;
+        /* Remove fixed height to allow flexibility */
+        flex-wrap: wrap; /* Add this to allow wrapping on smaller screens */
       }
 
       .search-input-group {
-          border: 1px solid #6c5ce7;
-          border-radius: 6px;
-          flex-grow: 1;
-          position: relative;
+        border: 1px solid #6c5ce7;
+        border-radius: 6px;
+        flex-grow: 1;
+        position: relative;
       }
 
       .search-input {
-          padding-left: 40px;
-          border-radius: 6px;
-          border: 1px solid #6c5ce7;
-          height: 45px;
-          width: 100%; /* Add this to ensure input fills the container */
+        padding-left: 40px;
+        border-radius: 6px;
+        border: 1px solid #6c5ce7;
+        height: 45px;
+        width: 100%; /* Add this to ensure input fills the container */
       }
 
       .search-input-group {
@@ -276,11 +294,11 @@
         transition: all 0.3s ease;
       }
 
-
       /* Responsive styles for smaller screens */
       @media (max-width: 768px) {
         #nanny_list {
           display: block;
+          overflow-y: auto; /* Enable scrolling for nanny list */
         }
 
         #nanny_list.hide {
@@ -324,48 +342,46 @@
           background: #6c5ce7;
           text-decoration: none;
         }
-    }
+      }
 
-    @media (min-width: 769px) {
+      @media (min-width: 769px) {
         .back-to-nanny {
           display: none;
         }
-    }
-    .empty-details-card {
-  height: 400px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background-color: white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
+      }
+      .empty-details-card {
+        height: 400px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
 
-.empty-state-content {
-  text-align: center;
-}
+      .empty-state-content {
+        text-align: center;
+      }
 
-.empty-state-icon {
-  margin-bottom: 16px;
-  opacity: 0.5;
-  margin: 0 auto;
-}
+      .empty-state-icon {
+        margin-bottom: 16px;
+        opacity: 0.5;
+        margin: 0 auto;
+      }
 
-.empty-state-content h3 {
-  margin-bottom: 8px;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
-}
+      .empty-state-content h3 {
+        margin-bottom: 8px;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111827;
+      }
 
-.empty-state-content p {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-
+      .empty-state-content p {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
     </style>
   </head>
   <body>
@@ -487,11 +503,11 @@
               >
                 <div class="job-card-content">
                   <img
-                  :src="nanny.profilePictureUrl || '/api/placeholder/80/80'"
-                  :alt="nanny.firstName + ' ' + nanny.lastName"
-                  class="nanny-profile-pic"
-                />
-                
+                    :src="nanny.profilePictureUrl || '/api/placeholder/80/80'"
+                    :alt="nanny.firstName + ' ' + nanny.lastName"
+                    class="nanny-profile-pic"
+                  />
+
                   <div class="job-description">
                     <h5>{{ nanny.firstName }} {{ nanny.lastName }}</h5>
                     <p>Experience: {{ nanny.yrsExperience || 'N/A' }} years</p>
@@ -502,66 +518,112 @@
           </div>
 
           <!-- Nanny Details Section -->
-          <div class="col-md-6" id="detailsContainer" :class="{ 'show': selectedNanny }">
+          <div
+            class="col-md-6"
+            id="detailsContainer"
+            :class="{ 'show': selectedNanny }"
+          >
             <div v-if="selectedNanny">
               <div class="d-flex align-items-start gap-4 mb-4">
-              <a
-                :href="`parent_displaynannyprofile.html?id=${selectedNanny.id}`"
-                style="text-decoration: none;"
-              >
-                <img
-                  :src="selectedNanny.profilePictureUrl || '/api/placeholder/100/100'"
-                  :alt="selectedNanny.firstName + ' ' + selectedNanny.lastName"
-                  class="rounded-circle"
-                  style="width: 100px; height: 100px; object-fit: cover; border:none; cursor: pointer;"
-                />
-              </a>
-              
-              <div class="d-flex justify-content-between flex-grow-1">
-                <div>
-                  <h2 class="text-4xl font-bold mb-2" style="color: #6c5ce7">
-                    {{ selectedNanny.firstName }} {{ selectedNanny.lastName }}
-                  </h2>
-                  <div class="text-xl" style="color: #666">
-                    <span class="details">
-                      {{ selectedNanny.gender.charAt(0).toUpperCase() + selectedNanny.gender.slice(1) }} 
-                      | {{ calculateAge(selectedNanny.dob) }} years old
-                    </span>
+                <a
+                  :href="`parent_displaynannyprofile.html?id=${selectedNanny.id}`"
+                  style="text-decoration: none"
+                >
+                  <img
+                    :src="selectedNanny.profilePictureUrl || '/api/placeholder/100/100'"
+                    :alt="selectedNanny.firstName + ' ' + selectedNanny.lastName"
+                    class="rounded-circle"
+                    style="
+                      width: 100px;
+                      height: 100px;
+                      object-fit: cover;
+                      border: none;
+                      cursor: pointer;
+                    "
+                  />
+                </a>
+
+                <div class="d-flex justify-content-between flex-grow-1">
+                  <div>
+                    <h2 class="text-4xl font-bold mb-2" style="color: #6c5ce7">
+                      {{ selectedNanny.firstName }} {{ selectedNanny.lastName }}
+                    </h2>
+                    <div class="text-xl" style="color: #666">
+                      <span class="details">
+                        {{ selectedNanny.gender.charAt(0).toUpperCase() +
+                        selectedNanny.gender.slice(1) }} | {{
+                        calculateAge(selectedNanny.dob) }} years old
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="chat-button-container">
+                    <button
+                      class="chat-button"
+                      @click="sendMessage"
+                      :disabled="!currentUserId || !selectedNanny"
+                    >
+                      Chat Now
+                    </button>
                   </div>
                 </div>
-                
-                <div class="chat-button-container">
-                  <button
-                    class="chat-button"
-                    @click="sendMessage"
-                    :disabled="!currentUserId || !selectedNanny">
-                    Chat Now
-                  </button>
+              </div>
+
+              <div class="nanny-details" style="margin-top: 12px">
+                <div class="experience-section" style="margin-bottom: 12px">
+                  <span
+                    style="
+                      color: #6c5ce7;
+                      font-size: 1rem;
+                      display: block;
+                      margin-bottom: 4px;
+                    "
+                    >Experience:</span
+                  >
+                  <p style="margin: 0; font-size: 0.95rem">
+                    {{ selectedNanny.yrsExperience || 'N/A' }} years
+                  </p>
+                </div>
+
+                <div class="about-section">
+                  <span
+                    style="
+                      color: #6c5ce7;
+                      font-size: 1rem;
+                      display: block;
+                      margin-bottom: 4px;
+                    "
+                    >About Me:</span
+                  >
+                  <p
+                    style="
+                      margin: 0;
+                      font-size: 0.95rem;
+                      line-height: 1.4;
+                      max-width: 800px;
+                    "
+                  >
+                    {{ selectedNanny.description }}
+                  </p>
                 </div>
               </div>
-            </div> 
-            
-            <div class="nanny-details" style="margin-top: 12px;">
-              <div class="experience-section" style="margin-bottom: 12px;">
-                <span style="color: #6c5ce7; font-size: 1rem; display: block; margin-bottom: 4px;">Experience:</span>
-                <p style="margin: 0; font-size: 0.95rem;">{{ selectedNanny.yrsExperience || 'N/A' }} years</p>
-              </div>
-              
-              <div class="about-section">
-                <span style="color: #6c5ce7; font-size: 1rem; display: block; margin-bottom: 4px;">About Me:</span>
-                <p style="margin: 0; font-size: 0.95rem; line-height: 1.4; max-width: 800px;">{{ selectedNanny.description }}</p>
-              </div>
-            </div>
             </div>
             <div v-else class="empty-state-content">
               <h3 class="empty-state-title">Select a post to view details</h3>
-              <p class="empty-state-description">Click on any post from the list to see more information</p>
+              <p class="empty-state-description">
+                Click on any post from the list to see more information
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <a href="#" class="back-to-nanny" v-if="selectedNanny" @click.prevent="closeDetails">
+      <a
+        href="#"
+        class="back-to-nanny"
+        v-if="selectedNanny"
+        @click.prevent="closeDetails"
+      >
         <i class="fas fa-arrow-left"></i> Back to List
       </a>
     </div>
@@ -610,15 +672,18 @@
           const genderOptions = ["Male", "Female"];
 
           const calculateAge = (dob) => {
-            if (!dob) return 'N/A';
-            return Math.floor((new Date() - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000));
+            if (!dob) return "N/A";
+            return Math.floor(
+              (new Date() - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000)
+            );
           };
 
           const toggleFilterMenu = (filterType) => {
             Object.keys(showFilterMenu.value).forEach((key) => {
               if (key !== filterType) showFilterMenu.value[key] = false;
             });
-            showFilterMenu.value[filterType] = !showFilterMenu.value[filterType];
+            showFilterMenu.value[filterType] =
+              !showFilterMenu.value[filterType];
           };
 
           const setExperienceFilter = (value) => {
@@ -640,7 +705,8 @@
           };
 
           const handleClickOutside = (event) => {
-            const filterDropdowns = document.querySelectorAll(".filter-dropdown");
+            const filterDropdowns =
+              document.querySelectorAll(".filter-dropdown");
             filterDropdowns.forEach((dropdown) => {
               if (!dropdown.contains(event.target)) {
                 Object.keys(showFilterMenu.value).forEach((key) => {
@@ -670,7 +736,10 @@
 
           const matchesGenderFilter = (nanny, filter) => {
             if (!filter) return true;
-            return nanny.gender.charAt(0).toUpperCase() + nanny.gender.slice(1) === filter;
+            return (
+              nanny.gender.charAt(0).toUpperCase() + nanny.gender.slice(1) ===
+              filter
+            );
           };
 
           const fetchNannies = async () => {
@@ -684,7 +753,9 @@
                   const userData = userDoc.data();
                   const nannyDocRef = doc(db, "NANNY", userDoc.id);
                   const nannySnapshot = await getDoc(nannyDocRef);
-                  const nannyDetails = nannySnapshot.exists() ? nannySnapshot.data() : {};
+                  const nannyDetails = nannySnapshot.exists()
+                    ? nannySnapshot.data()
+                    : {};
 
                   return { ...userData, ...nannyDetails, id: userDoc.id };
                 })
@@ -698,31 +769,31 @@
           };
 
           const sendMessage = async () => {
-              if (!currentUserId.value || !selectedNanny.value) {
-                alert("Please log in to send messages");
-                return;
-              }
+            if (!currentUserId.value || !selectedNanny.value) {
+              alert("Please log in to send messages");
+              return;
+            }
 
-              try {
-            // Create chat data
-            const chatData = {
-              from_user_id: auth.currentUser.uid,
-              to_user_id: selectedNanny.value.id,
-              message: `Hi, I would like to hire you and discuss details.`,
-              timestamp: serverTimestamp(),
-            };
+            try {
+              // Create chat data
+              const chatData = {
+                from_user_id: auth.currentUser.uid,
+                to_user_id: selectedNanny.value.id,
+                message: `Hi, I would like to hire you and discuss details.`,
+                timestamp: serverTimestamp(),
+              };
 
-            // Send message first
-            await addDoc(collection(db, "CHATS"), chatData);
-            console.log("Message sent successfully");
+              // Send message first
+              await addDoc(collection(db, "CHATS"), chatData);
+              console.log("Message sent successfully");
 
-            // Redirect to parent_chat with the correct userId parameter
-            window.location.href = `parent_chat.html?userId=${selectedNanny.value.id}`;
-          } catch (error) {
-            console.error("Error sending message:", error);
-            alert("Failed to send message. Please try again.");
-          }
-            };
+              // Redirect to parent_chat with the correct userId parameter
+              window.location.href = `parent_chat.html?userId=${selectedNanny.value.id}`;
+            } catch (error) {
+              console.error("Error sending message:", error);
+              alert("Failed to send message. Please try again.");
+            }
+          };
 
           const filteredNannies = computed(() => {
             const query = searchQuery.value.toLowerCase();
@@ -748,13 +819,13 @@
           const showDetails = (nanny) => {
             selectedNanny.value = nanny;
 
-            const listElement = document.getElementById('nanny_list');
-            const detailsElement = document.getElementById('detailsContainer');
+            const listElement = document.getElementById("nanny_list");
+            const detailsElement = document.getElementById("detailsContainer");
 
             if (window.innerWidth <= 768) {
               // On mobile, hide the list and show the details
-              if (listElement) listElement.classList.add('hide');
-              if (detailsElement) detailsElement.classList.add('show');
+              if (listElement) listElement.classList.add("hide");
+              if (detailsElement) detailsElement.classList.add("show");
 
               // Scroll to top when showing details
               window.scrollTo(0, 0);
@@ -762,15 +833,15 @@
           };
 
           const closeDetails = () => {
-            const listElement = document.getElementById('nanny_list');
-            const detailsElement = document.getElementById('detailsContainer');
+            const listElement = document.getElementById("nanny_list");
+            const detailsElement = document.getElementById("detailsContainer");
 
             // Reset selected nanny to hide details view
             selectedNanny.value = null;
 
             // Show list and hide details on both mobile and desktop
-            if (listElement) listElement.classList.remove('hide');
-            if (detailsElement) detailsElement.classList.remove('show');
+            if (listElement) listElement.classList.remove("hide");
+            if (detailsElement) detailsElement.classList.remove("show");
           };
 
           const searchNanny = () => {
@@ -829,7 +900,6 @@
       import { logout } from "./backend/auth.js";
       import { serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-
       async function loadNavbar(user) {
         let fileToLoad = "unloggedin_navbar_template.html";
 
@@ -856,11 +926,11 @@
           const navbarHTML = await response.text();
           document.getElementById("navbar").innerHTML = navbarHTML;
 
-          if (window.location.pathname.endsWith('parent_home.html') && user) {
+          if (window.location.pathname.endsWith("parent_home.html") && user) {
             const userDoc = await getDoc(doc(db, "USER", user.uid));
             if (userDoc.exists()) {
               const userData = userDoc.data();
-              const brandText = document.querySelector('.brand-text');
+              const brandText = document.querySelector(".brand-text");
               if (brandText) {
                 brandText.textContent = `Welcome, ${userData.firstName}`;
               }
